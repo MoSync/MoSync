@@ -99,11 +99,8 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	_mkdir(assets.c_str());
 	if (s.program && existsFile(s.program)) {
 		copyFile(programMp3.c_str(), s.program);
-	} else {
-		// Create dummy file. We'll fix this later
-		// so the runtime ignores it...
-		copyFile(programMp3.c_str(), (string(mosyncdir()) + "/profiles/platforms/Android/dummy.mp3").c_str());
 	}
+
 	if(s.resource && existsFile(s.resource)) {
 		string resMp3 = assets + "/resources.mp3";
 		copyFile(resMp3.c_str(), s.resource);
@@ -138,8 +135,16 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	bool isNative = !strcmp("native", s.outputType);
 
+	// TODO: These things should be in module manifests, not as special hacks...
+	bool useSTL = false;
+	for (size_t i = 0; i < extensions.size(); i++) {
+		useSTL |= "STL" == extensions[i];
+	}
 	if (isNative) {
 		// Default modules; todo: externalize?
+		if (useSTL) {
+			modules.push_back("stlport_shared");
+		}
 		modules.push_back("mosync");
 		modules.push_back("mosynclib");
 		initFuncs["mosynclib"] = "resource_selector";
@@ -236,15 +241,17 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 		for (size_t j = 0; j < modules.size(); j++) {
 			string module = modules[j];
-			string nativeLib = findNativeLibrary(s, modules, module, arch, s.debug);
-			if (!nativeLib.empty()) {
-				string dstLibDir = addlib + "/" + arch + "/";
-				_mkdir(dstLibDir.c_str());
-				string dstLib = dstLibDir + "lib" + module + ".so";
-				copyFile(dstLib.c_str(), nativeLib.c_str());
-			} else {
-				printf("Could not find library %s!\n", module.c_str());
-				exit(1);
+			if ("STL" != module) {
+				string nativeLib = findNativeLibrary(s, modules, module, arch, s.debug);
+				if (!nativeLib.empty()) {
+					string dstLibDir = addlib + "/" + arch + "/";
+					_mkdir(dstLibDir.c_str());
+					string dstLib = dstLibDir + "lib" + module + ".so";
+					copyFile(dstLib.c_str(), nativeLib.c_str());
+				} else {
+					printf("Could not find library %s!\n", module.c_str());
+					exit(1);
+				}
 			}
 		}
 	}

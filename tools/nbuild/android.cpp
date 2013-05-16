@@ -248,7 +248,6 @@ int executeNdkBuild(Arguments* params) {
 	bool useSTL = false;
 	for (size_t i = 0; i < modules.size(); i++) {
 		useSTL |= isSTL(modules[i]);
-		printf("USE STL? %s, %d\n", modules[i].c_str(), useSTL);
 	}
 
 	for (size_t i = 0; i < configNames.size(); i++) {
@@ -276,6 +275,9 @@ int executeNdkBuild(Arguments* params) {
 			if (doClean) {
 				cmd << "-B ";
 			}
+
+			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
+
 			string libDir = string(mosyncdir()) + "/lib";
 			toSlashes(libDir);
 			string moduleDir = string(mosyncdir()) + "/modules";
@@ -294,13 +296,13 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("NDK_PROJECT_PATH=.") << " ";
 			cmd << arg("APP_ABI=" + arch) << " ";
 			if (useSTL) {
-				cmd << arg("APP_STL=stlport_static") << " ";
+				string appstl = string("APP_STL=stlport_") + (useStatic ? "static" : "shared");
+				cmd << arg(appstl) << " ";
 			}
 			string androidVersion = getAppPlatform(params);
 			cmd << arg("APP_PLATFORM=android-" + androidVersion) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
 
-			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
 			_mkdir(fullOutputDir.c_str());
 
@@ -317,6 +319,12 @@ int executeNdkBuild(Arguments* params) {
 			}
 
 			copyFile(fullOutputFile.c_str(), libFile.c_str());
+			if (useSTL && !useStatic) {
+				copyFile(fullOutputFile.c_str(), libFile.c_str());
+				string stlLibFile = tmpBuildDir + "libs/" + arch + "/libstlport_shared.so";
+				string stlOutputFile = fullOutputDir + "libstlport_shared.so";
+				copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
+			}
 		}
 	}
 	return 0;
