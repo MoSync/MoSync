@@ -24,6 +24,7 @@
 #import "StackScreenWidgetController.h"
 #import "UINavigationControllerExpanded.h"
 #import "UIColorExpanded.h"
+#import "ScreenOrientation.h"
 
 @implementation StackScreenWidget
 
@@ -215,23 +216,42 @@
                 break;
         }
 
-        CGFloat imageScale = 1.0;
-
-        if (navBarScaleMode)
+        ScreenOrientation* screenOrientation = [ScreenOrientation getInstance];
+        for (int i = 0; i < 2; ++i)
         {
-            if ([navBarScaleMode isEqualToString:@"scaleAndRepeatXY"])
+            if (i == 0 && !screenOrientation.isPortraitModeSupported)
             {
-                UINavigationController* navigationController = (UINavigationController*)_controller;
-                imageScale = imageResource->height / navigationController.navigationBar.bounds.size.height;
+                continue;
+            }
+            else if (i == 1 && !(screenOrientation.isLandscapeRightModeSupported || screenOrientation.isLandscapeLeftModeSupported))
+            {
+                continue;
+            }
+
+            CGFloat imageScale = 1.0;
+
+            if (navBarScaleMode)
+            {
+                if ([navBarScaleMode isEqualToString:@"scaleAndRepeatXY"])
+                {
+                    CGFloat navBarSize = (i == 0) ? 44.f : 32.f;
+                    imageScale = imageResource->height / navBarSize;
+                }
+            }
+
+            UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:imageScale orientation:orientation];
+
+            if (i == 0)
+            {
+                [[UINavigationBar appearance] setBackgroundImage:image
+                                                   forBarMetrics:UIBarMetricsDefault];
+            }
+            else if (i == 1)
+            {
+                [[UINavigationBar appearance] setBackgroundImage:image
+                                                   forBarMetrics:UIBarMetricsLandscapePhone];
             }
         }
-
-        UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:imageScale orientation:orientation];
-
-        [[UINavigationBar appearance] setBackgroundImage:image
-											forBarMetrics:UIBarMetricsDefault];
-        [[UINavigationBar appearance] setBackgroundImage:image
-											forBarMetrics:UIBarMetricsLandscapePhone];
     }
     else if ([key isEqualToString:@MAW_STACK_SCREEN_TITLE_BACKGROUND_SCALE_MODE])
     {
@@ -254,6 +274,7 @@
     {
         UINavigationController* navigationController = (UINavigationController*)_controller;
         [navigationController setToolbarHidden:![value boolValue] animated:YES];
+        [navigationController.toolbar setTranslucent:YES];
     }
     else if ([key isEqualToString:@MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_IMAGE_HANDLE])
     {
@@ -297,26 +318,46 @@
                 break;
         }
 
-        CGFloat imageScale = 1.0;
-
         UINavigationController* navigationController = (UINavigationController*)_controller;
-        if (toolBarScaleMode)
+        ScreenOrientation* screenOrientation = [ScreenOrientation getInstance];
+        for (int i = 0; i < 2; ++i)
         {
-            if ([toolBarScaleMode isEqualToString:@"scaleAndRepeatXY"])
+            if (i == 0 && !screenOrientation.isPortraitModeSupported)
             {
-                imageScale = imageResource->height / navigationController.toolbar.bounds.size.height;
+                continue;
+            }
+            else if (i == 1 && !(screenOrientation.isLandscapeRightModeSupported || screenOrientation.isLandscapeLeftModeSupported))
+            {
+                continue;
+            }
+
+            CGFloat imageScale = 1.0;
+
+            if (toolBarScaleMode)
+            {
+                if ([toolBarScaleMode isEqualToString:@"scaleAndRepeatXY"])
+                {
+                    CGFloat toolBarSize = (i == 0) ? 44.f : 32.f;
+                    imageScale = imageResource->height / toolBarSize;
+                }
+            }
+
+            UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:imageScale orientation:orientation];
+
+            navigationController.toolbar.barStyle = UIBarStyleBlackTranslucent;
+            if (i == 0)
+            {
+                [navigationController.toolbar setBackgroundImage:image
+                                              forToolbarPosition:UIToolbarPositionAny
+                                              barMetrics:UIBarMetricsDefault];
+            }
+            else if (i == 1)
+            {
+                [navigationController.toolbar setBackgroundImage:image
+                                              forToolbarPosition:UIToolbarPositionAny
+                                              barMetrics:UIBarMetricsLandscapePhone];
             }
         }
-
-        UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:imageScale orientation:orientation];
-
-        navigationController.toolbar.barStyle = UIBarStyleBlackTranslucent;
-        [navigationController.toolbar setBackgroundImage:image
-                                        forToolbarPosition:UIToolbarPositionAny
-                                        barMetrics:UIBarMetricsDefault];
-        [navigationController.toolbar setBackgroundImage:image
-                                        forToolbarPosition:UIToolbarPositionAny
-                                        barMetrics:UIBarMetricsLandscapePhone];
     }
     else if ([key isEqualToString:@MAW_STACK_SCREEN_TOOLBAR_BACKGROUND_SCALE_MODE])
     {
