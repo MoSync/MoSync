@@ -26,6 +26,11 @@ using namespace std;
 #define VERBOSE "--verbose"
 #define CLEAN "--clean"
 
+#define IOS_SDK "--ios-sdk"
+#define IOS_SDK_VERSION "--ios-sdk-version"
+#define IOS_XCODE_TARGET "--ios-xcode-target"
+#define IOS_XCODE_LOCATION "--ios-xcode-location"
+
 string require(Arguments* args, string key);
 
 /**
