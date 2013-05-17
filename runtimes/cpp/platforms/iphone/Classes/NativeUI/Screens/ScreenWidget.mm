@@ -181,7 +181,7 @@
 
         NSMutableArray* newButtonArrayB = [navigationController.toolbarItems mutableCopy];
         [newButtonArrayB removeObject:navBarButton.barButtonItem];
-        [navigationController setToolbarItems:newButtonArrayB animated:YES];
+        [navigationController setToolbarItems:newButtonArrayB animated:NO];
     }
     else if([key isEqualToString:@MAW_SCREEN_REMOVE_NAV_BAR_BUTTONS])
     {
@@ -197,7 +197,7 @@
         }
         else if (side == MAW_SCREEN_NAV_BAR_SIDE_BOTTOM)
         {
-            [navigationController setToolbarItems:[[NSArray alloc] init] animated:YES];
+            [navigationController setToolbarItems:[[NSArray alloc] init] animated:NO];
         }
     }
 	else
@@ -237,7 +237,7 @@
     }
     else if (side == MAW_SCREEN_NAV_BAR_SIDE_BOTTOM)
     {
-        [navigationController setToolbarItems:buttons animated:YES];
+        [navigationController setToolbarItems:buttons animated:NO];
     }
 }
 
