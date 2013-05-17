@@ -408,6 +408,11 @@
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					Classes,
+					/Applications/MoSync/include/MAStdNative,
+					../../,
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/__PROJECT_NAME__.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				LIBRARY_SEARCH_PATHS = (
@@ -430,6 +435,11 @@
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					Classes,
+					/Applications/MoSync/include/MAStdNative,
+					../../,
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/__PROJECT_NAME__.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				LIBRARY_SEARCH_PATHS = (
