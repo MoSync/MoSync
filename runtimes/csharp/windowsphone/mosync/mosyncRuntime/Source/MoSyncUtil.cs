@@ -338,7 +338,13 @@ namespace MoSync
 			}
 		}
 
-		public static void convertStringToColor(string value, out System.Windows.Media.SolidColorBrush brush)
+        /**
+         * Converts a color string into a SolidColorBrush.
+         * @param value The color string.
+         * @param brush The resulting brush.
+         * @throws InvalidPropertyValueException,
+         */
+		public static void ConvertStringToColor(string value, out System.Windows.Media.SolidColorBrush brush)
 		{
 			brush = null;
 

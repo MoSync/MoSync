@@ -177,13 +177,43 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("scaleMode"))
                 {
-                    return false;
+                    if (!(propertyValue.Equals("none") ||
+                        propertyValue.Equals("scaleXY") ||
+                        propertyValue.Equals("scalePreserveAspect")))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("imagePath"))
+                {
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(propertyValue))
+                    {
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(propertyValue, System.IO.FileMode.Open, f);
+                        }
+                        catch
+                        {
+                            // There was a problem reading the image file.
+                            isPropertyValid = false;
+                        }
+                    }
+                    else
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

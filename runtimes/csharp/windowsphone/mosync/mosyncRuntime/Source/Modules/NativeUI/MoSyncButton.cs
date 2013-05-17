@@ -164,7 +164,7 @@ namespace MoSync
                 set
                 {
                     System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
+                    MoSync.Util.ConvertStringToColor(value, out brush);
                     mButton.Foreground = brush;
                 }
             }
@@ -191,13 +191,43 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("textVerticalAlignment"))
                 {
-                    return false;
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("textHorizontalAlignment"))
+                {
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            System.Windows.Media.SolidColorBrush brush;
+                            MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                        });
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion
