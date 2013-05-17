@@ -1946,11 +1946,11 @@ namespace Base
 		case maIOCtl_maActionBarAddMenuItem:
 		{
 			SYSLOG("maIOCtl_maActionBarAddMenuItem");
-			//int displayFlag = SYSCALL_THIS->GetValidatedStackValue(0);
+			//int displayFlag = ARG_NO_4;
 			//return _maActionBarAddMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), c, displayFlag, mJNIEnv, mJThis);
 			int _handle = a;
 			const char *_title = SYSCALL_THIS->GetValidatedStr(b);
-			int _flag = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _flag = ARG_NO_4;
 			MA_ACTION_BAR_ITEM_ICON* args = (MA_ACTION_BAR_ITEM_ICON*) SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MA_ACTION_BAR_ITEM_ICON));
 			return _maActionBarAddMenuItem(
 				_handle,
