@@ -36,8 +36,8 @@ version = ['Developer build', 'Unknown']
 
 PLATFORMS = [
 	'Android 2.3, 4.x',
-	'iOS (iPhone, iPad, iPod Touch) 4.3 - 5.0',
-	'Windows Phone 7.5',
+	'iOS (iPhone, iPad, iPod Touch) 5.1 - 6.1',
+	'Windows Phone 7.8',
 	'Java ME MIDP 2',
 	'Moblin 2.x',
 	'Symbian S60 2nd, 3rd, 5th edition',
