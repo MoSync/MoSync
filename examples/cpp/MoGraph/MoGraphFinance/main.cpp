@@ -24,7 +24,7 @@ MA 02110-1301, USA.
 #include <glm/glm.hpp>
 #include <stdlib.h>
 #include "MAHeaders.h"
-#include <MoGraph.h>
+#include <MoGraph/MoGraph.h>
 
 using namespace MAUtil;
 #define CONNECTION_BUFFER_SIZE 1024
