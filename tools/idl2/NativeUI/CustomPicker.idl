@@ -6,6 +6,7 @@ group WidgetCustomPickerProperties "CustomPicker" {
 		/**
 		* @brief Sets or gets the custom picker items row height in pixels.
 		* All its items should have the same height.
+		* Should be set before the widget is drawn on the screen.
 		* Default value it's the height of the widget.
 		* Platform: iOS and Android.
 		* @validvalue A positive integer value.
@@ -22,6 +23,7 @@ group WidgetCustomPickerProperties "CustomPicker" {
 		/**
 		* @brief Sets or gets the custom picker items row width in pixels.
 		* All its items should have the same width.
+		* Should be set before the widget is drawn on the screen.
 		* Platform: iOS and Android.
 		* @validvalue A positive integer value.
 		*

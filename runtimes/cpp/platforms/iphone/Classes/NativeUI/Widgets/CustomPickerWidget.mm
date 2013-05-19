@@ -364,7 +364,13 @@
 
 	self.rowHeight = [rowHeightString intValue] / getScreenScale();
 	[[self pickerView] reloadAllComponents];
-	return MAW_RES_OK;
+
+    // Fix for MOSYNC-3221 CustomPicker rowHeight problem on iOS.
+    // Calling reloadAllComponents method doesn't force the system to
+    // check if the row height has changed.
+    [[self pickerView] setNeedsLayout];
+
+    return MAW_RES_OK;
 }
 
 /**
@@ -384,6 +390,12 @@
 
 	self.rowWidth = [rowWidthString intValue] / getScreenScale();
 	[[self pickerView] reloadAllComponents];
+
+    // Fix for MOSYNC-3221 CustomPicker rowHeight problem on iOS.
+    // Calling reloadAllComponents method doesn't force the system to
+    // check if the row width has changed.
+    [[self pickerView] setNeedsLayout];
+
 	return MAW_RES_OK;
 }
 

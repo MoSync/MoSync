@@ -106,6 +106,12 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::setCustomPickerRowHeight(const int height)
 	{
+		int items = mCustomPickerRef->countChildWidgets();
+		for (int index = 0; index < items; index++)
+		{
+			NativeUI::Widget* child = mCustomPickerRef->getChild(index);
+			child->setHeight(height);
+		}
 		mCustomPickerRef->setRowHeight(height);
 	}
 
@@ -116,6 +122,12 @@ namespace CustomPickerTest
 	 */
 	void CustomPickerScreen::setCustomPickerRowWidth(const int width)
 	{
+		int items = mCustomPickerRef->countChildWidgets();
+		for (int index = 0; index < items; index++)
+		{
+			NativeUI::Widget* child = mCustomPickerRef->getChild(index);
+			child->setWidth(width);
+		}
 		mCustomPickerRef->setRowWidth(width);
 	}
 
@@ -221,8 +233,9 @@ namespace CustomPickerTest
 			if (index >= 0)
 			{
 				NativeUI::Layout* child = (NativeUI::Layout*) mCustomPickerRef->getChild(index);
-				mCustomPickerRef->removeChild(child);
-				mCustomPickerRef->reloadData();
+				removeCustomPickerItem(child);
+				delete child;
+				child = NULL;
 			}
 		}
 	}
