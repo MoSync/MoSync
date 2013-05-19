@@ -29,11 +29,13 @@
 #define DEFAULT_CUSTOM_PICKER_ITEMS 5
 
 #define DEFAULT_ROW_HEIGHT 100
+#define CUSTOM_PICKER_BORDER_WIDTH 50
 
 #define ADD_ITEM_BUTTON_TITLE "Add item"
 #define REMOVE_ITEM_BUTTON_TITLE "Remove selected item"
 
 #include <conprint.h>
+#include <MAUtil/Environment.h>
 
 #include <NativeUI/Button.h>
 #include <NativeUI/CustomPicker.h>
@@ -60,6 +62,16 @@ namespace CustomPickerTest
 		this->createUI();
 
 		mCustomPickerRef->setRowHeight(DEFAULT_ROW_HEIGHT);
+
+		// For iOS we need to remove border size from rowWidth
+		MAUtil::Environment& environment(MAUtil::Environment::getEnvironment());
+		if (environment.getCurrentPlatform() == MAUtil::OS_IOS)
+		{
+			int rowWidth =
+				mCustomPickerRef->getRowWidth() - CUSTOM_PICKER_BORDER_WIDTH;
+			mCustomPickerRef->setRowWidth(rowWidth);
+		}
+
 		populateCustomPicker();
 
 		mAddItemButtonRef->addButtonListener(this);
