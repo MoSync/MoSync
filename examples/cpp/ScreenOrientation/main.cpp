@@ -43,18 +43,8 @@ public:
 	{
 		// Set the orientation mode to dynamic, so that it is possible to switch
 		// between portrait and landscape orientations. You can also use these
-		// syscalls to lock the screen in PORTRAIT or LANDSCAPE mode. Not all
-		// platforms support or need these syscalls.
-
-		// Android and Windows Phone.
-		maScreenSetOrientation(SCREEN_ORIENTATION_DYNAMIC);
-
-		// iOS and Windows Phone.
-		maScreenSetSupportedOrientations(
-			MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT |
-			MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT |
-			MA_SCREEN_ORIENTATION_PORTRAIT |
-			MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN);
+		// syscalls to lock the screen in PORTRAIT or LANDSCAPE mode.
+		maScreenSetSupportedOrientations(MA_SCREEN_ORIENTATION_DYNAMIC);
 
 		// Update the display.
 		drawScreen();

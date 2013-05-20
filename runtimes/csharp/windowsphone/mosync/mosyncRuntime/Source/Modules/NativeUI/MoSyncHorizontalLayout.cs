@@ -444,13 +444,28 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("childHorizontalAlignment"))
                 {
-                    return false;
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("childVerticalAlignment"))
+                {
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER)))
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

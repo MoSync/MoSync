@@ -262,13 +262,22 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = Screen.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = Screen.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("currentScreen"))
                 {
-                    return false;
+                    int val;
+                    if (!int.TryParse(propertyValue, out val))
+                    {
+                        isPropertyValid = false;
+                    }
+                    if (val < 0)
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion
