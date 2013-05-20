@@ -60,8 +60,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
-#define SYSLOG(...)
+#include <jni.h>
+#include <android/log.h>
+#define SYSLOG(...) __android_log_print(ANDROID_LOG_INFO, "MoSync Syscall", __VA_ARGS__)
+//#define SYSLOG(...)
 
 namespace Base
 {
@@ -302,7 +304,7 @@ namespace Base
 
 	void Syscall::setJNIEnvironment(JNIEnv* je, jobject jthis)
 	{
-		SYSLOG("setJNIEnvironment")
+		SYSLOG("setJNIEnvironment");
 
 		mJNIEnv = je;
 		mJThis = jthis;
@@ -1334,6 +1336,7 @@ namespace Base
 	 */
 	int maOpenGLInitFullscreen(int glApi)
 	{
+		SYSLOG("maOpenGLInitFullscreen");
 		return _maOpenGLInitFullscreen(glApi, mJNIEnv, mJThis);
 	}
 
@@ -1344,6 +1347,7 @@ namespace Base
 	 */
 	int maOpenGLCloseFullscreen()
 	{
+		SYSLOG("maOpenGLCloseFullscreen");
 		return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
 	}
 
@@ -1386,7 +1390,7 @@ namespace Base
 	*/
 	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
-		SYSLOG("maIOCtl");
+		SYSLOG("maIOCtl: %d", function);
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		//handlePendingExceptions(mJNIEnv);
 
