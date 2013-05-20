@@ -73,6 +73,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -357,6 +358,10 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 	private ArrayList<String> mDeferredModules = new ArrayList<String>();
 
+	private HashSet<String> mStaticModules = new HashSet<String>();
+
+	private String mUserLib = null;
+
 	/**
 	 * MoSyncThread constructor
 	 */
@@ -482,15 +487,24 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			LineNumberReader reader = new LineNumberReader(new InputStreamReader(depsList, Charset.forName("UTF-8")));
 			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 				if (line.length() > 0) {
-					String[] moduleAndInitFn = line.split(":", 2);
-					String module = moduleAndInitFn[0];
-					String initFn = moduleAndInitFn.length > 1 ? moduleAndInitFn[1] : null;
+					String[] moduleAndInitFn = line.split(":", 3);
+					String libType = moduleAndInitFn[0];
+					boolean shared = "SHARED".equalsIgnoreCase(libType);
+					String module = moduleAndInitFn[1];
+					mUserLib = module;
+					String initFn = moduleAndInitFn.length > 2 ? moduleAndInitFn[2] : null;
 					if (initFn != null) {
 						// Deferred init until nativeRun2 is executed.
+						// Static ones will be called using the last, main lib.
 						mDeferredModules.add(module);
+						if (!shared) {
+							mStaticModules.add(module);
+						}
 						mAppLibPaths.put(module, initFn);
 					}
-					System.loadLibrary(module);
+					if (shared) {
+						System.loadLibrary(module);
+					}
 				}
 			}
 			mNativeLibraryDir = context.getApplicationInfo().nativeLibraryDir;
@@ -1149,7 +1163,8 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		// Run program. This enters a while loop in C-code.
 		if (isNative) {
 			for (String deferred : mDeferredModules) {
-				runInitFunction(deferred, mAppLibPaths.get(deferred));
+				String lib = mStaticModules.contains(deferred) ? mUserLib : deferred;
+				runInitFunction(lib, mAppLibPaths.get(deferred));
 			}
 			mContext.finish();
 			nativeExit();
