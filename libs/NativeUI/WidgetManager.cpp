@@ -135,10 +135,13 @@ namespace NativeUI
         if (-1 == result)
         {
             maPanic(0,
-				"This application uses Native UI, which currently "
-				"works on iOS, Android and WindowsPhone only - please select "
-				"an iOS, Android or WindowsPhone target profile in the "
-				"right-hand profile panel.");
+                "This application uses Native UI, which is not supported "
+                "on the current platform. Please select another target profile "
+                "in the right-hand profile panel.");
+				//"This application uses Native UI, which currently "
+				//"works on iOS, Android and WindowsPhone only - please select "
+				//"an iOS, Android or WindowsPhone target profile in the "
+				//"right-hand profile panel.");
         }
     }
 
