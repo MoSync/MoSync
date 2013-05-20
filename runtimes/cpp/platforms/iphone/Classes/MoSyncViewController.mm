@@ -89,11 +89,21 @@ void MoSync_OrientationChanged(UIInterfaceOrientation fromOrientation);
 /**
  * Returns whether the view controller’s contents should auto rotate.
  * Available in iOS 6.0 and later.
- * @return YES.
+ * @return YES or NO if there is only one orientation supported.
  */
 -(BOOL)shouldAutorotate
 {
-	return YES;
+    // If it supports only one orientation than is no need for autorotate
+    NSUInteger orientations = MoSync_SupportedInterfaceOrientations();
+    switch ( orientations )
+    {
+        case UIInterfaceOrientationMaskPortrait:
+        case UIInterfaceOrientationMaskLandscapeLeft:
+        case UIInterfaceOrientationMaskLandscapeRight:
+        case UIInterfaceOrientationMaskPortraitUpsideDown:
+            return NO;
+    }
+    return YES;
 }
 
 /**
