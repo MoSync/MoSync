@@ -539,17 +539,7 @@ public class MoSync extends Activity
 	{
 		Log.e("@@MoSync", "MoSync onPrepareOptionsMenu");
 
-//    	MenuItem item1 = menu.add(0, 1, 0, "btn");
-//    	item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//    	item1.setIcon(17301555);
-//
-//    	MenuItem item2 = menu.add(1,0,0,"t");
-//    	item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//    	item2.setIcon(17301583);
-
-//		return super.onPrepareOptionsMenu(menu);
-
-//		// Remove all the items from the menu.
+		// Remove all the items from the menu.
 		menu.clear();
 
 		// Get the focused screen widget.

@@ -1955,6 +1955,7 @@ namespace Base
 			int _handle = a;
 			const char *_title = SYSCALL_THIS->GetValidatedStr(b);
 			int _flag = ARG_NO_4;
+
 			MA_ACTION_BAR_ITEM_ICON* args = (MA_ACTION_BAR_ITEM_ICON*) SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MA_ACTION_BAR_ITEM_ICON));
 			return _maActionBarAddMenuItem(
 				_handle,

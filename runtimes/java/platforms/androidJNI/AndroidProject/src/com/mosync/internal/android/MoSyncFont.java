@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.util.Log;
 
@@ -124,7 +123,7 @@ public class MoSyncFont
 		 * The new font is saved in the list of available fonts.
 		 * Skip 0 value for font handles.
 		 */
-		mFonts.put(new Integer(1), newMosyncFont);
+		mFonts.put(Integer.valueOf(1), newMosyncFont);
 	}
 
 	/************************ Syscalls ************************/
@@ -184,7 +183,7 @@ public class MoSyncFont
 			/*
 			 * The new font is saved in the list of available fonts.
 			 */
-			mFonts.put(new Integer(mFontHandle), newMosyncFont);
+			mFonts.put(Integer.valueOf(mFontHandle), newMosyncFont);
 
 			// Return the handle to the new font family, style and size combination.
 			return mFontHandle;
@@ -382,7 +381,7 @@ public class MoSyncFont
 			/*
 			 * The new font is saved in the list of available fonts.
 			 */
-			mFonts.put(new Integer(mFontHandle), newMosyncFont);
+			mFonts.put(Integer.valueOf(mFontHandle), newMosyncFont);
 
 			return mFontHandle;
 		}

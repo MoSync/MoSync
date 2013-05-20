@@ -120,7 +120,7 @@ namespace Wormhole
 	 */
 	void PhoneGapMessageHandler::initializePhoneGap()
 	{
-		callJS("try{PhoneGap.onNativeReady.fire()}catch(e){_nativeReady=true}");
+		callJS("try{cordova.require('cordova/channel').onNativeReady.fire();}catch(e){window._nativeReady=true;}");
 	}
 
 	/**
@@ -168,7 +168,7 @@ namespace Wormhole
 		}
 		// Send device information to PhoneGap
 		else if ((message.getParam("service") == "Device") &&
-				(message.getParam("action") == "Get"))
+				(message.getParam("action") == "getDeviceInfo"))
 		{
 			sendDeviceProperties(message.getParam("PhoneGapCallBackId"));
 		}
@@ -176,14 +176,14 @@ namespace Wormhole
 		else if ((message.getParam("service") == "Notification") &&
 				(message.getParam("action") == "vibrate"))
 		{
-			int duration = message.getArgsFieldInt("duration");
+			int duration = message.getArgsFieldInt(0);
 			maVibrate(duration);
 		}
 		//Process the beep message
 		else if ((message.getParam("service") == "Notification") &&
 				(message.getParam("action") == "beep"))
 		{
-			int repeatCount = message.getParamInt("args");
+			int repeatCount = message.getArgsFieldInt(0);
 			for (int i = 0; i < repeatCount; i++)
 			{
 				if (mBeepSound > 0)
@@ -192,7 +192,7 @@ namespace Wormhole
 				}
 			}
 		}
-		else if ((message.getParam("service") == "Connection") &&
+		else if ((message.getParam("service") == "NetworkStatus") &&
 				(message.getParam("action") == "getConnectionInfo"))
 		{
 			sendConnectionType(message.getParam("PhoneGapCallBackId"));
@@ -245,7 +245,7 @@ namespace Wormhole
 	{
 		if (MAK_BACK == keyCode)
 		{
-			callJS("try{PhoneGapCommandResult('backbutton')}catch(e){}");
+			callJS("try{cordova.fireDocumentEvent('backbutton');}catch(e){console.log('exception firing backbutton event from native');}");
 		}
 	}
 
@@ -271,8 +271,8 @@ namespace Wormhole
 		// Send the callback result.
 		sprintf(
 			buffer,
-			"\\\"%s\\\"",
-			networkType);
+			"%s",
+			Encoder::JSONStringify(networkType).c_str());
 		callSuccess(
 			callbackID,
 			PHONEGAP_CALLBACK_STATUS_OK,
@@ -287,6 +287,7 @@ namespace Wormhole
 	void PhoneGapMessageHandler::sendDeviceProperties(MAUtil::String callbackID)
 	{
 		char deviceName[256];
+		char deviceModel[256];
 		char deviceUUID[256];
 		char deviceOS[256];
 		char deviceOSVersion[256];
@@ -295,6 +296,11 @@ namespace Wormhole
 		int nameRes = maGetSystemProperty(
 			"mosync.device.name",
 			deviceName,
+			256);
+
+		int modelRes = maGetSystemProperty(
+			"mosync.device.model",
+			deviceModel,
 			256);
 
 		int uuidRes = maGetSystemProperty(
@@ -320,6 +326,14 @@ namespace Wormhole
 			//So we just return a value for the phoneGap apps to work
 			sprintf(deviceUUID, "Not Accessible");
 		}
+		//Due to some limitations on some devices
+		//We have to check the device model separately
+		if(modelRes < 0)
+		{
+			//PhoneGap does not return an error if it cannot read device model
+			//So we just return a value for the phoneGap apps to work
+			sprintf(deviceModel, "Not Accessible");
+		}
 		//if Any of the above commands fail send an error to PhoneGap
 		if((nameRes < 0)
 			|| (osRes < 0)
@@ -338,12 +352,14 @@ namespace Wormhole
 			"{"
 				"\"platform\":%s,"
 				"\"name\":%s,"
+				"\"model\":%s,"
 				"\"uuid\":%s,"
 				"\"version\":%s,"
-				"\"phonegap\":\"1.2.0\""
+				"\"cordova\":\"2.3.0\""
 			"}",
 			Encoder::JSONStringify(deviceOS).c_str(),
 			Encoder::JSONStringify(deviceName).c_str(),
+			Encoder::JSONStringify(deviceModel).c_str(),
 			Encoder::JSONStringify(deviceUUID).c_str(),
 			Encoder::JSONStringify(deviceOSVersion).c_str()
 			);
@@ -362,6 +378,7 @@ namespace Wormhole
 		//Adding this Class as a Sensor Listener
 		MAUtil::Environment::getEnvironment().addSensorListener(this);
 		MAUtil::Environment::getEnvironment().addCustomEventListener(this);
+		MAUtil::Environment::getEnvironment().addFocusListener(this);
 	}
 
 	/**
@@ -373,20 +390,26 @@ namespace Wormhole
 		{
 			mPhoneGapSensors->sendLocationData(event);
 		}
-		else if (event.type == EVENT_TYPE_FOCUS_LOST)
-		{
-			//let the phoneGap app know that it should go to sleep
-			callJS("try{PhoneGapCommandResult('pause')}catch(e){}");
-		}
-		else if (event.type == EVENT_TYPE_FOCUS_GAINED)
-		{
-			//let the PhoneGap side know that it should resume
-			callJS("try{PhoneGapCommandResult('resume')}catch(e){}");
-		}
+	}
+
+	/*
+	 * Tells the JavaScript-side of Cordova that it should pause
+	 */
+	void PhoneGapMessageHandler::focusLost()
+	{
+		callJS("try{cordova.fireDocumentEvent('pause');}catch(e){console.log('exception firing pause event from native');}");
+	}
+
+	/*
+	 * Tells the JavaScript-side of Cordova that it should resume
+	 */
+	void PhoneGapMessageHandler::focusGained()
+	{
+		callJS("try{cordova.fireDocumentEvent('resume');}catch(e){console.log('exception firing resume event from native');}");
 	}
 
 	/**
-	 * Receives sensor events and forwards them to PhoneGap
+	 * Receives sensor events and forwards them to Cordova
 	 *
 	 * @param sensorData sensor number and data (See sensor API for more info)
 	 */
@@ -410,7 +433,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Call the PhoneGap success function.
+	 * Call the Cordova JavaScript success function.
 	 *
 	 * @param callbackID The id of the JS callback function.
 	 * @param status Status code.
@@ -428,8 +451,9 @@ namespace Wormhole
 		)
 	{
 		callCallback(
-			"PhoneGap.CallbackSuccess",
+			"cordova.callbackFromNative",
 			callbackID,
+			true,
 			status,
 			args,
 			keepCallback,
@@ -437,7 +461,7 @@ namespace Wormhole
 	}
 
 	/**
-	 * Call the PhoneGap error function.
+	 * Call the Cordova JavaScript error function.
 	 *
 	 * @param callbackID The id of the JS callback function.
 	 * @param errorCode The error code.
@@ -453,7 +477,7 @@ namespace Wormhole
 	{
 		// Use string "error" if there is
 		// no error message.
-		// TODO: Does PhoneGap use this param?
+		// TODO: Does Cordova use this param?
 		String err = errorMessage;
 		if (0 == err.size())
 		{
@@ -465,8 +489,9 @@ namespace Wormhole
 			",\"message\":\"" + err + "\"}";
 
 		callCallback(
-			"PhoneGap.CallbackError",
+			"cordova.callbackFromNative",
 			callbackID,
+			false,
 			PHONEGAP_CALLBACK_STATUS_ERROR,
 			args,
 			keepCallback);
@@ -486,6 +511,7 @@ namespace Wormhole
 	void PhoneGapMessageHandler::callCallback(
 		const String& callbackFunction,
 		const String& callbackID,
+		bool success,
 		const MAUtil::String& status,
 		const String& args,
 		bool keepCallback,
@@ -493,25 +519,15 @@ namespace Wormhole
 		)
 	{
 		// Generate JavaScipt code.
+		String successStr = (success ? "true" : "false");
+		String keepCallbackStr = (keepCallback ? "true" : "false");
 
 		String script = callbackFunction + "(";
 		script += "'" + callbackID + "'";
-
-		script += ",'{";
-		script += "\"status\":" + status;
-		script += ",\"message\":" + args;
-
-		if (keepCallback)
-		{
-			script += ",\"keepCallback\":true";
-		}
-
-		script += "}'";
-
-		if (castFunction.size() > 0)
-		{
-			script += ",'" + castFunction + "'";
-		}
+		script += ",'" + successStr + "'";
+		script += ",'" + status + "'";
+		script += "," + Encoder::JSONStringify(args.c_str());
+		script += ",'" + keepCallbackStr + "'";
 
 		script += ")";
 
@@ -532,7 +548,7 @@ namespace Wormhole
 	 * Set the target class for sensor event messages.
 	 * @param sensor The sensor that is configured.
 	 * @param toSensorManager If true, the SensorManager object will
-	 * receive the events, normal PhoneGap API if false.
+	 * receive the events, normal Cordova API if false.
 	 */
 	void PhoneGapMessageHandler::setSensorEventTarget(int sensor, bool toSensorManager)
 	{

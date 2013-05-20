@@ -17,6 +17,8 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.core;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
 
@@ -420,7 +422,8 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetScreenShow invalidate menu");
-		m_activity.invalidateOptionsMenu();
+
+		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;
 	}
@@ -481,7 +484,8 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetScreenShowWithTransition invalidate menu");
-		m_activity.invalidateOptionsMenu();
+
+		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;
 	}
@@ -495,7 +499,6 @@ public class NativeUI
 	 */
 	public int maWidgetStackScreenPush(int stackScreenHandle, int newScreenHandle)
 	{
-
 		Widget stackScreenWidget = m_widgetTable.get( stackScreenHandle );
 		if( stackScreenWidget == null )
 		{
@@ -530,7 +533,8 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetStackScreenPush invalidate menu");
-		m_activity.invalidateOptionsMenu();
+
+		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;
 	}
@@ -791,7 +795,7 @@ public class NativeUI
 			{
 				int index = screen.addOptionsMenuItem(title, iconID);
 
-				m_activity.invalidateOptionsMenu();
+				mMoSyncThread.invalidateOptionsMenu(m_activity);
 				//m_activity.onCreateOptionsMenu( screen.getMenu() );
 				return index;
 			}
@@ -938,7 +942,7 @@ public class NativeUI
 
 			ScreenWidget screen = (ScreenWidget) widget;
 			int result = screen.removeActionBarMenuItem(itemHandle);
-			m_activity.invalidateOptionsMenu();
+			mMoSyncThread.invalidateOptionsMenu(m_activity);
 			return result;
 		}
 
@@ -1088,7 +1092,7 @@ public class NativeUI
 
 		if (checkActionBar())
 		{
-			m_activity.invalidateOptionsMenu();
+			mMoSyncThread.invalidateOptionsMenu(m_activity);
 			return IX_WIDGET.MAW_RES_OK;
 		}
 
@@ -1168,5 +1172,4 @@ public class NativeUI
 	{
 		return (Widget) m_widgetTable.get( handle );
 	}
-
 }

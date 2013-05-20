@@ -19,16 +19,20 @@ package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
@@ -44,17 +48,6 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
-import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
-import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
-import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -64,6 +57,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
@@ -121,15 +115,12 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import android.provider.Settings.Secure;
-import android.net.ConnectivityManager;
 
 import com.mosync.api.MoSyncContext;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
-import com.mosync.internal.generated.IX_OPENGL_ES;
 import com.mosync.internal.generated.IX_OPENGL_ES_MA;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
@@ -2949,6 +2940,10 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		{
 			property = Build.DEVICE;
 		}
+		else if(key.equals("mosync.device.model"))
+		{
+			property = Build.MODEL;
+		}
 		else if(key.equals("mosync.device.UUID"))
 		{
 			property = Secure.getString( mContext.getContentResolver(),
@@ -4757,6 +4752,31 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	public int maActionBarSetBackgroundImage(final int imageHandle)
 	{
 		return mMoSyncNativeUI.maActionBarSetBackgroundImage(imageHandle);
+	}
+
+	public void invalidateOptionsMenu(Activity activity) {
+		Class<?> activityClass = null;
+		Method activity_invalidateOptionMenu = null;
+		try {
+			activityClass = Class.forName("android.app.Activity");
+		} catch (Throwable e) {
+			System.err.println(e);
+		}
+
+		// Search for invalidateOptionsMenu into the Activity class.
+		try {
+			activity_invalidateOptionMenu = activityClass
+					.getMethod("invalidateOptionsMenu");
+			/* success, this is a newer device */
+		} catch (NoSuchMethodException nsme) {
+			/* failure, must be older device */
+			Log.i("MoSync", "invalidateOptionsMenu failed");
+		}
+		try {
+			activity_invalidateOptionMenu.invoke(activity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
