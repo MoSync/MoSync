@@ -105,14 +105,22 @@ int wcsnicmp(const wchar *s1, const wchar *s2, size_t count)
 	return f - l;
 }
 
+#if defined(MOSYNC_NATIVE) && defined(__ANDROID__)
+wchar *wcschr(const wchar *s, wchar ch)
+#else
 wchar *wcschr(const wchar *s, int ch)
+#endif
 {
 	while (*s && *s != (wchar) ch) s++;
 	if (*s == (wchar) ch) return (wchar *) s;
 	return NULL;
 }
 
+#if defined(MOSYNC_NATIVE) && defined(__ANDROID__)
+wchar *wcsrchr(const wchar *s, wchar ch)
+#else
 wchar *wcsrchr(const wchar *s, int ch)
+#endif
 {
 	wchar *start = (wchar *) s;
 
@@ -234,7 +242,11 @@ wchar *wcspbrk(const wchar *string, const wchar *control)
 	return NULL;
 }
 
+#if defined(MOSYNC_NATIVE) && defined(__ANDROID__)
+void *wmemchr(const void *buf, wchar ch, size_t count)
+#else
 void *wmemchr(const void *buf, int ch, size_t count)
+#endif
 {
 	while (count && (*(wchar *) buf != (wchar) ch)) 
 	{

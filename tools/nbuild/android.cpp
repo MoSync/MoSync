@@ -73,6 +73,7 @@ int generateMakefile(Arguments* params, string& configName) {
 	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
 	if (bootstrapModules.empty()) {
 		// Default
+		bootstrapModules.push_back("stlport");
 		bootstrapModules.push_back("mosync");
 		bootstrapModules.push_back("mosynclib");
 	} else if (bootstrapModules[0] == ".") {
@@ -252,12 +253,12 @@ int executeNdkBuild(Arguments* params) {
 		}
 	}
 
-	vector<string> modules;
-	split(modules, params->getSwitchValue(MODULE_LIST), ",");
-	bool useSTL = false;
-	for (size_t i = 0; i < modules.size(); i++) {
+	//vector<string> modules;
+	//split(modules, params->getSwitchValue(MODULE_LIST), ",");
+	bool useSTL = true;
+	/*for (size_t i = 0; i < modules.size(); i++) {
 		useSTL |= isSTL(modules[i]);
-	}
+	}*/
 
 	for (size_t i = 0; i < configNames.size(); i++) {
 		for (size_t j = 0; j < archs.size(); j++) {
@@ -360,10 +361,11 @@ int executeNdkBuild(Arguments* params) {
 			copyFile(fullOutputFile.c_str(), libFile.c_str());
 			// TODO: The important thing is: is the STL static, not the result?
 			if (useSTL) {
-				copyFile(fullOutputFile.c_str(), libFile.c_str());
 				string stlLibFile = tmpBuildDir + "libs/" + arch + "/libstlport_shared.so";
 				string stlOutputFile = fullOutputDir + "libstlport_shared.so";
-				copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
+				if (existsFile(stlLibFile.c_str())) {
+					copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
+				}
 			}
 		}
 	}
