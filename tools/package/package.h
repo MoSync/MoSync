@@ -62,6 +62,8 @@ struct SETTINGS {
 	bool WPgenerateOnly;
 	const char* WPguid;
 	const char* WPvsBuildPath;
+	const char* WPIncludePaths;
+	char* WPMacroDefines;
 
 	// Android specific settings
     const char* androidPackage;
