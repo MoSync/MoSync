@@ -427,11 +427,8 @@ namespace MoSync
                 {
                     try
                     {
-                        Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            System.Windows.Media.SolidColorBrush brush;
-                            MoSync.Util.ConvertStringToColor(propertyValue, out brush);
-                        });
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.ConvertStringToColor(propertyValue, out brush);
                     }
                     catch (InvalidPropertyValueException)
                     {
