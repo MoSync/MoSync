@@ -359,10 +359,20 @@ namespace MoSync
 				{
 					MoSync.Util.RunActionOnMainThreadSync(() =>
 					{
-						BitmapImage bi = new BitmapImage();
-						bi.SetSource((Stream)res.GetInternalObject());
-						w = bi.PixelWidth;
-						h = bi.PixelHeight;
+
+						if (res.GetInternalObject() is Stream)
+						{
+							BitmapImage bi = new BitmapImage();
+							bi.SetSource((Stream)res.GetInternalObject());
+							w = bi.PixelWidth;
+							h = bi.PixelHeight;
+						}
+						else if (res.GetInternalObject() is WriteableBitmap)
+						{
+							BitmapSource src = (BitmapSource)res.GetInternalObject();
+							w = src.PixelWidth;
+							h = src.PixelHeight;
+						}
 					});
 				}
 #endif
@@ -372,10 +382,27 @@ namespace MoSync
 			syscalls.maDrawImage = delegate(int image, int left, int top)
 			{
 				Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, image);
+#if !LIB
 				WriteableBitmap src = (WriteableBitmap)res.GetInternalObject();
-				Rect srcRect = new Rect(0, 0, src.PixelWidth, src.PixelHeight);
-				Rect dstRect = new Rect(left, top, src.PixelWidth, src.PixelHeight);
-				mCurrentDrawTarget.Blit(dstRect, src, srcRect, WriteableBitmapExtensions.BlendMode.Alpha);
+#else
+				Object src = null;
+				MoSync.Util.RunActionOnMainThreadSync(() =>
+				{
+					Object internalObj = res.GetInternalObject();
+					if (internalObj is Stream)
+					{
+						src = new WriteableBitmap(0, 0);
+						(src as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+					}
+					else if (internalObj is WriteableBitmap)
+					{
+						src = res.GetInternalObject();
+					}
+				});
+#endif
+				Rect srcRect = new Rect(0, 0, (src as WriteableBitmap).PixelWidth, (src as WriteableBitmap).PixelHeight);
+				Rect dstRect = new Rect(left, top, (src as WriteableBitmap).PixelWidth, (src as WriteableBitmap).PixelHeight);
+				mCurrentDrawTarget.Blit(dstRect, (src as WriteableBitmap), srcRect, WriteableBitmapExtensions.BlendMode.Alpha);
 			};
 
 			syscalls.maDrawImageRegion = delegate(int image, int srcRectPtr, int dstPointPtr, int transformMode)
@@ -455,7 +482,7 @@ namespace MoSync
 				byte[] bytes = new byte[width * height * 4];
 				core.GetDataMemory().ReadBytes(bytes, _src, width * height * 4);
 
-				bitmap.FromByteArray(bytes, _src, width * height * 4); // TO BE TESTED
+				bitmap.FromByteArray(bytes, 0, width * height * 4); // TO BE TESTED
 #endif
 				if (_alpha == 0)
 				{

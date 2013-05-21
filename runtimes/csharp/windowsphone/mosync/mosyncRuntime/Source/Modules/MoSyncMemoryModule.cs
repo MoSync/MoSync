@@ -98,8 +98,8 @@ namespace MoSync
 			{
 				Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, data);
 				Stream mem = (Stream)res.GetInternalObject();
-#if !LIB
 				mem.Seek(offset, SeekOrigin.Begin);
+#if !LIB
 				mem.Write(core.GetDataMemory().GetData(), src, size);
 #else
 				byte[] bytes = new byte[size];
@@ -112,12 +112,12 @@ namespace MoSync
 			{
 				Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, data);
 				Stream mem = (Stream)res.GetInternalObject();
-#if !LIB
 				mem.Seek(offset, SeekOrigin.Begin);
+#if !LIB
 				mem.Read(core.GetDataMemory().GetData(), dst, size);
 #else
 				byte[] bytes = new byte[size];
-				mem.Read( bytes, 0, size);
+				mem.Read(bytes, 0, size);
 				core.GetDataMemory().WriteBytes(dst, bytes, size); //TO BE TESTED
 #endif
 			};

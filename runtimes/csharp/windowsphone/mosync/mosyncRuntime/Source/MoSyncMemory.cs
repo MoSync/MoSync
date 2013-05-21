@@ -16,12 +16,12 @@ namespace MoSync
 	// and unloaded binary resources. Now ubins are loaded into memory also,
 	// in order to get something up and running quickly.
 
-    public interface IMemory
-    {
-        void WriteUInt8(int address, byte b);
+	public interface IMemory
+	{
+		void WriteUInt8(int address, byte b);
 		void WriteInt8(int address, sbyte b);
 		void WriteUInt16(int address, ushort b);
-        void WriteInt16(int address, short b);
+		void WriteInt16(int address, short b);
 		void WriteUInt32(int address, uint b);
 		void WriteInt32(int address, int b);
 		void WriteInt64(int address, Int64 b);
@@ -53,7 +53,7 @@ namespace MoSync
 		void WriteFromStream(int dstaddress, Stream stream, int length);
 
 		void FillRange(int dstaddress, byte val, int length);
-    }
+	}
 
 	public class Memory : IMemory
 	{
@@ -278,115 +278,115 @@ namespace MoSync
 		}
 	}
 #if LIB
-    public class SystemMemory : IMemory
-    {
-        public void WriteUInt8(int address, byte b)
-        {
-            IntPtr ptr = new IntPtr(address);
-            Marshal.WriteByte(ptr, b);
-        }
+	public class SystemMemory : IMemory
+	{
+		public void WriteUInt8(int address, byte b)
+		{
+			IntPtr ptr = new IntPtr(address);
+			Marshal.WriteByte(ptr, b);
+		}
 
-        public void WriteInt8(int address, sbyte b)
-        {
-            IntPtr ptr = new IntPtr(address);
-            Marshal.WriteByte(ptr, (byte)b);
-        }
+		public void WriteInt8(int address, sbyte b)
+		{
+			IntPtr ptr = new IntPtr(address);
+			Marshal.WriteByte(ptr, (byte)b);
+		}
 
-        public void WriteUInt16(int address, ushort b)
-        {
-            IntPtr ptr = new IntPtr(address);
-            Marshal.StructureToPtr(b, ptr, false);  // TO BE TESTED
-        }
+		public void WriteUInt16(int address, ushort b)
+		{
+			IntPtr ptr = new IntPtr(address);
+			Marshal.StructureToPtr(b, ptr, false);  // TO BE TESTED
+		}
 
-        public void WriteInt16(int address, short b)
-        {
-            IntPtr ptr = new IntPtr(address);
-            Marshal.WriteInt16(ptr, b);
-        }
+		public void WriteInt16(int address, short b)
+		{
+			IntPtr ptr = new IntPtr(address);
+			Marshal.WriteInt16(ptr, b);
+		}
 
-        public void WriteUInt32(int address, uint b)
-        {
-            IntPtr ptr = new IntPtr(address);
-            Marshal.StructureToPtr(b, ptr, false); // TO BE TESTED
-        }
+		public void WriteUInt32(int address, uint b)
+		{
+			IntPtr ptr = new IntPtr(address);
+			Marshal.StructureToPtr(b, ptr, false); // TO BE TESTED
+		}
 
-        public void WriteInt32(int address, int b)
-        {
-            IntPtr ptr = new IntPtr(address);
-            Marshal.WriteInt32(ptr, b);
-        }
+		public void WriteInt32(int address, int b)
+		{
+			IntPtr ptr = new IntPtr(address);
+			Marshal.WriteInt32(ptr, b);
+		}
 
-        public void WriteInt64(int address, Int64 b)
-        {
-            IntPtr ptr = new IntPtr(address);
-            Marshal.WriteInt64(ptr, b);
-        }
+		public void WriteInt64(int address, Int64 b)
+		{
+			IntPtr ptr = new IntPtr(address);
+			Marshal.WriteInt64(ptr, b);
+		}
 
-        public void WriteDouble(int address, double b)
-        {
-            IntPtr ptr = new IntPtr(address);
-            Marshal.StructureToPtr(b, ptr, false);
-        }
-
-        public void WriteFloat(int address, float b)
-        {
-            IntPtr ptr = new IntPtr(address);
+		public void WriteDouble(int address, double b)
+		{
+			IntPtr ptr = new IntPtr(address);
 			Marshal.StructureToPtr(b, ptr, false);
-        }
+		}
 
-        public byte ReadUInt8(int address)
-        {
-            IntPtr ptr = new IntPtr(address);
-            return Marshal.ReadByte(ptr);
-        }
+		public void WriteFloat(int address, float b)
+		{
+			IntPtr ptr = new IntPtr(address);
+			Marshal.StructureToPtr(b, ptr, false);
+		}
 
-        public sbyte ReadInt8(int address)
-        {
-            IntPtr ptr = new IntPtr(address);
-            return (sbyte)Marshal.ReadByte(ptr); // TO BE TESTED
-        }
+		public byte ReadUInt8(int address)
+		{
+			IntPtr ptr = new IntPtr(address);
+			return Marshal.ReadByte(ptr);
+		}
 
-        public ushort ReadUInt16(int address)
-        {
-            IntPtr ptr = new IntPtr(address);
-            return (ushort)Marshal.ReadInt16(ptr); // TO BE TESTED
-        }
+		public sbyte ReadInt8(int address)
+		{
+			IntPtr ptr = new IntPtr(address);
+			return (sbyte)Marshal.ReadByte(ptr); // TO BE TESTED
+		}
 
-        public short ReadInt16(int address)
-        {
-            IntPtr ptr = new IntPtr(address);
-            return Marshal.ReadInt16(ptr);
-        }
+		public ushort ReadUInt16(int address)
+		{
+			IntPtr ptr = new IntPtr(address);
+			return (ushort)Marshal.ReadInt16(ptr); // TO BE TESTED
+		}
 
-        public uint ReadUInt32(int address)
-        {
-            IntPtr ptr = new IntPtr(address);
-            return (uint)Marshal.ReadInt32(ptr);
-        }
+		public short ReadInt16(int address)
+		{
+			IntPtr ptr = new IntPtr(address);
+			return Marshal.ReadInt16(ptr);
+		}
 
-        public int ReadInt32(int address)
-        {
-            IntPtr ptr = new IntPtr(address);
-            return Marshal.ReadInt32(ptr);
-        }
+		public uint ReadUInt32(int address)
+		{
+			IntPtr ptr = new IntPtr(address);
+			return (uint)Marshal.ReadInt32(ptr);
+		}
 
-        // reads a null-terminated ascii c string
-        public String ReadStringAtAddress(int address)
-        {
+		public int ReadInt32(int address)
+		{
+			IntPtr ptr = new IntPtr(address);
+			return Marshal.ReadInt32(ptr);
+		}
+
+		// reads a null-terminated ascii c string
+		public String ReadStringAtAddress(int address)
+		{
 			IntPtr ptr = new IntPtr(address);
 			return Marshal.PtrToStringAnsi(ptr);
-        }
+		}
 
-        // reads a null-terminated unicode string.
-        public String ReadWStringAtAddress(int address)
-        {
-            IntPtr ptr = new IntPtr(address);
-            return Marshal.PtrToStringUni(ptr);
-        }
+		// reads a null-terminated unicode string.
+		public String ReadWStringAtAddress(int address)
+		{
+			IntPtr ptr = new IntPtr(address);
+			return Marshal.PtrToStringUni(ptr);
+		}
 
-        public void WriteStringAtAddress(int address, String str, int maxSize)
-        {
-            IntPtr ptr = new IntPtr(address);
+		public void WriteStringAtAddress(int address, String str, int maxSize)
+		{
+			IntPtr ptr = new IntPtr(address);
 
 			str += '\0';
 
@@ -397,78 +397,78 @@ namespace MoSync
 				if (1 == sizeChar) WriteUInt8(address + i, (byte)str[i]);
 				else if (2 == sizeChar) WriteUInt16(address + i, (UInt16)str[i]);
 			}
-        }
+		}
 
-        public void WriteWStringAtAddress(int address, String str, int maxSize)
-        {
-            IntPtr ptr = new IntPtr(address);
+		public void WriteWStringAtAddress(int address, String str, int maxSize)
+		{
+			IntPtr ptr = new IntPtr(address);
 
 			str += '\0';
 
 			int sizeChar = sizeof(char);
 
-            for (int i = 0; i < str.Length; i++)
-            {
-                if (2 == sizeChar) WriteUInt16(address + i, (UInt16)str[i]);
+			for (int i = 0; i < str.Length; i++)
+			{
+				if (2 == sizeChar) WriteUInt16(address + i, (UInt16)str[i]);
 				else if (4 == sizeChar) WriteUInt32(address + i, (UInt32)str[i]);
-            }
-        }
+			}
+		}
 
-        public void ReadBytes(byte[] bytes, int src, int size)
-        {
-            IntPtr ptr = new IntPtr(src);
-            Marshal.Copy(ptr, bytes, 0, size);
-        }
+		public void ReadBytes(byte[] bytes, int src, int size)
+		{
+			IntPtr ptr = new IntPtr(src);
+			Marshal.Copy(ptr, bytes, 0, size);
+		}
 
-        public void WriteBytes(int dst, byte[] bytes, int size)
-        {
-            for (int i = 0; i < size; i++)
-                WriteUInt8(dst + i, bytes[i]);
-        }
+		public void WriteBytes(int dst, byte[] bytes, int size)
+		{
+			for (int i = 0; i < size; i++)
+				WriteUInt8(dst + i * sizeof(byte), bytes[i]);
+		}
 
-        // size equals the amount of integers
-        public void ReadIntegers(int[] integers, int src, int size)
-        {
-            IntPtr ptr = new IntPtr(src);
-            Marshal.Copy(ptr, integers, 0, size);
-        }
+		// size equals the amount of integers
+		public void ReadIntegers(int[] integers, int src, int size)
+		{
+			IntPtr ptr = new IntPtr(src);
+			Marshal.Copy(ptr, integers, 0, size);
+		}
 
-        public void WriteMemoryAtAddress(int dstaddress, Memory memory, int srcaddress, int length)
-        {
-            byte[] mem = memory.GetData();
-            WriteBytes(dstaddress, mem, length);
-        }
+		public void WriteMemoryAtAddress(int dstaddress, Memory memory, int srcaddress, int length)
+		{
+			byte[] mem = memory.GetData();
+			WriteBytes(dstaddress, mem, length);
+		}
 
-        public void WriteMemoryAtAddress(int dstaddress, SystemMemory memory, int srcaddress, int length)
-        {
-            byte[] mem = new byte[length];
-            for(int i = 0; i < length; i++)
-                mem[i] = memory.ReadUInt8(srcaddress + i);
+		public void WriteMemoryAtAddress(int dstaddress, SystemMemory memory, int srcaddress, int length)
+		{
+			byte[] mem = new byte[length];
+			for (int i = 0; i < length; i++)
+				mem[i] = memory.ReadUInt8(srcaddress + i);
 
-            IntPtr ptr = new IntPtr(dstaddress);
-            Marshal.Copy(mem, 0, ptr, length);
-        }
+			IntPtr ptr = new IntPtr(dstaddress);
+			Marshal.Copy(mem, 0, ptr, length);
+		}
 
-        public void WriteFromStream(int dstaddress, Stream stream, int length)
-        {
-            byte[] buf = new byte[length];
-            int res = stream.Read(buf, 0, length);
+		public void WriteFromStream(int dstaddress, Stream stream, int length)
+		{
+			byte[] buf = new byte[length];
+			int res = stream.Read(buf, 0, length);
 			if (res != length)
 				throw new Exception("WriteFromStream(" + length + ") returned " + res);
 
-            IntPtr ptr = new IntPtr(dstaddress);
-            Marshal.Copy(buf, 0, ptr, length);
-        }
+			IntPtr ptr = new IntPtr(dstaddress);
+			Marshal.Copy(buf, 0, ptr, length);
+		}
 
-        public void FillRange(int dstaddress, byte val, int length)
-        {
-            byte[] buf = new byte[length];
-            for (int i = 0; i < length; i++)
-                buf[i] = val;
+		public void FillRange(int dstaddress, byte val, int length)
+		{
+			byte[] buf = new byte[length];
+			for (int i = 0; i < length; i++)
+				buf[i] = val;
 
-            IntPtr ptr = new IntPtr(dstaddress);
-            Marshal.Copy(buf, 0, ptr, length);
-        }
-    }
+			IntPtr ptr = new IntPtr(dstaddress);
+			Marshal.Copy(buf, 0, ptr, length);
+		}
+	}
 #endif
 }
