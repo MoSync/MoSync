@@ -34,6 +34,7 @@
 using namespace std;
 
 void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
+
 	testDst(s);
 	testName(s);
 	testVendor(s);
@@ -96,6 +97,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	}
 
 	_mkdir(csprojOutput.c_str());
+
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
 
 	generateCmd << getBinary("winphone-builder") <<
@@ -113,10 +115,12 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		generateCmd << " -mosync-project-path " << file(s.mosyncProjectPath) <<
 					   " -output-file-library-project " << file(outputLibFile) <<
 					   " -input-file-library-project " << file(templateLibProjectLocation);
-		if(strcmp(s.WPMacroDefines, "") != 0)
+
+		if(s.WPMacroDefines != NULL && strcmp(s.WPMacroDefines, "") != 0)
 			generateCmd << " -macro-defines " << s.WPMacroDefines;
+
 		if(strcmp(s.WPIncludePaths, "") != 0)
-			generateCmd << " -include-paths " << s.WPIncludePaths;
+			generateCmd << " -include-paths \"" << s.WPIncludePaths << "\"";
 	}
 
 	if(s.WPguid)
