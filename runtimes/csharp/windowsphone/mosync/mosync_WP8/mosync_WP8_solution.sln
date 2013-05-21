@@ -16,6 +16,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Any CPU.ActiveCfg = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Any CPU.Build.0 = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Any CPU.Deploy.0 = debug_lib_build|ARM
 		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|ARM.ActiveCfg = debug_lib_build|ARM
 		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|ARM.Build.0 = debug_lib_build|ARM
 		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|ARM.Deploy.0 = debug_lib_build|ARM
@@ -24,12 +26,14 @@ Global
 		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Mixed Platforms.Deploy.0 = debug_lib_build|ARM
 		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|x86.ActiveCfg = debug_lib_build|ARM
 		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|Any CPU.ActiveCfg = debug_lib_build|ARM
+		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|Any CPU.Build.0 = debug_lib_build|ARM
 		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|ARM.ActiveCfg = debug_lib_build|ARM
 		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|ARM.Build.0 = debug_lib_build|ARM
 		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|Mixed Platforms.ActiveCfg = debug_lib_build|ARM
 		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|Mixed Platforms.Build.0 = debug_lib_build|ARM
 		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|x86.ActiveCfg = debug_lib_build|ARM
 		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|Any CPU.ActiveCfg = debug_lib_build|ARM
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|Any CPU.Build.0 = debug_lib_build|ARM
 		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|ARM.ActiveCfg = debug_lib_build|ARM
 		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|ARM.Build.0 = debug_lib_build|ARM
 		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|Mixed Platforms.ActiveCfg = debug_lib_build|ARM
