@@ -152,9 +152,7 @@ namespace MoSyncCamera
 		{
 			// If flash not supported disable the flash button.
 			mSetNextFlashModeButton->setEnabled(false);
-			mSetNextFlashModeButton->setBackgroundImage(kFlashModesImg[FLASH_OFF]);
-			// Pressed is not handled so no pressed image needed.
-			mSetNextFlashModeButton->setPressedImage(kFlashModesImg[FLASH_OFF]);
+			mSetNextFlashModeButton->setBackgroundImage(RES_FLASH_IMG_DISABLED);
 		}
 
 		// If we have only one camera we don't add the swap camera button.
@@ -177,11 +175,12 @@ namespace MoSyncCamera
 					this, RES_ZOOM_IN_IMG, RES_ZOOM_IN_IMG_PRESSED);
 			mMainLayout->addChild(mZoomInButton);
 
-			// camera zoom out button
+			// camera zoom out button. Disabled at startup.
 			mZoomOutButton = new NativeUI::ImageButton();
 			ScreenUtils::setupImageButton(mZoomOutButton,
-					this, RES_ZOOM_OUT_IMG, RES_ZOOM_OUT_IMG_PRESSED);
+					this, RES_ZOOM_OUT_IMG_DISABLED, RES_ZOOM_OUT_IMG_DISABLED);
 			mMainLayout->addChild(mZoomOutButton);
+			mZoomOutButton->setEnabled(false);
 		}
 	}
 
@@ -291,7 +290,7 @@ namespace MoSyncCamera
 	void CameraScreen::showSnapshotInProgress()
 	{
 		toogleShowSnapshotButton(false);
-		mTakeSnapshotButton->setEnabled(false);
+		toogleTakeSnapshotButton(false);
 
 		mActivityIndicator->show();
 	}
@@ -300,7 +299,7 @@ namespace MoSyncCamera
 	void CameraScreen::hideSnapshotInProgress(bool snapshotIsValid)
 	{
 		toogleShowSnapshotButton(snapshotIsValid);
-		mTakeSnapshotButton->setEnabled(true);
+		toogleTakeSnapshotButton(true);
 
 		mActivityIndicator->hide();
 	}
@@ -402,7 +401,19 @@ namespace MoSyncCamera
 		{
 			nextZoomLevel = maxZoomLevel;
 		}
-		mCamera->setZoomLevel(nextZoomLevel);
+		bool isZoomLevelSuported = mCamera->setZoomLevel(nextZoomLevel);
+
+		if ( isZoomLevelSuported && !mZoomOutButton->isEnabled() )
+		{
+			mZoomOutButton->setBackgroundImage(RES_ZOOM_OUT_IMG);
+			mZoomOutButton->setPressedImage(RES_ZOOM_OUT_IMG_PRESSED);
+			mZoomOutButton->setEnabled(true);
+		}
+		if ( nextZoomLevel == maxZoomLevel )
+		{
+			mZoomInButton->setBackgroundImage(RES_ZOOM_IN_IMG_DISABLED);
+			mZoomInButton->setEnabled(false);
+		}
 	}
 
 
@@ -417,7 +428,19 @@ namespace MoSyncCamera
 		{
 			nextZoomLevel = 0;
 		}
-		mCamera->setZoomLevel(nextZoomLevel);
+		bool isZoomLevelSuported = mCamera->setZoomLevel(nextZoomLevel);
+
+		if ( isZoomLevelSuported && !mZoomInButton->isEnabled() )
+		{
+			mZoomInButton->setBackgroundImage(RES_ZOOM_IN_IMG);
+			mZoomInButton->setPressedImage(RES_ZOOM_IN_IMG_PRESSED);
+			mZoomInButton->setEnabled(true);
+		}
+		if ( nextZoomLevel == 0 )
+		{
+			mZoomOutButton->setBackgroundImage(RES_ZOOM_OUT_IMG_DISABLED);
+			mZoomOutButton->setEnabled(false);
+		}
 	}
 
 	void CameraScreen::toogleShowSnapshotButton(bool enabled)
@@ -432,8 +455,24 @@ namespace MoSyncCamera
 		{
 			// Use disabled images
 			mShowSnapshotButton->setBackgroundImage(RES_SHOW_PICTURE_IMG_DISABLED);
-			mShowSnapshotButton->setPressedImage(RES_SHOW_PICTURE_IMG_DISABLED);
 		}
 		mShowSnapshotButton->setEnabled(enabled);
+	}
+
+
+	void CameraScreen::toogleTakeSnapshotButton(bool enabled)
+	{
+		if ( enabled )
+		{
+			// Use enabled images
+			mTakeSnapshotButton->setBackgroundImage(RES_TAKE_PICTURE_IMG);
+			mTakeSnapshotButton->setPressedImage(RES_TAKE_PICTURE_IMG_PRESSED);
+		}
+		else
+		{
+			// Use disabled images
+			mTakeSnapshotButton->setBackgroundImage(RES_TAKE_PICTURE_IMG_DISABLED);
+		}
+		mTakeSnapshotButton->setEnabled(enabled);
 	}
 } // MoSyncCamera
