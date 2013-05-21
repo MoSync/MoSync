@@ -198,6 +198,20 @@ namespace MoSyncCamera
 	}
 
 
+	void MoCameraController::handleBackPress()
+	{
+		if ( isDisplayed(*mImageViewerScreen) )
+		{
+			imageViewingDone();
+		}
+		else
+		{
+			// This will be replaced to "send to background" in the near future.
+			maExit(0);
+		}
+	}
+
+
 	void MoCameraController::pointerPressEvent(MAPoint2d point)
 	{
 		if ( isDisplayed(*mCameraScreen) )
