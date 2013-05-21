@@ -1,6 +1,8 @@
 #include "android.h"
 #include "util.h"
 #include "nbuild.h"
+#include "fileset.h"
+#include <filelist/filelist.h>
 #include "mustache/mustache.h"
 #include "profiledb/profiledb.h"
 #include "helpers/mkdir.h"
@@ -269,6 +271,28 @@ int executeNdkBuild(Arguments* params) {
 			bool isDebug = libVariant == "debug";
 			bool isVerbose = params->isFlagSet(VERBOSE);
 			bool doClean = params->isFlagSet(CLEAN);
+
+			if (doClean) {
+				DefaultFileSet* libs = new DefaultFileSet(tmpBuildDir, "libs/**", false, NULL);
+				DefaultFileSet* objs = new DefaultFileSet(tmpBuildDir, "obj/**", false, NULL);
+				FileSetList* dfs = new FileSetList();
+				dfs->addFileSet(libs);
+				dfs->addFileSet(objs);
+				vector<string> files;
+				dfs->listFiles(files);
+				if (isVerbose) {
+					printf("Removing %d files from %s.\n", (int) files.size(), tmpBuildDir.c_str());
+				}
+				for (size_t k = 0; k < files.size(); k++) {
+					// TODO: dirs?
+					string file = tmpBuildDir + files[k];
+					remove(file.c_str());
+					printf("Removed %s.\n", files[k].c_str());
+				}
+				delete libs;
+				delete objs;
+				delete dfs;
+			}
 
 			ostringstream cmd;
 			string ndkBuildCmd = getNdkBuildScript(params);
