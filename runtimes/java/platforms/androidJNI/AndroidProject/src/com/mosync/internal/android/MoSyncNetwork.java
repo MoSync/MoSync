@@ -63,7 +63,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.UUID;
@@ -76,7 +75,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.net.SSLCertificateSocketFactory;
-import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 

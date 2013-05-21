@@ -35,6 +35,8 @@
 
 using namespace NativeUI;
 
+#define FOCUS_TOAST_STR "Tap to focus"
+
 #define BTN_RATIO 0.16 // Image button/container width ratio for normal buttons
 #define TAKE_PICTURE_BTN_RATIO 0.30 // Image button/container width ratio for the -take snapshot- button
 #define ZOOM_STEP_RATIO 0.1 // (Zoom step)/(maximum zoom) ratio
@@ -114,7 +116,7 @@ namespace MoSyncCamera
 	}
 
 
-	void CameraScreen::resetCameraPropeties()
+	void CameraScreen::resetCameraProperties()
 	{
 		if ( mCamera )
 		{
@@ -241,9 +243,7 @@ namespace MoSyncCamera
 	void CameraScreen::show()
 	{
 		Screen::show();
-
-		mCamera->startPreview();
-		resetCameraPropeties();
+		startCameraPreview();
 	}
 
 
@@ -252,12 +252,18 @@ namespace MoSyncCamera
 	{
 		int returnCode = Screen::showWithTransition(screenTransitionType,
 				screenTransitionDuration);
-		if ( returnCode >= 0 )
-		{
-			mCamera->startPreview();
-			resetCameraPropeties();
-		}
+
+		startCameraPreview();
 		return returnCode;
+	}
+
+
+	void CameraScreen::startCameraPreview()
+	{
+		mCamera->startPreview();
+		resetCameraProperties();
+
+		maToast(FOCUS_TOAST_STR, MA_TOAST_DURATION_SHORT);
 	}
 
 
@@ -299,6 +305,13 @@ namespace MoSyncCamera
 		mActivityIndicator->hide();
 	}
 
+	void CameraScreen::triggerAutoFocus()
+	{
+		if ( mCamera->isCameraStarted() )
+		{
+			mCamera->setFocusMode(FOCUS_AUTO);
+		}
+	}
 
 	void CameraScreen::buttonClicked(NativeUI::Widget* button)
 	{
