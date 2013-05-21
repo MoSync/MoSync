@@ -788,8 +788,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			}
 			catch (FileNotFoundException fnfe)
 			{
-				logError("loadProgram - Has no resources! exception: "
-					+ fnfe.toString(), fnfe);
+				Log.i("@@MoSync", "No resources");
 			}
 
 			// We have a program file so now we sends it to the native side
@@ -802,9 +801,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 				pFd = pAfd.getFileDescriptor();
 				pFdOffset = pAfd.getStartOffset();
 			} catch (FileNotFoundException fnfe) {
-				logError(
-						"loadProgram - Has no program! exception: "
-								+ fnfe.toString(), fnfe);
+				Log.i("@@MoSync", "No program file");
 			}
 
 			if (isNative || (null != pFd))
