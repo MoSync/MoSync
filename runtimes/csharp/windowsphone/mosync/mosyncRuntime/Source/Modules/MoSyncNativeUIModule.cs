@@ -289,6 +289,18 @@ namespace MoSync
                 {
                     widget.RemoveFromParent();
                     mWidgets[_widget] = null;
+
+                    mWidgetTypeDictionary.Remove(_widget);
+                    Thread widgetCreationThread = null;
+                    mWidgetThreadDictionary.TryGetValue(_widget, out widgetCreationThread);
+                    if (widgetCreationThread != null)
+                    {
+                        if (widgetCreationThread.IsAlive)
+                        {
+                            widgetCreationThread.Abort();
+                        }
+                        mWidgetThreadDictionary.Remove(_widget);
+                    }
                 }
                 return MoSync.Constants.MAW_RES_OK;
             };
