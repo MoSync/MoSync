@@ -84,6 +84,10 @@ int generateMakefile(Arguments* params, string& configName) {
 			DefaultContext* moduleCtx = new DefaultContext(&rootCtx);
 			// TODO: Clean up
 			moduleCtx->setParameter("name", moduleName);
+			string initFunc = initFuncs[moduleName];
+			if (!initFunc.empty()) {
+				moduleCtx->setParameter("init", initFunc);
+			}
 			rootCtx.addChild("modules", moduleCtx);
 		}
 	}

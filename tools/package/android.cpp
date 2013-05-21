@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "filelist/filelist.h"
 #include "profiledb/profiledb.h"
 #include <fstream>
+#include <map>
+#include <set>
 #include <sstream>
 #include <errno.h>
 #include <vector>
@@ -42,7 +44,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri);
 static string packageNameToByteCodeName(const string& packageName);
-static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug);
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug, bool& staticLib);
 
 class AndroidContext : public DefaultContext {
 private:
@@ -131,6 +133,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	// Extensions & modules.
 	vector<string> modules;
+	set<string> staticModules;
 	map<string,string> initFuncs;
 
 	bool isNative = !strcmp("native", s.outputType);
@@ -148,6 +151,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		modules.push_back("mosync");
 		modules.push_back("mosynclib");
 		initFuncs["mosynclib"] = "resource_selector";
+		//staticModules.insert("mosynclib");
 
 		modules.insert(modules.end(), extensions.begin(), extensions.end());
 		modules.push_back(s.name);
@@ -179,9 +183,12 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		string moduleList = assetDir + "startup.mf";
 		ofstream moduleListOut(moduleList.c_str());
 		for (size_t i = 0; i < modules.size(); i++) {
+			string module = modules[i];
+			moduleListOut << (staticModules.count(module) ?
+					"STATIC:" : "SHARED:");
 			// Last one in list is the 'app' lib
-			moduleListOut << modules[i];
-			string initFunc = initFuncs[modules[i]];
+			moduleListOut << module;
+			string initFunc = initFuncs[module];
 			if (!initFunc.empty()) {
 				moduleListOut << ":" << initFunc;
 			}
@@ -341,7 +348,7 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 		" "<<arg(alias);
 }
 
-static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug) {
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug, bool& staticLib) {
 	vector<string> paths;
 
 	string variantDirName = string("android_") + arch + (debug ? "_debug" : "_release");
@@ -365,9 +372,15 @@ static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, stri
 	for (size_t i = 0; i < paths.size(); i++)  {
 		string path = paths[i];
 		toDir(path);
-		string potentialMatch = path + "lib" + name + ".so";
-		if (existsFile(potentialMatch.c_str())) {
-			return potentialMatch;
+		string potentialSharedLib = path + "lib" + name + ".so";
+		string potentialStaticLib = path + "lib" + name + ".a";
+		if (existsFile(potentialSharedLib.c_str())) {
+			staticLib = false;
+			return potentialSharedLib;
+		}
+		if (existsFile(potentialStaticLib.c_str())) {
+			staticLib = true;
+			return potentialStaticLib;
 		}
 	}
 	return "";
