@@ -348,7 +348,7 @@ namespace MoSync
 		{
             brush = null;
             System.Windows.Media.SolidColorBrush tempBrush = null;
-            bool invalidColor = false;;
+            bool invalidColor = false;
 
             MoSync.Util.RunActionOnMainThread(() =>
             {
