@@ -138,10 +138,10 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	bool isNative = !strcmp("native", s.outputType);
 
-	// TODO: These things should be in module manifests, not as special hacks...
+	// TODO: beta
 	bool useSTL = false;
 	for (size_t i = 0; i < extensions.size(); i++) {
-		useSTL |= "STL" == extensions[i];
+		useSTL |= "stlport" == extensions[i];
 	}
 	if (isNative) {
 		// Default modules; todo: externalize?
@@ -153,7 +153,12 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		initFuncs["mosynclib"] = "resource_selector";
 		//staticModules.insert("mosynclib");
 
-		modules.insert(modules.end(), extensions.begin(), extensions.end());
+		for (size_t i = 0; i < extensions.size(); i++) {
+			string extension = extensions[i];
+			if ("stlport" != extension) {
+				modules.push_back(extension);
+			}
+		}
 		modules.push_back(s.name);
 		initFuncs[string(s.name)] = "MAMain";
 	}
@@ -248,17 +253,17 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 		for (size_t j = 0; j < modules.size(); j++) {
 			string module = modules[j];
-			if ("STL" != module) {
-				string nativeLib = findNativeLibrary(s, modules, module, arch, s.debug);
-				if (!nativeLib.empty()) {
-					string dstLibDir = addlib + "/" + arch + "/";
-					_mkdir(dstLibDir.c_str());
-					string dstLib = dstLibDir + "lib" + module + ".so";
-					copyFile(dstLib.c_str(), nativeLib.c_str());
-				} else {
-					printf("Could not find library %s!\n", module.c_str());
-					exit(1);
-				}
+			bool staticLib = false;
+			string nativeLib = findNativeLibrary(s, modules, module, arch, s.debug, staticLib);
+			bool mustExist = !staticLib;//&& "stlport_shared" != module;
+			if (!nativeLib.empty() && mustExist) {
+				string dstLibDir = addlib + "/" + arch + "/";
+				_mkdir(dstLibDir.c_str());
+				string dstLib = dstLibDir + "lib" + module + ".so";
+				copyFile(dstLib.c_str(), nativeLib.c_str());
+			} else if (nativeLib.empty()) {
+				printf("Could not find library %s!\n", module.c_str());
+				exit(1);
 			}
 		}
 	}

@@ -65,6 +65,9 @@ int generateMakefile(Arguments* params, string& configName) {
 	_mkdir(tmpBuildDir.c_str());
 
 	vector<string> bootstrapModules;
+	// TODO: Duplicated in package tool, should use manifest instead!
+	map<string, string> initFuncs;
+	initFuncs["mosynclib"] = "resource_selector";
 	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
 	if (bootstrapModules.empty()) {
 		// Default
@@ -300,7 +303,11 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("NDK_PROJECT_PATH=.") << " ";
 			cmd << arg("APP_ABI=" + arch) << " ";
 			if (useSTL) {
-				string appstl = string("APP_STL=stlport_") + (useStatic ? "static" : "shared");
+				// TODO: beta
+				if (useStatic) {
+					error("Static STL not supported!");
+				}
+				string appstl = string("APP_STL=stlport_shared");
 				cmd << arg(appstl) << " ";
 			}
 			string androidVersion = getAppPlatform(params);
@@ -317,13 +324,18 @@ int executeNdkBuild(Arguments* params) {
 			string fullOutputFile = fullOutputDir + "lib" + moduleName + libExt;
 
 			file(libFile.c_str());
+			remove(libFile.c_str());
 			string fullCmd = getNdkBuildCommand(cmd.str());
 			if (sh(fullCmd.c_str(), !isVerbose)) {
 				error("NDK build command failed!\n", 1);
 			}
 
+			if (!existsFile(libFile.c_str())) {
+				error("NDK build failed!\n", 1);
+			}
 			copyFile(fullOutputFile.c_str(), libFile.c_str());
-			if (useSTL && !useStatic) {
+			// TODO: The important thing is: is the STL static, not the result?
+			if (useSTL) {
 				copyFile(fullOutputFile.c_str(), libFile.c_str());
 				string stlLibFile = tmpBuildDir + "libs/" + arch + "/libstlport_shared.so";
 				string stlOutputFile = fullOutputDir + "libstlport_shared.so";
