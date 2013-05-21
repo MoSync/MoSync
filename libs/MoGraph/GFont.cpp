@@ -28,7 +28,7 @@ MA 02110-1301, USA.
 #include <GLES2/gl2.h>
 #include <string>
 #include <vector>
-#include <hash_map>
+
 #include <glm/glm.hpp>
 #include <mavsprintf.h>
 #include "Shaders.h"
