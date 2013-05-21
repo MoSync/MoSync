@@ -9,6 +9,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <iterator>
 
 #define LLVM_GCC_LOC "/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-gcc"
 
@@ -17,47 +18,40 @@ using namespace std;
 int buildIOSNative(Arguments* params) {
 	int result = 1;
 
-	string xcodeLocation = "/Applications/Xcode.app/Contents/Developer/"; //Should be taked from the command options eventually
-	string sdkVersion = "6.1"; //Should be taked from the command options eventually
-	string projectDir = require(params, "--project");
+	string xcodeLocation = require(params, IOS_XCODE_LOCATION);
+	string sdkVersion = require(params, IOS_SDK_VERSION);
+	string projectDir = require(params, PROJECT_DIR);
 	string finalOutputFileName = "userCode.o"; //Should be taked from the command options eventually
 
 	//Special header folder for the native ios build, which does not include headers
 	//that already exist in the iphone SDK
 	string nativeHeaderDir = string(mosyncdir()) + "/include/MAStdNative";
 
+	typedef vector<string>::const_iterator vctrStrCIter;
+
 	//Gather the source files in a string
 	vector<string> sourceFiles = getSourceFiles(params);
-	string sourceFileList;
-	for (size_t i = 0; i < sourceFiles.size(); i++) {
-		sourceFileList += sourceFiles[i];
-		sourceFileList += " ";
+	stringstream sourceFileList;
+	if (!sourceFiles.empty()) {
+		copy(sourceFiles.begin(), sourceFiles.end(), ostream_iterator<string>(sourceFileList," "));
 	}
-	if (sourceFiles.empty()) {
+	else {
 		error("No source files!\n");
 	}
 
 	vector<string> compilerDefines = params->getPrefixedList(MACRO_DEFINES, true);
-	string compilerDefinesList;
-	for (size_t i = 0; i < compilerDefines.size(); i++) {
-		compilerDefinesList += compilerDefines[i];
-		compilerDefinesList += " ";
-	}
+	stringstream compilerDefinesList;
+	copy(compilerDefines.begin(), compilerDefines.end(), ostream_iterator<string>(compilerDefinesList," "));
 
 	vector<string> additionalIncludes = params->getPrefixedList(ADDITIONAL_INCLUDES, true);
-	string additionalIncludesList;
-	for (size_t i = 0; i < additionalIncludes.size(); i++) {
-		additionalIncludesList += additionalIncludes[i];
-		additionalIncludesList += " ";
-	}
+	stringstream additionalIncludesList;
+	copy(additionalIncludes.begin(), additionalIncludes.end(), ostream_iterator<string>(additionalIncludesList," "));
 
 	//Not used yet
 	vector<string> additionalLibPaths = params->getPrefixedList(ADDITIONAL_LIB_PATHS, true);
-	string additionalLibPathsList;
-	for (size_t i = 0; i < additionalLibPaths.size(); i++) {
-		additionalLibPathsList += additionalLibPaths[i];
-		additionalLibPathsList += " ";
-	}
+	stringstream additionalLibPathsList;
+	copy(additionalLibPaths.begin(), additionalLibPaths.end(), ostream_iterator<string>(additionalLibPathsList," "));
+
 
 	vector<string> configNames;
 	vector<string> libVariants;
@@ -67,7 +61,7 @@ int buildIOSNative(Arguments* params) {
 	string moduleName = require(params, NAME);
 
 	//Recursively create the output dir
-	string outputDir = require(params, "--dst");
+	string outputDir = require(params, OUTPUT_DIR);
 	size_t slashPos = 0;
 	do {
 		slashPos = outputDir.find('/', slashPos + 1);
@@ -79,6 +73,7 @@ int buildIOSNative(Arguments* params) {
 	}
 
 	bool isVerbose = params->isFlagSet(VERBOSE);
+	string compilerSwitches = params->getSwitchValue(COMPILER_SWITCHES);
 
 	//List of architectures to build
 	vector<string> archs;
@@ -120,16 +115,17 @@ int buildIOSNative(Arguments* params) {
 
 			cmd << "-arch " + arch << " "; //The architecture to build
 			cmd << "-Xlinker -r "; //Tell the linker to just bundle all the .o files into one .o instead of linking/assembling
-			cmd << " -nostdlib "; //Don't link with stdlib, xcode will do that
-			cmd << "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/" << archSDKName << ".platform/Developer/SDKs/" << archSDKName << sdkVersion << ".sdk ";
+			cmd << "-nostdlib "; //Don't link with stdlib, xcode will do that
+			cmd << "-isysroot " << xcodeLocation << "/Platforms/" << archSDKName << ".platform/Developer/SDKs/" << archSDKName << sdkVersion << ".sdk ";
 			cmd << "-miphoneos-version-min=" << sdkVersion << " ";
 			cmd << "-D__IOS__ -DUSE_NEWLIB -DMOSYNC_NATIVE" << " ";
+			cmd << compilerSwitches << " ";
 			cmd << "-I" << nativeHeaderDir << " ";
 			cmd << "-I" << outputDir << " ";
-			cmd << sourceFileList << " ";
-			cmd << additionalIncludesList << " ";
-			cmd << additionalLibPathsList << " ";
-			cmd << compilerDefinesList << " ";
+			cmd << sourceFileList.str() << " ";
+			cmd << additionalIncludesList.str() << " ";
+			cmd << additionalLibPathsList.str() << " ";
+			cmd << compilerDefinesList.str() << " ";
 			cmd << "-o " << outputFile << " ";
 			sh(cmd.str().c_str(), !isVerbose);
 		}

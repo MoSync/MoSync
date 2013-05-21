@@ -3467,7 +3467,7 @@ interface MAAPI {
 		*
 		* "mosync.device.name" is the name of the device. Usually set by the user.
 		*
-		* "mosync.device.UUID" is the Unique identifier of the device.
+		* "mosync.device.UUID" is the Unique identifier of the device. Not available on iOS platform.
 		*
 		* "mosync.device.OS" is the operating system or platform that the device is using.
 		* It might contain version detail as well.

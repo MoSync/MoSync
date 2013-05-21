@@ -341,8 +341,10 @@ public class TextBox extends Activity implements OnClickListener {
 
 			// Write text directly to the MoSync memory
 			char[] ca = output.toCharArray();
-			ByteBuffer buffer = mosyncThread.getMemorySlice(mOutputMemPtr, ca.length * 2 + 1);
+			ByteBuffer buffer = mosyncThread.getMemorySlice(mOutputMemPtr, (ca.length + 1) * 2);
 
+			// NOTE: THIS DIFFERS FROM WHAT IS BEING OUTPUT IN THE mCancelButton check,
+			// where bytes are used instead. Really strange -- is this wchars or smthg? Why?
 			CharBuffer cb = buffer.asCharBuffer();
 			cb.put(ca);
 			cb.put((char)0);

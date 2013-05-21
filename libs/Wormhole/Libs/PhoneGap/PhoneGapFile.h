@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #include <NativeUI/WebView.h>
 #include <MAUtil/String.h>
 
+
 namespace Wormhole
 {
 	class JSONMessage;
@@ -168,6 +169,24 @@ namespace Wormhole
 		virtual void actionGetFreeDiskSpace(JSONMessage& message);
 
 		virtual void actionUploadFile(JSONMessage& message);
+
+		/**
+		 * Get the options parameters "create" and "exclusive"
+		 * from the JSON tree.
+		 * @return true on success, false on error.
+		 */
+		virtual bool getJSONParamsOptionsCreateExclusive(
+			JSONMessage& message,
+			bool& create,
+			bool& exclusive);
+
+		/**
+		 * Get the parent fullPath of a directory entry from the JSON tree.
+		 * @return true on success, false on error.
+		 */
+		virtual bool getJSONParamParentFullPath(
+			JSONMessage& message,
+			MAUtil::String& destinationPath);
 
 	protected:
 		/**

@@ -8,6 +8,9 @@ MOSYNC_MODULE_PATH := $(MOSYNC_MODULES)/{{name}}/lib/$(MOSYNC_PLATFORM)/$(MOSYNC
 LOCAL_LDLIBS += -L$(MOSYNC_MODULE_PATH)
 LOCAL_LDLIBS += -l{{name}}
 LOCAL_C_INCLUDES += $(MOSYNC_MODULES)/{{name}}/inc
+{{#init}}
+LOCAL_LDFLAGS += -u {{init}}
+{{/init}}
 {{/modules}}
 {{! Default libs }}
 LOCAL_LDLIBS += -llog -landroid -lEGL -lGLESv1_CM -lGLESv2

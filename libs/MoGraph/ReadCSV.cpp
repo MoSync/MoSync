@@ -78,13 +78,16 @@ bool ReadCSV::load( MAHandle resource, char delim, bool trim)
 	for (int i=0;pch != NULL;i++)
 	{
 	    pch = strtok(NULL, "\r\n");
-	    line = pch;
-//	    lprintfln("ReadCSV::Load Line=%s",line.c_str());
-		lineData = Utils::split(line,delim,trim);
-		if (lineData.size() > /*1*/0)
-			m_db.push_back(lineData);
-		else
-		    lprintfln("WARNING ReadCSV::load missing lineData from line %i => %s\n",i,line.c_str());
+		if (pch)
+		{
+			line = pch;
+//			lprintfln("ReadCSV::Load Line=%s",line.c_str());
+			lineData = Utils::split(line,delim,trim);
+			if (lineData.size() > /*1*/0)
+				m_db.push_back(lineData);
+			else
+				lprintfln("WARNING ReadCSV::load missing lineData from line %i => %s\n",i,line.c_str());
+		}
 	}
 
 	delete [] data;						// need to free temp buffer.

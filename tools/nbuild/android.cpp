@@ -65,6 +65,9 @@ int generateMakefile(Arguments* params, string& configName) {
 	_mkdir(tmpBuildDir.c_str());
 
 	vector<string> bootstrapModules;
+	// TODO: Duplicated in package tool, should use manifest instead!
+	map<string, string> initFuncs;
+	initFuncs["mosynclib"] = "resource_selector";
 	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
 	if (bootstrapModules.empty()) {
 		// Default
@@ -84,6 +87,10 @@ int generateMakefile(Arguments* params, string& configName) {
 			DefaultContext* moduleCtx = new DefaultContext(&rootCtx);
 			// TODO: Clean up
 			moduleCtx->setParameter("name", moduleName);
+			string initFunc = initFuncs[moduleName];
+			if (!initFunc.empty()) {
+				moduleCtx->setParameter("init", initFunc);
+			}
 			rootCtx.addChild("modules", moduleCtx);
 		}
 	}
@@ -248,7 +255,6 @@ int executeNdkBuild(Arguments* params) {
 	bool useSTL = false;
 	for (size_t i = 0; i < modules.size(); i++) {
 		useSTL |= isSTL(modules[i]);
-		printf("USE STL? %s, %d\n", modules[i].c_str(), useSTL);
 	}
 
 	for (size_t i = 0; i < configNames.size(); i++) {
@@ -276,6 +282,9 @@ int executeNdkBuild(Arguments* params) {
 			if (doClean) {
 				cmd << "-B ";
 			}
+
+			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
+
 			string libDir = string(mosyncdir()) + "/lib";
 			toSlashes(libDir);
 			string moduleDir = string(mosyncdir()) + "/modules";
@@ -294,13 +303,17 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("NDK_PROJECT_PATH=.") << " ";
 			cmd << arg("APP_ABI=" + arch) << " ";
 			if (useSTL) {
-				cmd << arg("APP_STL=stlport_static") << " ";
+				// TODO: beta
+				if (useStatic) {
+					error("Static STL not supported!");
+				}
+				string appstl = string("APP_STL=stlport_shared");
+				cmd << arg(appstl) << " ";
 			}
 			string androidVersion = getAppPlatform(params);
 			cmd << arg("APP_PLATFORM=android-" + androidVersion) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
 
-			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
 			_mkdir(fullOutputDir.c_str());
 
@@ -311,12 +324,23 @@ int executeNdkBuild(Arguments* params) {
 			string fullOutputFile = fullOutputDir + "lib" + moduleName + libExt;
 
 			file(libFile.c_str());
+			remove(libFile.c_str());
 			string fullCmd = getNdkBuildCommand(cmd.str());
 			if (sh(fullCmd.c_str(), !isVerbose)) {
 				error("NDK build command failed!\n", 1);
 			}
 
+			if (!existsFile(libFile.c_str())) {
+				error("NDK build failed!\n", 1);
+			}
 			copyFile(fullOutputFile.c_str(), libFile.c_str());
+			// TODO: The important thing is: is the STL static, not the result?
+			if (useSTL) {
+				copyFile(fullOutputFile.c_str(), libFile.c_str());
+				string stlLibFile = tmpBuildDir + "libs/" + arch + "/libstlport_shared.so";
+				string stlOutputFile = fullOutputDir + "libstlport_shared.so";
+				copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
+			}
 		}
 	}
 	return 0;

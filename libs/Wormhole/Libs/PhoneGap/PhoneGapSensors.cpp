@@ -63,13 +63,13 @@ namespace Wormhole
 					message.getParam("PhoneGapCallBackId"),
 					false); //stop Accelerometer after the first run
 			}
-			else if (message.getParam("action") == "startWatch")
+			else if (message.getParam("action") == "start")
 			{
 				processAcelerometerRequest(
 					message.getParam("PhoneGapCallBackId"),
 					true); // Keep the Accelerometer running
 			}
-			else if (message.getParam("action") == "stopWatch")
+			else if (message.getParam("action") == "stop")
 			{
 				maSensorStop(SENSOR_TYPE_ACCELEROMETER);
 				mAccelerometerWatchStarted = false;
@@ -78,13 +78,13 @@ namespace Wormhole
 		// GeoLocation request from PhoneGap
 		else if (message.getParam("service") == "GeoLocation")
 		{
-			if (message.getParam("action") == "watchPosition")
+			if (message.getParam("action") == "addWatch")
 			{
 				processLocationRequest(
 					message.getParam("PhoneGapCallBackId"),
 					true);
 			}
-			else if (message.getParam("action") == "getCurrentPosition")
+			else if (message.getParam("action") == "getLocation")
 			{
 				processLocationRequest(
 					message.getParam("PhoneGapCallBackId"),
@@ -105,13 +105,14 @@ namespace Wormhole
 					message.getParam("PhoneGapCallBackId"),
 					false); //stop Sensor after the first run
 			}
-			else if (message.getParam("action") == "startWatch")
+			// Cordova 2.3.0 doesn't use Compass.startWatch
+			/* else if (message.getParam("action") == "startWatch")
 			{
 				processCompassRequest(
 					message.getParam("PhoneGapCallBackId"),
 					true); // Keep the Compass running
-			}
-			else if (message.getParam("action") == "stopWatch")
+			} */
+			else if (message.getParam("action") == "stopHeading")
 			{
 				maSensorStop(SENSOR_TYPE_COMPASS);
 				mAccelerometerWatchStarted = false;
@@ -223,11 +224,11 @@ namespace Wormhole
 
 		// Call the PhoneGap function, can call the commandResult function too.
 		sprintf(result,
-			"\\'{"
+			"{"
 				"\"x\": %f,"
 				"\"y\": %f,"
 				"\"z\": %f"
-			"}\\'",
+			"}",
 			sensorData.values[0],
 			sensorData.values[1],
 			sensorData.values[2]
@@ -267,7 +268,7 @@ namespace Wormhole
 		// Call the Phonegap function, Can call the commandResult function too
 		sprintf(
 				result,
-				"\\'{\"magneticHeading\":%f }\\'",
+				"{\"magneticHeading\":%f }",
 				sensorData.values[0] // only x is considered as compass heading in PhoneGap
 				);
 		mMessageHandler->callSuccess(

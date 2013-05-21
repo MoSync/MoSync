@@ -72,6 +72,7 @@ end
 
 $androidNDKPath = ARGV[0]
 $androidVersion = ARGV[1]
+$stl = ARGV[2] == "stlport"
 
 if ($androidNDKPath == '@')
 	# Then use the 'settings' ruby file instead.
@@ -130,10 +131,21 @@ puts "Building native Library\n\n"
 # First, we need wchar support
 #buildLib("wchar", { 'src' => "-SMAStd/wchar.c -SMAStd/mawstring.c -SMAStd/mawvsprintf.c", 'bootmodules' => "." })
 
+modules = ""
+if ($stl)
+	modules = 'stlport'
+end
+
 bootfiles = "-S./* -S./UTF/* -S../../core/Core.cpp -S../sdl/FileImpl.cpp -S../../base/FileStream.cpp -S../../base/MemStream.cpp -S../../base/Stream.cpp -S../../base/Image.cpp -S../../base/ResourceArray.cpp -S../../base/Syscall.cpp -S../../../../intlibs/helpers/platforms/linux/log.cpp -S../../../../intlibs/hashmap/hashmap.cpp"
 cppDir = "#{ENV['MOSYNC_SRC']}/runtimes/cpp"
 additionalIncludes = "-I#{cppDir} -I#{cppDir}/base -I#{cppDir}/core -I#{ENV['MOSYNC_SRC']}/intlibs"
-buildLib("mosync", { 'src' => bootfiles, 'compiler-flags' => "-Wno-psabi -D_android", 'project' => "#{cppDir}/platforms/android", 'includes' => additionalIncludes, 'bootmodules' => "."})
+buildLib("mosync", {
+	'modules' =>  modules,
+	'src' => bootfiles,
+	'compiler-flags' =>	"-Wno-psabi -D_android",
+	'project' => "#{cppDir}/platforms/android",
+	'includes' => additionalIncludes,
+	'bootmodules' => "." })
 #sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name mosync --project #{cppDir}/platforms/android --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndk-location #{$androidNDKPath} --android-version #{$androidVersion} #{bootfiles} --verbose --boot-modules . #{additionalIncludes} --compiler-switches -Wno-psabi -D_android")
 
 #wcharfiles = "-S./newlib/libc/string/wcpcpy.c -S./newlib/libc/string/wcsncpy.c -S./newlib/libc/string/wcpncpy.c -S./newlib/libc/string/wcsnlen.c -S./newlib/libc/string/wcscasecmp.c -S./newlib/libc/string/wcspbrk.c -S./newlib/libc/string/wcscat.c -S./newlib/libc/string/wcsrchr.c -S./newlib/libc/string/wcschr.c -S./newlib/libc/string/wcsspn.c -S./newlib/libc/string/wcscmp.c -S./newlib/libc/string/wcsstr.c -S./newlib/libc/string/wcscoll.c -S./newlib/libc/string/wcstok.c -S./newlib/libc/string/wcscpy.c -S./newlib/libc/string/wcswidth.c -S./newlib/libc/string/wcscspn.c -S./newlib/libc/string/wcsxfrm.c -S./newlib/libc/string/wcsdup.c -S./newlib/libc/string/wcwidth.c -S./newlib/libc/string/wcslcat.c -S./newlib/libc/string/wmemchr.c -S./newlib/libc/string/wcslcpy.c -S./newlib/libc/string/wmemcmp.c -S./newlib/libc/string/wcslen.c -S./newlib/libc/string/wmemcpy.c -S./newlib/libc/string/wcsncasecmp.c -S./newlib/libc/string/wmemmove.c -S./newlib/libc/string/wcsncat.c -S./newlib/libc/string/wmemset.c -S./newlib/libc/string/wcsncmp.c"
@@ -153,8 +165,12 @@ buildLib("mosync", { 'src' => bootfiles, 'compiler-flags' => "-Wno-psabi -D_andr
 #buildLib("Notification", { 'src' => "-SNotification/**", 'modules' => "MAStd,MAUtil" })
 
 libfiles = "-SMAP -SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
+if $stl
+	libfiles = "-SMoGraph/** " + libfiles
+end
 #libfiles = "- -Skazlib  -SHybris "
-buildLib("mosynclib", { 'shared' => true,
+buildLib("mosynclib", { 'libtype' => 'shared',
+	'modules' => modules,
 	'src' => libfiles,
 	'compiler-flags' => "-D_MB_CAPABLE",
-	'includes' => "-I#{ENV['MOSYNC_SRC']}/libs -I#{ENV['MOSYNC_SRC']}/libs/MAStd" })
+	'includes' => "-I#{ENV['MOSYNC_SRC']}/libs" })

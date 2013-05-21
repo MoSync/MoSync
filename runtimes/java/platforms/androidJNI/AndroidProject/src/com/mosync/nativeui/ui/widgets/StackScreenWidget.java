@@ -239,8 +239,10 @@ public class StackScreenWidget extends ScreenWidget
 			getView( ).addView( previousScreen.getView( ) );
 
 			// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
-			Log.e("@@MoSync","NativeUI maWidgetScreenShow invalidate menu");
-			MoSyncThread.getInstance().getActivity().invalidateOptionsMenu();
+			Log.e("@@MoSync", "NativeUI maWidgetScreenShow invalidate menu");
+			MoSyncThread mosyncThread = MoSyncThread.getInstance();
+			mosyncThread.invalidateOptionsMenu(mosyncThread.getActivity());
+
 		}
 	}
 

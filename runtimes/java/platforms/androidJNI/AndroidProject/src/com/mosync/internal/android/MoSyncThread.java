@@ -19,16 +19,20 @@ package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
@@ -44,17 +48,6 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
-import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
-import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
-import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -64,6 +57,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
@@ -73,6 +67,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -120,15 +115,12 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import android.provider.Settings.Secure;
-import android.net.ConnectivityManager;
 
 import com.mosync.api.MoSyncContext;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
-import com.mosync.internal.generated.IX_OPENGL_ES;
 import com.mosync.internal.generated.IX_OPENGL_ES_MA;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
@@ -357,6 +349,10 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 	private ArrayList<String> mDeferredModules = new ArrayList<String>();
 
+	private HashSet<String> mStaticModules = new HashSet<String>();
+
+	private String mUserLib = null;
+
 	/**
 	 * MoSyncThread constructor
 	 */
@@ -482,15 +478,24 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			LineNumberReader reader = new LineNumberReader(new InputStreamReader(depsList, Charset.forName("UTF-8")));
 			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 				if (line.length() > 0) {
-					String[] moduleAndInitFn = line.split(":", 2);
-					String module = moduleAndInitFn[0];
-					String initFn = moduleAndInitFn.length > 1 ? moduleAndInitFn[1] : null;
+					String[] moduleAndInitFn = line.split(":", 3);
+					String libType = moduleAndInitFn[0];
+					boolean shared = "SHARED".equalsIgnoreCase(libType);
+					String module = moduleAndInitFn[1];
+					mUserLib = module;
+					String initFn = moduleAndInitFn.length > 2 ? moduleAndInitFn[2] : null;
 					if (initFn != null) {
 						// Deferred init until nativeRun2 is executed.
+						// Static ones will be called using the last, main lib.
 						mDeferredModules.add(module);
+						if (!shared) {
+							mStaticModules.add(module);
+						}
 						mAppLibPaths.put(module, initFn);
 					}
-					System.loadLibrary(module);
+					if (shared) {
+						System.loadLibrary(module);
+					}
 				}
 			}
 			mNativeLibraryDir = context.getApplicationInfo().nativeLibraryDir;
@@ -769,10 +774,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		try
 		{
 			AssetManager assetManager = mContext.getAssets();
-			AssetFileDescriptor pAfd = assetManager.openFd(PROGRAM_FILE);
-			FileDescriptor pFd = pAfd.getFileDescriptor();
-			long pFdOffset = pAfd.getStartOffset();
-
 			FileDescriptor rFd = null;
 			mResourceOffset = 0;
 
@@ -794,23 +795,30 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			// We have a program file so now we sends it to the native side
 			// so it will be loaded into memory. The data section will also be
 			// created and if there are any resources they will be loaded.
-			if (null != pFd)
+			FileDescriptor pFd = null;
+			long pFdOffset = 0;
+			try {
+				AssetFileDescriptor pAfd = assetManager.openFd(PROGRAM_FILE);
+				pFd = pAfd.getFileDescriptor();
+				pFdOffset = pAfd.getStartOffset();
+			} catch (FileNotFoundException fnfe) {
+				logError(
+						"loadProgram - Has no program! exception: "
+								+ fnfe.toString(), fnfe);
+			}
+
+			if (isNative || (null != pFd))
 			{
-				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset, isNative))
+				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset,
+						isNative))
 				{
 					logError("loadProgram - "
-						+ "ERROR Load program was unsuccesfull");
+							+ "ERROR Load program was unsuccesfull");
 
-					if (null == mMemDataSection)
-					{
-						threadPanic(
-							0,
-							"This device does not have enough" +
-							"memory to run this application."
-						);
-					}
-					else
-					{
+					if (null == mMemDataSection) {
+						threadPanic(0, "This device does not have enough"
+								+ "memory to run this application.");
+					} else {
 						threadPanic(0, "Unable to load program or resources");
 					}
 
@@ -1146,9 +1154,11 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		// Run program. This enters a while loop in C-code.
 		if (isNative) {
 			for (String deferred : mDeferredModules) {
-				runInitFunction(deferred, mAppLibPaths.get(deferred));
+				String lib = mStaticModules.contains(deferred) ? mUserLib : deferred;
+				runInitFunction(lib, mAppLibPaths.get(deferred));
 			}
 			mContext.finish();
+			nativeExit();
 		} else {
 			nativeRun();
 		}
@@ -2929,6 +2939,10 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		else if(key.equals("mosync.device.name"))
 		{
 			property = Build.DEVICE;
+		}
+		else if(key.equals("mosync.device.model"))
+		{
+			property = Build.MODEL;
 		}
 		else if(key.equals("mosync.device.UUID"))
 		{
@@ -4738,6 +4752,31 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	public int maActionBarSetBackgroundImage(final int imageHandle)
 	{
 		return mMoSyncNativeUI.maActionBarSetBackgroundImage(imageHandle);
+	}
+
+	public void invalidateOptionsMenu(Activity activity) {
+		Class<?> activityClass = null;
+		Method activity_invalidateOptionMenu = null;
+		try {
+			activityClass = Class.forName("android.app.Activity");
+		} catch (Throwable e) {
+			System.err.println(e);
+		}
+
+		// Search for invalidateOptionsMenu into the Activity class.
+		try {
+			activity_invalidateOptionMenu = activityClass
+					.getMethod("invalidateOptionsMenu");
+			/* success, this is a newer device */
+		} catch (NoSuchMethodException nsme) {
+			/* failure, must be older device */
+			Log.i("MoSync", "invalidateOptionsMenu failed");
+		}
+		try {
+			activity_invalidateOptionMenu.invoke(activity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
