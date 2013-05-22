@@ -563,6 +563,13 @@ int main(int argc, char **argv) {
 			nodeValue.append(cppFilesReferences.back().filePath);
 			contentChild.append_attribute("Include").set_value(nodeValue.c_str());
 
+			if(strcmp(nodeValue.substr(nodeValue.length() - 2, 2).c_str(), ".c") == 0) //a .c file
+			{
+				pugi::xml_node conditionChild = contentChild.append_child("CompileAsWinRT");
+				conditionChild.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'");
+				conditionChild.append_child(pugi::node_pcdata).set_value("false");
+			}
+
 			cppFilesReferences.pop_back();
 		}
 	}
