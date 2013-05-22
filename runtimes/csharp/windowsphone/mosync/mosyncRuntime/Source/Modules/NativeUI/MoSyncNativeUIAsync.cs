@@ -112,12 +112,11 @@ namespace MoSync
                         child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(child.GetHandle());
                     }
 
-                    // TODO SA: verify if this should be sync or not
                     MoSync.Util.RunActionOnMainThread(() =>
                     {
                         child.SetParent(parent);
                         parent.AddChild(child);
-                    }, false);
+                    }, true);
                 }
             }
 
@@ -142,12 +141,11 @@ namespace MoSync
                         child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(child.GetHandle());
                     }
 
-                    // TODO SA: verify if this should be sync or not
                     MoSync.Util.RunActionOnMainThread(() =>
                     {
                         child.SetParent(parent);
                         parent.InsertChild(child, index);
-                    }, false);
+                    }, true);
                 }
             }
 
@@ -172,11 +170,10 @@ namespace MoSync
                         child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(child.GetHandle());
                     }
 
-                    // TODO SA: verify if this should be sync or not
                     MoSync.Util.RunActionOnMainThread(() =>
                     {
                         child.RemoveFromParent();
-                    }, false);
+                    }, true);
                 }
             }
 
