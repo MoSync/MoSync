@@ -76,8 +76,6 @@ namespace MoSync
          */
         private void CreateWidgetAsync(int widgetHandle, Type widgetType)
         {
-            IWidget widgetMock = mWidgets[widgetHandle];
-
             // create the widget on the UI thread sync
             MoSync.Util.RunActionOnMainThread(() =>
             {
@@ -108,13 +106,15 @@ namespace MoSync
             widget.SetHandle(widgetHandle);
             widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
             widget.SetRuntime(widgetMock.GetRuntime());
+
+            // run the operation queue on the newly created widget
+            (widget as WidgetBaseWindowsPhone).RunOperationQueue();
+
             // lock the mWidgets array when this thread starts manipulating it
             lock (mWidgets)
             {
                 mWidgets[widgetHandle] = widget;
             }
-            // run the operation queue on the newly created widget
-            (widget as WidgetBaseWindowsPhone).RunOperationQueue();
         }
 
         /**
