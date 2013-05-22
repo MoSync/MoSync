@@ -166,11 +166,12 @@ namespace MoSyncCamera
         void toogleShowSnapshotButton(bool enabled);
 
         /**
-         * Changes the state of the take snapshot button.
-         *
-         * @param enabled true if button must be enabled,
-         * false if it must be disabled.
-         */
+		 * Changes the state of the button that captures a
+		 * snapshot
+		 *
+		 * @param enabled true if button must be enabled,
+		 * false if it must be disabled.
+		 */
         void toogleTakeSnapshotButton(bool enabled);
 
         /**

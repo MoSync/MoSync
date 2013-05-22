@@ -59,7 +59,7 @@ public class EGLViewFactory implements AbstractViewFactory
 		{
 			return null;
 		}
-		eglView.setLayoutParams( new LayoutParams( LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT ) );
+		eglView.setLayoutParams( new LayoutParams( LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT ) );
 		eglView.setEglViewReadyListener( new EGLViewReadyListener( ) {
 
 			@Override

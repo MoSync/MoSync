@@ -69,7 +69,7 @@ namespace MAUtil {
 			 * \returns 'true' if there is a next element, otherwise 'false'.
 			 */
 			bool hasNext() const {
-				return mCurrent!=NULL && mCurrent->mNext;
+				return mCurrent!=NULL && (mFirst || mCurrent->mNext);
 			}
 
 			/**
@@ -77,7 +77,7 @@ namespace MAUtil {
 			 * \returns 'true' if there is a previous element, otherwise 'false'.
 			 */
 			bool hasPrev() const {
-				return mCurrent!=NULL && mCurrent->mPrev;
+				return mCurrent!=NULL && (mFirst || mCurrent->mPrev);
 			}
 
 			/**
@@ -132,7 +132,7 @@ namespace MAUtil {
 			 * \returns 'true' if there is a next element, otherwise 'false'.
 			 */
 			bool hasNext() const {
-				return mCurrent!=NULL && mCurrent->mNext;
+				return mCurrent!=NULL && (mFirst || mCurrent->mNext);
 			}
 
 			/**
@@ -140,7 +140,7 @@ namespace MAUtil {
 			 * \returns 'true' if there is a previous element, otherwise 'false'.
 			 */
 			bool hasPrev() const {
-				return mCurrent!=NULL && mCurrent->mPrev;
+				return mCurrent!=NULL && (mFirst || mCurrent->mPrev);
 			}
 
 			/**

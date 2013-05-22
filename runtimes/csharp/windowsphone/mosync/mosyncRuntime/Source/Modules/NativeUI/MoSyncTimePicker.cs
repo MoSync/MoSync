@@ -82,13 +82,33 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("currentHour") || propertyName.Equals("currentMinute"))
                 {
-                    return false;
+                    int val;
+                    if (!int.TryParse(propertyValue, out val))
+                    {
+                        isPropertyValid = false;
+                    }
+
+                    if (propertyName.Equals("currentHour"))
+                    {
+                        if (val >= 24 || val < 0)
+                        {
+                            isPropertyValid = false;
+                        }
+                    }
+                    else if (propertyName.Equals("currentMinute"))
+                    {
+                        if (val >= 60 || val < 0)
+                        {
+                            isPropertyValid = false;
+                        }
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

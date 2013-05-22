@@ -1,8 +1,10 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_CUSTOM;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_HOME;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_OTHER;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_WORK;

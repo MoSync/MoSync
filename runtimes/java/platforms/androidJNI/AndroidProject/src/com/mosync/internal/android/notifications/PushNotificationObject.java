@@ -23,7 +23,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-import com.mosync.java.android.GCMIntentService;
 import com.mosync.java.android.MoSync;
 
 /**
