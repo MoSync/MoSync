@@ -31,7 +31,6 @@ import com.mosync.internal.android.notifications.PushNotificationsUtil;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_NOT_REGISTERED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ALREADY_REGISTERED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_HANDLE;

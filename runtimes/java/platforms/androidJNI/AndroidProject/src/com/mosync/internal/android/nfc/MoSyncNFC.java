@@ -5,8 +5,6 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_RECE
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_INVALID_TAG_TYPE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_ENABLED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_ISO_DEP;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

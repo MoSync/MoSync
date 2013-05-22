@@ -17,7 +17,6 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
-import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import android.net.Uri;
 import android.widget.MediaController;
 import android.widget.VideoView;

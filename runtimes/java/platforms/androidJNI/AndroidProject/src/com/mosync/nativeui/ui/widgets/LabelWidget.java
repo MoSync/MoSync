@@ -22,7 +22,6 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.TextView;
 
-import com.mosync.internal.android.MoSyncFont;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.generated.IX_WIDGET;

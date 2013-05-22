@@ -7,11 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_HOME;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_WORK;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_MOBILE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_OTHER;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_CUSTOM;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
 
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;

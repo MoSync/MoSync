@@ -17,12 +17,9 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
-import android.graphics.Typeface;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.mosync.internal.generated.IX_WIDGET;
-import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
