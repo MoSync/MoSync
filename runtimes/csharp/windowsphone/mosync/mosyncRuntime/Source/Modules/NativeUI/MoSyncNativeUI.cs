@@ -164,24 +164,25 @@ namespace MoSync
          */
         public void AddOperation(WidgetOperation op)
         {
-            // we need to check if the widget was already created or not when the AddOperation is called
-            // if so, we'll run the operation on the widget instead of inserting it into the queue
-            IWidget widget = mRuntime.GetModule<NativeUIModule>().GetWidget(this.GetHandle());
-            if (widget is WidgetBaseMock)
+            MoSync.Util.RunActionOnMainThread(() =>
             {
-                mOperationQueue.Enqueue(op);
-            }
-            else
-            {
-                // we need to check if the widget we got from the runtime can be cast to WidgetBaseWindowsPhone
-                if (typeof(WidgetBaseWindowsPhone).IsAssignableFrom(widget.GetType()))
+                // we need to check if the widget was already created or not when the AddOperation is called
+                // if so, we'll run the operation on the widget instead of inserting it into the queue
+                IWidget widget = mRuntime.GetModule<NativeUIModule>().GetWidget(this.GetHandle());
+                int handle = this.GetHandle();
+                if (widget is WidgetBaseMock)
                 {
-                    MoSync.Util.RunActionOnMainThread(() =>
+                    (widget as WidgetBaseMock).OperationQueue.Enqueue(op);
+                }
+                else
+                {
+                    // we need to check if the widget we got from the runtime can be cast to WidgetBaseWindowsPhone
+                    if (typeof(WidgetBaseWindowsPhone).IsAssignableFrom(widget.GetType()))
                     {
                         (widget as WidgetBaseWindowsPhone).RunOperation(op);
-                    }, true);
+                    }
                 }
-            }
+            }, true);
         }
 
         /**
