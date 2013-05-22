@@ -5,10 +5,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_DATA
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import android.nfc.tech.MifareUltralight;
-
 import com.mosync.internal.android.nfc.INFCTag;
-import com.mosync.internal.android.nfc.MifareUltralightTag;
 import com.mosync.internal.android.nfc.NFCEvent;
 
 public abstract class MFWrite<TagType extends INFCTag> extends TagRunnable<TagType> {
