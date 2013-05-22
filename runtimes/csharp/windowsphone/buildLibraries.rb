@@ -38,7 +38,8 @@ FileUtils.cp_r Dir.glob('mosync/mosync/Properties'), 'template', :verbose => tru
 #sh "winphone-builder -input-file template/mosync.csproj -output-type interpreted -output-file template/mosync_interpreted.csproj"
 #FileUtils.rm(["template/mosync.csproj"])
 
-FileUtils.rm_rf([mosyncdir+"/profiles/runtimes/winphone"])
+FileUtils.rm_rf([mosyncdir+"/profiles/runtimes/winphone/1/template"])
+FileUtils.rm_rf([mosyncdir+"/profiles/runtimes/winphone/1/template/extension_dev_template"])
 FileUtils.mkpath([
 					mosyncdir+"/profiles/runtimes/winphone",
 					mosyncdir+"/profiles/runtimes/winphone/1",

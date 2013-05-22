@@ -41,7 +41,7 @@ FileUtils.cp_r Dir.glob('mosync/packages/*.*'), 'template_WP8/packages', :verbos
 
 sh "xcopy \"mosync/mosyncRuntime\" \"template_WP8/mosyncRuntime\" /S /I /EXCLUDE:xcopyExcludes.txt"
 
-FileUtils.rm_rf([mosyncdir+"/profiles/runtimes/winphone"])
+FileUtils.rm_rf([mosyncdir+"/profiles/runtimes/winphone/1/template_WP8"])
 FileUtils.mkpath([
 					mosyncdir+"/profiles/runtimes/winphone",
 					mosyncdir+"/profiles/runtimes/winphone/1",
