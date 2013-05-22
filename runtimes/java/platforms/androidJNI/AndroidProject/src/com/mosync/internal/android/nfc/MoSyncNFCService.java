@@ -3,10 +3,8 @@ package com.mosync.internal.android.nfc;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.mosync.java.android.MoSync;

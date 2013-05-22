@@ -147,9 +147,6 @@ public class MoSync extends Activity
 		// Initialize.
 		mMoSyncView = null;
 
-		// Default screen orientation is portrait mode.
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
 		try
 		{
 			// Create the thread.

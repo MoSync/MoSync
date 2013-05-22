@@ -17,8 +17,6 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.core;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
 

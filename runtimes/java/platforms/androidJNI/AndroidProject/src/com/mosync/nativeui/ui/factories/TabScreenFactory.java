@@ -49,7 +49,7 @@ public class TabScreenFactory implements AbstractViewFactory
         TabHost tabHost = new TabHost( activity, null );
         tabHost.setLayoutParams(
         		new LinearLayout.LayoutParams(
-                        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT ) );
+                        LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT ) );
 
         // Create the visual structure of the tab host
         LinearLayout tabRootView = createTabRoot( activity );
@@ -77,7 +77,7 @@ public class TabScreenFactory implements AbstractViewFactory
         tabRootView.setOrientation( LinearLayout.VERTICAL );
         tabRootView.setLayoutParams(
         		new ViewGroup.LayoutParams(
-        				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT ) );
+        				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT ) );
 
 		tabRootView.addView( createTabWidget( activity ) );
 		tabRootView.addView( createTabContent( activity ) );
@@ -97,7 +97,7 @@ public class TabScreenFactory implements AbstractViewFactory
 	{
 		FrameLayout tabContent = new FrameLayout( activity );
         tabContent.setId( android.R.id.tabcontent );
-        LinearLayout.LayoutParams tabContentParams = new LinearLayout.LayoutParams( LayoutParams.FILL_PARENT, 0 );
+        LinearLayout.LayoutParams tabContentParams = new LinearLayout.LayoutParams( LayoutParams.MATCH_PARENT, 0 );
         tabContentParams.weight = 1;
         tabContent.setLayoutParams( tabContentParams );
 
@@ -117,7 +117,7 @@ public class TabScreenFactory implements AbstractViewFactory
         tabWidget.setId( android.R.id.tabs );
         LinearLayout.LayoutParams tabWidgetParams =
 			new LinearLayout.LayoutParams(
-        				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT );
+        				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT );
         tabWidgetParams.weight = 0;
         tabWidget.setLayoutParams( tabWidgetParams );
 
