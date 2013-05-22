@@ -23,7 +23,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.IntConverter;
