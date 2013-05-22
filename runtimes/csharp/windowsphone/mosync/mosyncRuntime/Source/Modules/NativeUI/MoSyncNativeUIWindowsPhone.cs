@@ -163,7 +163,7 @@ namespace MoSync
             protected void InsertChild(WidgetOperation operation)
             {
                 IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(operation.Handle);
-//                child.SetParent(this);
+                child.SetParent(this);
                 this.InsertChild(child, operation.Index);
             }
 
