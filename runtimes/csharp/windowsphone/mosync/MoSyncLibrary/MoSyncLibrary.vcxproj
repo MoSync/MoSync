@@ -53,7 +53,7 @@
       <IgnoreSpecificDefaultLibraries>ole32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateWindowsMetadata>true</GenerateWindowsMetadata>
       <AdditionalLibraryDirectories>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MAStd.lib;MAUtil.lib;MAFS.lib;NativeUI.lib;MAUI.lib;Wormhole.lib;yajl.lib;MAP.lib;Notification.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MAStd.lib;MAUtil.lib;MAFS.lib;NativeUI.lib;MAUI.lib;Wormhole.lib;yajl.lib;MAP.lib;Notification.lib;Ads.lib;ResCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
