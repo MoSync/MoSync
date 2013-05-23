@@ -24,16 +24,14 @@ MA 02110-1301, USA.
  * For list view events see ListViewListener.
  */
 
+#include <conprint.h>
+
 #include "ListView.h"
 #include "ListViewSection.h"
 #include "ListViewListener.h"
 
 namespace NativeUI
 {
-	/**
-	 * Constructor.
-	 * @param type List view's type.
-	 */
 	ListView::ListView(ListViewType type, ListViewStyle style): Widget(MAW_LIST_VIEW)
 	{
 		this->setPropertyInt(
@@ -46,53 +44,26 @@ namespace NativeUI
 		this->fillSpaceVertically();
 	}
 
-	/**
-	 * Destructor.
-	 */
 	 ListView::~ListView()
 	 {
 		 mListViewListeners.clear();
 	 }
 
-	/**
-	 * Add a widget as a child of this widget.
-	 * @param widget The widget that will be added.
-	 * The ownership of the widget is passed to this function.
-	 * When the parent widget will be destroyed, all child widgets
-	 * will be deleted.
-	 * @return Any of the following result codes:
-	 * - #MAW_RES_OK if the child could be added to the parent.
-	 * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
-	 * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
-	 * - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a dialog.
-	 * - #MAW_RES_ERROR if it could not be added for some other reason.
-	 * @note Since MoSync 3.2 on iOS platform the added widget must be
-	 * ListViewItem or ListViewSection. Any other type of widgets will not added.
-	 */
 	int ListView::addChild(Widget* widget)
 	{
 		return Widget::addChild(widget);
 	}
 
-	/**
-	 * Enforces the focus on the list.
-	 * Generally needed when for some reason the list looses it's focus.
-	 * Platform: Android.
-	 */
 	void ListView::requestFocus()
 	{
 		setProperty(MAW_LIST_VIEW_REQUEST_FOCUS,"");
 	}
 
-	 /**
-	  * Get the list view type.
-	  * @return List view type.
-	  */
-	 ListViewType ListView::getType()
-	 {
-		 int type = this->getPropertyInt(MAW_LIST_VIEW_TYPE);
-		 return this->getListViewTypeEnum(type);
-	 }
+	ListViewType ListView::getType()
+	{
+		int type = this->getPropertyInt(MAW_LIST_VIEW_TYPE);
+		return this->getListViewTypeEnum(type);
+	}
 
 	/**
 	 * Get the list view style.
@@ -104,39 +75,24 @@ namespace NativeUI
 		return this->getListViewStyleEnum(style);
 	}
 
-	/**
-	 * Sets the list view style.
-	 * This property should be set before the list contains any children.
-	 * @param newStyle The new style to be set.
-	 */
 	void ListView::setStyle(ListViewStyle newStyle)
 	{
 		int style = this->getListViewStyleFromEnum(newStyle);
 		this->setPropertyInt(MAW_LIST_VIEW_STYLE, style);
 	}
 
-	 /**
-	  * Set the list view mode.
-	  * Platform: iOS.
-	  * @param listMode List mode to set.
-	  */
-	 void ListView::setMode(ListViewMode listMode)
-	 {
+	void ListView::setMode(ListViewMode listMode)
+	{
 		 int mode = MAW_LIST_VIEW_MODE_DISPLAY;
 		 if (listMode == LIST_VIEW_MODE_EDIT)
 		 {
 			 mode = MAW_LIST_VIEW_MODE_EDIT;
 		 }
 		 this->setPropertyInt(MAW_LIST_VIEW_MODE, mode);
-	 }
+	}
 
-	 /**
-	  * Get the list view mode.
-	  * Platform: iOS.
-	  * @return List mode to get.
-	  */
-	 ListViewMode ListView::getMode()
-	 {
+	ListViewMode ListView::getMode()
+	{
 		 int mode = this->getPropertyInt(MAW_LIST_VIEW_MODE);
 		 ListViewMode listMode = LIST_VIEW_MODE_DISPLAY;
 		 if(mode == MAW_LIST_VIEW_MODE_EDIT)
@@ -146,33 +102,17 @@ namespace NativeUI
 		 return listMode;
 	 }
 
-	/**
-	 * Reload all its items.
-	 * Platform: iOS, Android and Windows Phone 7.
-	 */
 	void ListView::reloadData()
 	{
 		this->setProperty(MAW_LIST_VIEW_RELOAD_DATA, "");
 	}
 
-	/**
-	 * Enable/disable item selection.
-	 * If you don't want to allow the user to select any items, set this
-	 * property to false.
-	 * Platform: iOS, Android and Windows Phone 7.
-	 * @param allow true to enable it, false to disable it.
-	 */
 	void ListView::allowSelection(bool allow)
 	{
 		const char* value = allow ? "true" : "false";
 		this->setProperty(MAW_LIST_VIEW_ALLOW_SELECTION, value);
 	}
 
-	/**
-	 * Check if user is allowed to select an item.
-	 * Platform: iOS, Android and Windows Phone 7.
-	 * @return true if it's allowed, false otherwise.
-	 */
 	bool ListView::isSelectionAllowed()
 	{
 		MAUtil::String value = this->getPropertyString(
@@ -181,77 +121,46 @@ namespace NativeUI
 		return returnValue;
 	}
 
-	/**
-	 * Add an list view event listener.
-	 * @param listener The listener that will receive list view events.
-	 */
 	void ListView::addListViewListener(ListViewListener* listener)
 	{
 		addListenerToVector(mListViewListeners, listener);
 	}
 
-	/**
-	 * Remove the list view listener.
-	 * @param listener The listener that receives list view events.
-	 */
 	void ListView::removeListViewListener(ListViewListener* listener)
 	{
 		removeListenerFromVector(mListViewListeners, listener);
 	}
 
-	 /**
-	  * This method is called when there is an event for this widget.
-	  * It passes on the event to all widget's listeners.
-	  * @param widgetEventData The data for the widget event.
-	  */
 	void ListView::handleWidgetEvent(MAWidgetEventData* widgetEventData)
 	{
 		Widget::handleWidgetEvent(widgetEventData);
-
-		if (MAW_EVENT_ITEM_CLICKED == widgetEventData->eventType)
+		if (!widgetEventData)
 		{
-			int itemClickedIndex = widgetEventData->listItemIndex;
-			ListViewItem* listViewItem = (ListViewItem*)
-				this->getChild(itemClickedIndex);
-
-			for (int i = 0; i < mListViewListeners.size(); i++)
-			{
-				mListViewListeners[i]->listViewItemClicked(
-					this,
-					listViewItem);
-				mListViewListeners[i]->listViewItemClicked(
-					this,
-					itemClickedIndex);
-			}
+			printf(" widgetEventData should not be null in ListView::handleWidgetEvent");
+			return;
 		}
-		else if (MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED == widgetEventData->eventType)
-		{
-			int sectionClickedIndex = widgetEventData->sectionIndex;
-			int itemIndexWithinSection = widgetEventData->sectionItemIndex;
-			ListViewSection* listViewSection = (ListViewSection*)
-				this->getChild(sectionClickedIndex);
-			ListViewItem* listViewItem = (ListViewItem*)
-				listViewSection->getChild(itemIndexWithinSection);
 
-			for (int i = 0; i < mListViewListeners.size(); i++)
-			{
-				mListViewListeners[i]->segmentedListViewItemClicked(
-					this,
-					sectionClickedIndex,
-					itemIndexWithinSection);
-				mListViewListeners[i]->segmentedListViewItemClicked(
-					this,
-					listViewSection,
-					listViewItem);
-			}
-		}
-		else if (MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN == widgetEventData->eventType)
+		const int eventType = widgetEventData->eventType;
+		switch (eventType)
 		{
-			this->notifyListenersClickedInsertButton(widgetEventData);
-		}
-		else if (MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN == widgetEventData->eventType)
-		{
-			this->notifyListenersClickedDeleteButton(widgetEventData);
+			case MAW_EVENT_ITEM_CLICKED:
+				notifyListenersItemClicked(*widgetEventData);
+				break;
+			case MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED:
+				notifyListenersSectionItemClicked(*widgetEventData);
+				break;
+			case MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN:
+				notifyListenersInsertButtonClicked(*widgetEventData);
+				break;
+			case MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN:
+				notifyListenersDeleteButtonClicked(*widgetEventData);
+				break;
+			case MAW_EVENT_ITEM_WILL_SELECT:
+				// no listener method implemented for this event.
+				break;
+			default:
+				printf("Unhandled switch case in ListView::handleWidgetEvent");
+				break;
 		}
 	}
 
@@ -363,63 +272,148 @@ namespace NativeUI
 		return style;
 	}
 
-	/**
-	 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN.
-	 * @param widgetEventData Event's data.
-	 */
-	void ListView::notifyListenersClickedInsertButton(
-		MAWidgetEventData* widgetEventData)
+	void ListView::notifyListenersItemClicked(
+		const MAWidgetEventData& widgetEventData)
 	{
-		int sectionClickedIndex = widgetEventData->sectionIndex;
-		int itemIndex = widgetEventData->sectionItemIndex;
-		ListViewSection* listViewSection = NULL;
-		ListViewItem* listViewItem = NULL;
-		if (getType() != LIST_VIEW_TYPE_DEFAULT)
+		int itemIndex = widgetEventData.listItemIndex;
+		int sectionIndex = widgetEventData.listSectionIndex;
+		ListViewSection* section = NULL;
+		ListViewItem* item = NULL;
+		const int countListeners = mListViewListeners.size();
+		bool isDefaultList = sectionIndex == MAW_RES_INVALID_INDEX;
+
+		if (isDefaultList)
 		{
-			listViewSection = (ListViewSection*) getChild(sectionClickedIndex);
-			listViewItem = (ListViewItem*) listViewSection->getChild(itemIndex);
+			// Default list view. Does not contain sections.
+			item = (ListViewItem*)getChild(itemIndex);
 		}
 		else
 		{
-			listViewItem = (ListViewItem*) getChild(itemIndex);
+			// Alphabetical or segmented list view.
+			section = (ListViewSection*)getChild(sectionIndex);
+			item = (ListViewItem*)section->getChild(itemIndex);
 		}
 
-		for (int i = 0; i < mListViewListeners.size(); i++)
+		for (int i = 0; i < countListeners; i++)
 		{
-			mListViewListeners[i]->segmentedListViewItemInsert(
+			// deprecated methods.
+			mListViewListeners[i]->listViewItemClicked(
 				this,
-				listViewSection,
-				listViewItem);
+				item);
+			mListViewListeners[i]->listViewItemClicked(
+				this,
+				itemIndex);
+
+			// new methods.
+			mListViewListeners[i]->listViewItemClicked(
+				this,
+				sectionIndex,
+				itemIndex);
+			mListViewListeners[i]->listViewItemClicked(
+				this,
+				section,
+				item);
 		}
 	}
 
 	/**
-	 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN.
+	 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED.
+	 * @deprecated
 	 * @param widgetEventData Event's data.
 	 */
-	void ListView::notifyListenersClickedDeleteButton(
-		MAWidgetEventData* widgetEventData)
+	void ListView::notifyListenersSectionItemClicked(
+		const MAWidgetEventData& widgetEventData)
 	{
-		int sectionClickedIndex = widgetEventData->sectionIndex;
-		int itemIndex = widgetEventData->sectionItemIndex;
-		ListViewSection* listViewSection = NULL;
-		ListViewItem* listViewItem = NULL;
-		if (getType() != LIST_VIEW_TYPE_DEFAULT)
+		int itemIndex = widgetEventData.sectionItemIndex;
+		int sectionIndex = widgetEventData.sectionIndex;
+		ListViewSection* section = NULL;
+		ListViewItem* item = NULL;
+		const int countListeners = mListViewListeners.size();
+		section = (ListViewSection*)getChild(sectionIndex);
+		item = (ListViewItem*)section->getChild(itemIndex);
+
+		for (int i = 0; i < countListeners; i++)
 		{
-			listViewSection = (ListViewSection*) getChild(sectionClickedIndex);
-			listViewItem = (ListViewItem*) listViewSection->getChild(itemIndex);
+			mListViewListeners[i]->segmentedListViewItemClicked(
+				this,
+				sectionIndex,
+				itemIndex);
+			mListViewListeners[i]->segmentedListViewItemClicked(
+				this,
+				section,
+				item);
+		}
+	}
+
+	void ListView::notifyListenersInsertButtonClicked(
+		const MAWidgetEventData& widgetEventData)
+	{
+		const int itemIndex = widgetEventData.listItemIndex;
+		const int sectionIndex = widgetEventData.listSectionIndex;
+		ListViewSection* section = NULL;
+		ListViewItem* item = NULL;
+		const int countListeners = mListViewListeners.size();
+		bool isDefaultList = sectionIndex == MAW_RES_INVALID_INDEX;
+
+		if (!isDefaultList)
+		{
+			section = (ListViewSection*) getChild(sectionIndex);
+			item = (ListViewItem*) section->getChild(itemIndex);
 		}
 		else
 		{
-			listViewItem = (ListViewItem*) getChild(itemIndex);
+			item = (ListViewItem*) getChild(itemIndex);
 		}
 
-		for (int i = 0; i < mListViewListeners.size(); i++)
+		for (int i = 0; i < countListeners; i++)
 		{
+			// deprecated.
+			mListViewListeners[i]->segmentedListViewItemInsert(
+				this,
+				section,
+				item);
+
+			// new method.
+			mListViewListeners[i]->listViewItemInsert(
+				this,
+				section,
+				item);
+		}
+	}
+
+	void ListView::notifyListenersDeleteButtonClicked(
+		const MAWidgetEventData& widgetEventData)
+	{
+		const int itemIndex = widgetEventData.listItemIndex;
+		const int sectionIndex = widgetEventData.listSectionIndex;
+		ListViewSection* section = NULL;
+		ListViewItem* item = NULL;
+		const int countListeners = mListViewListeners.size();
+		bool isDefaultList = sectionIndex == MAW_RES_INVALID_INDEX;
+
+		if (!isDefaultList)
+		{
+			section = (ListViewSection*) getChild(sectionIndex);
+			item = (ListViewItem*) section->getChild(itemIndex);
+		}
+		else
+		{
+			item = (ListViewItem*) getChild(itemIndex);
+		}
+
+		for (int i = 0; i < countListeners; i++)
+		{
+			// deprecated
 			mListViewListeners[i]->segmentedListViewItemDelete(
 				this,
-				listViewSection,
-				listViewItem);
+				section,
+				item);
+
+			// new method
+			mListViewListeners[i]->listViewItemDelete(
+				this,
+				section,
+				item);
 		}
 	}
 

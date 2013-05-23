@@ -69,16 +69,16 @@ namespace EuropeanCountries
 	}
 
 	/**
-	 * This method is called when an alphabetical list view item is clicked.
-	 * From ListViewListener.
+	 * This method is called when a list view item is clicked.
 	 * @param listView The list view object that generated the event.
-	 * @param listViewSection The ListViewSection object that contains the selected item.
-	 * @param listViewItem The ListViewItem objet clicked.
+	 * @param listViewSection The section object that contains the selected item.
+	 * Will be null for default type list views.
+	 * @param listViewItem The item object that was clicked.
 	 */
-	void CountriesListScreen::segmentedListViewItemClicked(
-		NativeUI::ListView* listView,
-		NativeUI::ListViewSection* listViewSection,
-		NativeUI::ListViewItem* listViewItem)
+	void CountriesListScreen::listViewItemClicked(
+		NativeUI::ListView *listView,
+		NativeUI::ListViewSection *listViewSection,
+		NativeUI::ListViewItem *listViewItem)
 	{
 		int countryID = mCountryMap[listViewItem->getWidgetHandle()];
 		mObserver.showCountryInfoScreen(countryID);

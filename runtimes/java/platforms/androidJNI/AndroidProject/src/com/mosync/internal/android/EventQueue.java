@@ -97,13 +97,13 @@ public class EventQueue
 	 * @param widgetHandle The list that sends the event.
 	 * @param position The position in the list of the view.
 	 */
-	public void postWidgetItemClickedEvent(int widgetHandle, int position)
+	public void postWidgetItemClickedEvent(int widgetHandle, int section, int index)
 	{
 		postWidgetEvent(
 			IX_WIDGET.MAW_EVENT_ITEM_CLICKED,
 			widgetHandle,
-			position,
-			0);
+			index,
+			section);
 	}
 
 	/**
