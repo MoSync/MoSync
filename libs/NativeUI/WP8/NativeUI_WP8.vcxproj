@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\ActivityIndicator.cpp" />
     <ClCompile Include="..\Button.cpp" />
+    <ClCompile Include="..\Camera.cpp" />
     <ClCompile Include="..\CameraPreview.cpp" />
     <ClCompile Include="..\CheckBox.cpp" />
     <ClCompile Include="..\DatePicker.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="..\ActivityIndicator.h" />
     <ClInclude Include="..\Button.h" />
     <ClInclude Include="..\ButtonListener.h" />
+    <ClInclude Include="..\Camera.h" />
     <ClInclude Include="..\CameraPreview.h" />
     <ClInclude Include="..\CheckBox.h" />
     <ClInclude Include="..\CheckBoxListener.h" />

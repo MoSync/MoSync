@@ -49,6 +49,7 @@
     <ClCompile Include="..\WebView.cpp" />
     <ClCompile Include="..\Widget.cpp" />
     <ClCompile Include="..\WidgetManager.cpp" />
+    <ClCompile Include="..\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ActivityIndicator.h" />
@@ -119,5 +120,6 @@
     <ClInclude Include="..\WidgetManager.h" />
     <ClInclude Include="..\Widgets.h" />
     <ClInclude Include="..\WidgetUtil.h" />
+    <ClInclude Include="..\Camera.h" />
   </ItemGroup>
 </Project>
