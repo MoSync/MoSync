@@ -4677,15 +4677,11 @@ public class MoSyncThread extends Thread
 		try {
 			activity_invalidateOptionMenu = activityClass
 					.getMethod("invalidateOptionsMenu");
+			activity_invalidateOptionMenu.invoke(activity);
 			/* success, this is a newer device */
-		} catch (NoSuchMethodException nsme) {
+		} catch (Exception e) {
 			/* failure, must be older device */
 			Log.i("MoSync", "invalidateOptionsMenu failed");
-		}
-		try {
-			activity_invalidateOptionMenu.invoke(activity);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 

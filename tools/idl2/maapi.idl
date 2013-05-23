@@ -3599,8 +3599,8 @@ interface MAAPI {
 
 #if IX_PIM
 group PIMAPI "PIM API" {
-#include "pim/PimConstants.idl"
-#include "pim/PimFunctions.idl"
+#include "Modules/pim/PimConstants.idl"
+#include "Modules/pim/PimFunctions.idl"
 }
 #endif	//IX_PIM
 
@@ -3608,52 +3608,52 @@ group PIMAPI "PIM API" {
 #include "native_ui_intro_doc.idl"
 group WidgetAPI "Widget API" {
 
-#include "NativeUI/ActivityIndicator.idl"
-#include "NativeUI/Button.idl"
-#include "NativeUI/CheckBox.idl"
-#include "NativeUI/CustomPicker.idl"
-#include "NativeUI/DatePicker.idl"
-#include "NativeUI/EditBox.idl"
-#include "NativeUI/GLView.idl"
-#include "NativeUI/HorizontalLayout.idl"
-#include "NativeUI/Image.idl"
-#include "NativeUI/ImageButton.idl"
-#include "NativeUI/Label.idl"
-#include "NativeUI/ListView.idl"
-#include "NativeUI/ListViewItem.idl"
-#include "NativeUI/ListViewSection.idl"
-#include "NativeUI/Map.idl"
-#include "NativeUI/MapPin.idl"
-#include "NativeUI/ModalDialog.idl"
-#include "NativeUI/NavBar.idl"
-#include "NativeUI/NumberPicker.idl"
-#include "NativeUI/OptionsMenu.idl"
-#include "NativeUI/PanoramaView.idl"
-#include "NativeUI/ProgressBar.idl"
-#include "NativeUI/RadioButton.idl"
-#include "NativeUI/RadioGroup.idl"
-#include "NativeUI/RatingBar.idl"
-#include "NativeUI/RelativeLayout.idl"
-#include "NativeUI/Screen.idl"
-#include "NativeUI/ScreenTransition.idl"
-#include "NativeUI/SearchBar.idl"
-#include "NativeUI/Slider.idl"
-#include "NativeUI/StackScreen.idl"
-#include "NativeUI/TabScreen.idl"
-#include "NativeUI/TimePicker.idl"
-#include "NativeUI/ToggleButton.idl"
-#include "NativeUI/VerticalLayout.idl"
-#include "NativeUI/VideoView.idl"
-#include "NativeUI/WebView.idl"
-#include "NativeUI/WidgetAlignment.idl"
-#include "NativeUI/WidgetConstants.idl"
-#include "NativeUI/WidgetEvent.idl"
-#include "NativeUI/WidgetFunctions.idl"
-#include "NativeUI/WidgetProperties.idl"
-#include "NativeUI/WidgetResultCodes.idl"
-#include "NativeUI/WidgetTypes.idl"
-//#include "NativeUI/ActionBarConstants.idl"
-//#include "NativeUI/ActionBarFunctions.idl"
+#include "Modules/NativeUI/ActivityIndicator.idl"
+#include "Modules/NativeUI/Button.idl"
+#include "Modules/NativeUI/CheckBox.idl"
+#include "Modules/NativeUI/CustomPicker.idl"
+#include "Modules/NativeUI/DatePicker.idl"
+#include "Modules/NativeUI/EditBox.idl"
+#include "Modules/NativeUI/GLView.idl"
+#include "Modules/NativeUI/HorizontalLayout.idl"
+#include "Modules/NativeUI/Image.idl"
+#include "Modules/NativeUI/ImageButton.idl"
+#include "Modules/NativeUI/Label.idl"
+#include "Modules/NativeUI/ListView.idl"
+#include "Modules/NativeUI/ListViewItem.idl"
+#include "Modules/NativeUI/ListViewSection.idl"
+#include "Modules/NativeUI/Map.idl"
+#include "Modules/NativeUI/MapPin.idl"
+#include "Modules/NativeUI/ModalDialog.idl"
+#include "Modules/NativeUI/NavBar.idl"
+#include "Modules/NativeUI/NumberPicker.idl"
+#include "Modules/NativeUI/OptionsMenu.idl"
+#include "Modules/NativeUI/PanoramaView.idl"
+#include "Modules/NativeUI/ProgressBar.idl"
+#include "Modules/NativeUI/RadioButton.idl"
+#include "Modules/NativeUI/RadioGroup.idl"
+#include "Modules/NativeUI/RatingBar.idl"
+#include "Modules/NativeUI/RelativeLayout.idl"
+#include "Modules/NativeUI/Screen.idl"
+#include "Modules/NativeUI/ScreenTransition.idl"
+#include "Modules/NativeUI/SearchBar.idl"
+#include "Modules/NativeUI/Slider.idl"
+#include "Modules/NativeUI/StackScreen.idl"
+#include "Modules/NativeUI/TabScreen.idl"
+#include "Modules/NativeUI/TimePicker.idl"
+#include "Modules/NativeUI/ToggleButton.idl"
+#include "Modules/NativeUI/VerticalLayout.idl"
+#include "Modules/NativeUI/VideoView.idl"
+#include "Modules/NativeUI/WebView.idl"
+#include "Modules/NativeUI/WidgetAlignment.idl"
+#include "Modules/NativeUI/WidgetConstants.idl"
+#include "Modules/NativeUI/WidgetEvent.idl"
+#include "Modules/NativeUI/WidgetFunctions.idl"
+#include "Modules/NativeUI/WidgetProperties.idl"
+#include "Modules/NativeUI/WidgetResultCodes.idl"
+#include "Modules/NativeUI/WidgetTypes.idl"
+//#include "Modules/NativeUI/ActionBarConstants.idl"
+//#include "Modules/NativeUI/ActionBarFunctions.idl"
 
 } // end of group WidgetAPI
 #endif //IX_WIDGET
@@ -3898,8 +3898,8 @@ group WidgetAPI "Widget API" {
 		}
 
 group OpenGLES "OpenGLES" {
-#include "opengl_non_generated.idl"
-#include "opengl_generated.idl"
+#include "Modules/OpenGL/opengl_non_generated.idl"
+#include "Modules/OpenGL/opengl_generated.idl"
 }
 
 		/**
@@ -6560,11 +6560,11 @@ group CaptureAPI "Capture API" {
 } // End of Capture API
 
 group PurchaseAPI "Purchase API" {
-#include "purchase.idl"
+#include "Modules/purchase.idl"
 } // End of Purchase API
 
 group OrientationAPI "Orientation API" {
-#include "orientation.idl"
+#include "Modules/orientation.idl"
 } // End of Orientation API
 
 }
