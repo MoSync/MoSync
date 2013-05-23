@@ -185,7 +185,7 @@ namespace ResourceCompiler
 		resourceSmartHandles = new short[numberOfVariantResources];
 		memset(resourceSmartHandles, 0, numberOfVariantResources * sizeof(short));
 
-		char currentPriority[numberOfVariantResources];
+		char* currentPriority = new char[numberOfVariantResources];
 		memset(currentPriority, 0xFF, numberOfVariantResources);
 
 		for (int i=0; i<numberOfVariants; i++)
@@ -211,6 +211,8 @@ namespace ResourceCompiler
 		{
 			PRINT("resourceSmartHandles[%d]=%d", i, resourceSmartHandles[i]);
 		}
+
+		delete [] currentPriority;
 	}
 
 	MAHandle VariantResourceLookup::getSmartHandle(MAHandle handle)
