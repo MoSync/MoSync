@@ -1,6 +1,8 @@
 #include "android.h"
 #include "util.h"
 #include "nbuild.h"
+#include "fileset.h"
+#include <filelist/filelist.h>
 #include "mustache/mustache.h"
 #include "profiledb/profiledb.h"
 #include "helpers/mkdir.h"
@@ -71,6 +73,7 @@ int generateMakefile(Arguments* params, string& configName) {
 	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
 	if (bootstrapModules.empty()) {
 		// Default
+		bootstrapModules.push_back("stlport");
 		bootstrapModules.push_back("mosync");
 		bootstrapModules.push_back("mosynclib");
 	} else if (bootstrapModules[0] == ".") {
@@ -250,12 +253,12 @@ int executeNdkBuild(Arguments* params) {
 		}
 	}
 
-	vector<string> modules;
-	split(modules, params->getSwitchValue(MODULE_LIST), ",");
-	bool useSTL = false;
-	for (size_t i = 0; i < modules.size(); i++) {
+	//vector<string> modules;
+	//split(modules, params->getSwitchValue(MODULE_LIST), ",");
+	bool useSTL = true;
+	/*for (size_t i = 0; i < modules.size(); i++) {
 		useSTL |= isSTL(modules[i]);
-	}
+	}*/
 
 	for (size_t i = 0; i < configNames.size(); i++) {
 		for (size_t j = 0; j < archs.size(); j++) {
@@ -269,6 +272,28 @@ int executeNdkBuild(Arguments* params) {
 			bool isDebug = libVariant == "debug";
 			bool isVerbose = params->isFlagSet(VERBOSE);
 			bool doClean = params->isFlagSet(CLEAN);
+
+			if (doClean) {
+				DefaultFileSet* libs = new DefaultFileSet(tmpBuildDir, "libs/**", false, NULL);
+				DefaultFileSet* objs = new DefaultFileSet(tmpBuildDir, "obj/**", false, NULL);
+				FileSetList* dfs = new FileSetList();
+				dfs->addFileSet(libs);
+				dfs->addFileSet(objs);
+				vector<string> files;
+				dfs->listFiles(files);
+				if (isVerbose) {
+					printf("Removing %d files from %s.\n", (int) files.size(), tmpBuildDir.c_str());
+				}
+				for (size_t k = 0; k < files.size(); k++) {
+					// TODO: dirs?
+					string file = tmpBuildDir + files[k];
+					remove(file.c_str());
+					printf("Removed %s.\n", files[k].c_str());
+				}
+				delete libs;
+				delete objs;
+				delete dfs;
+			}
 
 			ostringstream cmd;
 			string ndkBuildCmd = getNdkBuildScript(params);
@@ -336,10 +361,11 @@ int executeNdkBuild(Arguments* params) {
 			copyFile(fullOutputFile.c_str(), libFile.c_str());
 			// TODO: The important thing is: is the STL static, not the result?
 			if (useSTL) {
-				copyFile(fullOutputFile.c_str(), libFile.c_str());
 				string stlLibFile = tmpBuildDir + "libs/" + arch + "/libstlport_shared.so";
 				string stlOutputFile = fullOutputDir + "libstlport_shared.so";
-				copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
+				if (existsFile(stlLibFile.c_str())) {
+					copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
+				}
 			}
 		}
 	}

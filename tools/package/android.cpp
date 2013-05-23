@@ -139,10 +139,10 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	bool isNative = !strcmp("native", s.outputType);
 
 	// TODO: beta
-	bool useSTL = false;
-	for (size_t i = 0; i < extensions.size(); i++) {
+	bool useSTL = true;
+	/*for (size_t i = 0; i < extensions.size(); i++) {
 		useSTL |= "stlport" == extensions[i];
-	}
+	}*/
 	if (isNative) {
 		// Default modules; todo: externalize?
 		if (useSTL) {

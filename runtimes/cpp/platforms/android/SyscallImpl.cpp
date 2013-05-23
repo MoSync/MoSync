@@ -60,10 +60,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-#include <jni.h>
-#include <android/log.h>
-#define SYSLOG(...) __android_log_print(ANDROID_LOG_INFO, "MoSync Syscall", __VA_ARGS__)
-//#define SYSLOG(...)
+#include "syslog.h"
 
 namespace Base
 {
@@ -318,7 +315,6 @@ namespace Base
 
 	int Syscall::getEventQueueSize()
 	{
-		SYSLOG("getEventQueueSize");
 		return gEventFifo.count();
 	}
 
@@ -1103,8 +1099,6 @@ namespace Base
 
 	SYSCALL(void,  maWait(int timeout))
 	{
-		SYSLOG("maWait");
-
 		if(gEventFifo.count() != 0)
 			return;
 

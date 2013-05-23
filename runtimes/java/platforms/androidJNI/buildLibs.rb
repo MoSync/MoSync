@@ -43,36 +43,39 @@ mkdir_p path
 end
 
 def buildLib(name, buildParams)
-	srcfiles = buildParams['src']
-	modules = buildParams['modules']
-	bootmodules = buildParams['bootmodules'] || "mosync"
-	project = buildParams['project'] || "#{ENV['MOSYNC_SRC']}/libs"
-	includes = buildParams['includes'] || ""
-	libtype = buildParams['libtype'] || "shared"
-	compilerflags = buildParams['compiler-flags'] || ""
+	if (name == $libsPattern || $libsPattern == "." || $libsPattern == nil)
+		srcfiles = buildParams['src']
+		modules = buildParams['modules']
+		bootmodules = buildParams['bootmodules'] || ""
+		project = buildParams['project'] || "#{ENV['MOSYNC_SRC']}/libs"
+		includes = buildParams['includes'] || ""
+		libtype = buildParams['libtype'] || "shared"
+		compilerflags = buildParams['compiler-flags'] || ""
 
-	# Todo: move into workfiles
-	moduleList = ""
-	if modules != nil && !modules.empty?
-		moduleList = "--modules " + modules
-	end
-	bootmoduleList = ""
-	if bootmodules != nil && !bootmodules.empty?
-		bootmoduleList = "--boot-modules " + bootmodules
-	end
+		# Todo: move into workfiles
+		moduleList = ""
+		if modules != nil && !modules.empty?
+			moduleList = "--modules " + modules
+		end
+		bootmoduleList = ""
+		if bootmodules != nil && !bootmodules.empty?
+			bootmoduleList = "--boot-modules " + bootmodules
+		end
 
-	compileflags = "--compiler-switches \"--std=c99 #{compilerflags}\""
+		compileflags = "--compiler-switches \"--std=c99 #{compilerflags}\""
 
-	mkdir_p "#{ENV['MOSYNCDIR']}/lib"
-	success = sh("#{ENV['MOSYNCDIR']}/bin/nbuild --platform Android --name #{name} --project #{project} --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndk-location #{$androidNDKPath} --android-version #{$androidVersion} #{srcfiles} --verbose #{libtype} #{includes} #{bootmoduleList} #{moduleList} #{compileflags} --android-lib-type #{libtype} --android-build-dir #{project}/temp_#{name}")
-	if !success
-		exit 1
+		mkdir_p "#{ENV['MOSYNCDIR']}/lib"
+		success = sh("#{ENV['MOSYNCDIR']}/bin/nbuild --clean --platform Android --name #{name} --project #{project} --dst #{ENV['MOSYNCDIR']}/lib --config Debug,Release --lib-variant debug,release --android-ndk-location #{$androidNDKPath} --android-version #{$androidVersion} #{srcfiles} --verbose #{libtype} #{includes} #{bootmoduleList} #{moduleList} #{compileflags} --android-lib-type #{libtype} --android-build-dir #{project}/temp_#{name}")
+		if !success
+			exit 1
+		end
 	end
 end
 
 $androidNDKPath = ARGV[0]
 $androidVersion = ARGV[1]
-$stl = ARGV[2] == "stlport"
+$libsPattern = ARGV[2]
+$stl = ARGV[3] == "stlport"
 
 if ($androidNDKPath == '@')
 	# Then use the 'settings' ruby file instead.
@@ -150,27 +153,32 @@ buildLib("mosync", {
 
 #wcharfiles = "-S./newlib/libc/string/wcpcpy.c -S./newlib/libc/string/wcsncpy.c -S./newlib/libc/string/wcpncpy.c -S./newlib/libc/string/wcsnlen.c -S./newlib/libc/string/wcscasecmp.c -S./newlib/libc/string/wcspbrk.c -S./newlib/libc/string/wcscat.c -S./newlib/libc/string/wcsrchr.c -S./newlib/libc/string/wcschr.c -S./newlib/libc/string/wcsspn.c -S./newlib/libc/string/wcscmp.c -S./newlib/libc/string/wcsstr.c -S./newlib/libc/string/wcscoll.c -S./newlib/libc/string/wcstok.c -S./newlib/libc/string/wcscpy.c -S./newlib/libc/string/wcswidth.c -S./newlib/libc/string/wcscspn.c -S./newlib/libc/string/wcsxfrm.c -S./newlib/libc/string/wcsdup.c -S./newlib/libc/string/wcwidth.c -S./newlib/libc/string/wcslcat.c -S./newlib/libc/string/wmemchr.c -S./newlib/libc/string/wcslcpy.c -S./newlib/libc/string/wmemcmp.c -S./newlib/libc/string/wcslen.c -S./newlib/libc/string/wmemcpy.c -S./newlib/libc/string/wcsncasecmp.c -S./newlib/libc/string/wmemmove.c -S./newlib/libc/string/wcsncat.c -S./newlib/libc/string/wmemset.c -S./newlib/libc/string/wcsncmp.c"
 #buildLib("MAStd", { 'src' => "-Skazlib -SMinUI -SMAMath/MAVector3.c -SResCompiler -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAStd/mawstring.c -SMAStd/mawvsprinf.c" })
-#buildLib("mautil", { 'src' => "-SHybris -SMAUtil -XMAUtil/DomParser.cpp -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp", 'modules' => "MAStd" })
-#buildLib("maui", { 'src' => "-SMAUI", 'modules' => "MAStd,MAUtil"})
-#buildLib("mafs", { 'src' => "-SMAFS/**" })
-#buildLib("ads", { 'src' => "-SAds", 'modules' => "MAStd,MAUtil" })
-#buildLib("Facebook", { 'src' => "-SFacebook/**", 'modules' => "MAStd,MAUtil" })
-#buildLib("nativeui", { 'src' => "-SNativeUI", 'modules' => "MAStd,MAUtil" })
-#buildLib("Purchase", { 'src' => "-SPurchase", 'modules' => "MAStd,MAUtil" })
-#buildLib("Wormhole", { 'src' => "-SWormhole/**", 'modules' => "MAStd,MAUtil" })
-#buildLib("matest", { 'src' => "-SMATest" })
-#buildLib("mtxml", { 'src' => "-SMTXml", 'modules' => "MAStd,MAUtil" })
-#buildLib("testify", { 'src' => "-STestify/src" })
-#buildLib("yajl", { 'src' => "-Syajl/**", 'modules' => "MAStd,MAUtil" })
-#buildLib("Notification", { 'src' => "-SNotification/**", 'modules' => "MAStd,MAUtil" })
 
-libfiles = "-SMAP -SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
-if $stl
-	libfiles = "-SMoGraph/** " + libfiles
-end
+#libfiles = "-SMAP -SMAUI -SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SAds -SMinUI -SResCompiler -Skazlib -Syasper -SFacebook/** -SNativeUI -SHybris -SMAFS/** -SMAUtil -XMAUtil/DomParser.cpp -SNotification -STestify -SMATest -SPurchase -SWormhole/** -Syajl/** -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp"
+libfiles = "-SMAStd/conprint.c -SMAStd/maassert.c -SMAStd/mastring.c -SMAStd/mawstring.c -SMAStd/matime.c -SMAStd/mavsprintf.c -SMAStd/mawvsprintf.c -SMAStd/maxtoa.c -SMAStd/wchar.c -SMAMath/MAVector3.c -SResCompiler -Syasper"
+#if $stl
+#	libfiles = "-SMoGraph/** " + libfiles
+#end
 #libfiles = "- -Skazlib  -SHybris "
-buildLib("mosynclib", { 'libtype' => 'shared',
+buildLib("mosynclib", {
 	'modules' => modules,
 	'src' => libfiles,
 	'compiler-flags' => "-D_MB_CAPABLE",
-	'includes' => "-I#{ENV['MOSYNC_SRC']}/libs" })
+	'includes' => "-I#{ENV['MOSYNC_SRC']}/libs",
+	'bootmodules' => 'mosync' })
+
+buildLib("mautil", { 'src' => "-Skazlib/dict.c -Skazlib/hash.c -SMAUtil -XMAUtil/DomParser.cpp -XMAUtil/GraphicsOpenGL.c -XMAUtil/XMLDataProvider.cpp -XMAUtil/XPathTokenizer.cpp" })
+buildLib("yajl", { 'src' => "-Syajl/**", 'modules' => "mautil" })
+buildLib("maui", { 'src' => "-SMAUI -SMinUI", 'modules' => "mautil" })
+buildLib("mafs", { 'src' => "-SMAFS/**"})
+buildLib("map", { 'src' => "-SMAP/**", 'modules' => "mautil,maui" })
+buildLib("ads", { 'src' => "-SAds", 'modules' => "mautil" })
+buildLib("nativeui", { 'src' => "-SNativeUI", 'modules' => "mautil" })
+buildLib("Facebook", { 'src' => "-SFacebook/**", 'modules' => "mautil,yajl" })
+buildLib("Purchase", { 'src' => "-SPurchase", 'modules' => "mautil" })
+buildLib("matest", { 'src' => "-SMATest", 'modules' => "mautil" })
+buildLib("mtxml", { 'src' => "-SMTXml", 'modules' => "mautil" })
+buildLib("testify", { 'src' => "-STestify/src", 'includes' => "-I#{ENV['MOSYNC_SRC']}/libs/Testify/inc" })
+buildLib("Notification", { 'src' => "-SNotification/**", 'modules' => "mautil" })
+buildLib("Wormhole", { 'src' => "-SWormhole/**", 'modules' => "mautil,mafs,yajl,nativeui,Notification" })
+buildLib("MoGraph", { 'src' => "-SMoGraph/**", 'modules' => "mautil" })
