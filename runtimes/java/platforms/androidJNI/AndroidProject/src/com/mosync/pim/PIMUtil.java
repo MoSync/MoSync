@@ -55,7 +55,7 @@ public class PIMUtil {
 	 */
 	static char[] readBufferFromMemory(int address, int length) {
 		char[] buffer = new char[length];
-		ByteBuffer byteBuffer = sMoSyncThread.getMemorySlice(address, length * 2).order(null);;
+		ByteBuffer byteBuffer = sMoSyncThread.getMemorySlice(address, length * 2).order(null);
 		for (int i = 0; i < length; i++) {
 			buffer[i] = byteBuffer.getChar();
 		}
