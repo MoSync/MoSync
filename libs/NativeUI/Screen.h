@@ -274,8 +274,8 @@ namespace NativeUI
 		 * - #MAW_RES_ACTION_BAR_DISABLED If the action bar is not enabled, or
 		 * -
 		 */
-		MAHandle addActionBarMenuItem(const MAUtil::String itemTitle, const int iconPredefinedId,
-				const MAHandle iconHandle, const ActionBarMenuItemDisplayFlag flag);
+		// MAHandle addActionBarMenuItem(const MAUtil::String itemTitle, const int iconPredefinedId,
+		// 		const MAHandle iconHandle, const ActionBarMenuItemDisplayFlag flag);
 
 		/**
 		 * Remove a menu item from the Action bar.
@@ -290,7 +290,7 @@ namespace NativeUI
 		 * - #MAW_RES_ACTION_BAR_DISABLED If the action bar is not enabled, or
 		 * - #MAW_RES_INVALID_HANDLE If the indicated screen has no item on specified handle.
 		 */
-		int removeActionBarMenuItem(MAHandle itemHandle);
+		// int removeActionBarMenuItem(MAHandle itemHandle);
 
 		/**
 		 * Remove all Action bar menu items from the current screen.
@@ -305,7 +305,7 @@ namespace NativeUI
 		 * - #MAW_RES_ACTION_BAR_DISABLED If the Action bar is not enabled, or
 		 * - #MAW_RES_INVALID_HANDLE If the indicated screen has no menu item on specified handle.
 		 */
-		int removeActionBarItems();
+		// int removeActionBarItems();
 
 		/**
 		 * Check if a screen is shown.
