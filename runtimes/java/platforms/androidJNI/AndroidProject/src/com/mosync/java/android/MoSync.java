@@ -208,48 +208,50 @@ public class MoSync extends Activity
 		registerShutdownListener();
     }
 
-    public int setActionBarState(Boolean state)
-    {
-        if (checkActionBarCompatibility())
-        {
-			if ( state )
-			{
-				getActionBar().show();
-			}
-			else
-			{
-				getActionBar().hide();
-			}
-			return IX_WIDGET.MAW_RES_OK;
-        }
-
-        Log.e("@@MoSync", "maActionBarSetEnabled error: selected feature cannot be applied.");
-        return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-    }
-
-	public static Boolean checkActionBarCompatibility()
-	{
-		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
-		{
-			SYSLOG("@@MoSync ActionBar is not available on current platform");
-			return false;
-		}
-		return true;
-	}
-
-	public int setActionBarVisibility(Boolean visibility)
-	{
-        if (checkActionBarCompatibility())
-        {
-			if (visibility)
-				getActionBar().show();
-			else
-				getActionBar().hide();
-        }
-
-        Log.e("@@MoSync", "maActionBarSetEnabled error: selected feature cannot be applied.");
-        return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-	}
+	// public int setActionBarState(Boolean state)
+	// {
+	// if (checkActionBarCompatibility())
+	// {
+	// if ( state )
+	// {
+	// getActionBar().show();
+	// }
+	// else
+	// {
+	// getActionBar().hide();
+	// }
+	// return IX_WIDGET.MAW_RES_OK;
+	// }
+	//
+	// Log.e("@@MoSync",
+	// "maActionBarSetEnabled error: selected feature cannot be applied.");
+	// return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
+	// }
+	//
+	// public static Boolean checkActionBarCompatibility()
+	// {
+	// if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
+	// {
+	// SYSLOG("@@MoSync ActionBar is not available on current platform");
+	// return false;
+	// }
+	// return true;
+	// }
+	//
+	// public int setActionBarVisibility(Boolean visibility)
+	// {
+	// if (checkActionBarCompatibility())
+	// {
+	// if (visibility)
+	// getActionBar().show();
+	// else
+	// getActionBar().hide();
+	// }
+	//
+	// Log.e("@@MoSync",
+	// "maActionBarSetEnabled error: selected feature cannot be applied.");
+	// return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
+	// }
 
     public MoSyncThread getMoSyncThread()
     {
