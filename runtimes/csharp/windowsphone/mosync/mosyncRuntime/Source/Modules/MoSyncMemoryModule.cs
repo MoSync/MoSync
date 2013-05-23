@@ -59,18 +59,7 @@ namespace MoSync
 				string s1 = core.GetDataMemory().ReadStringAtAddress(str1);
 				string s2 = core.GetDataMemory().ReadStringAtAddress(str2);
 
-				int i = 0, j = 0;
-
-				while (s1[i] != 0 && s1[i] == s2[j])
-				{
-					if (i == s1.Length - 1 || j == s2.Length - 1) //end of a string
-					{
-						break;
-					}
-					i++;
-					j++;
-				}
-				return (s1[i] - s2[j]);
+				return s1.CompareTo(s2);
 #endif
 			};
 
