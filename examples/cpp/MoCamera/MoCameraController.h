@@ -102,6 +102,11 @@ namespace MoSyncCamera
 			int resultCode);
 
         /**
+         * Handles the hardware back press.
+         */
+        void handleBackPress();
+
+        /**
          * Pointer event listeners. Used here to trigger auto focus.
          *
          * From PointerListener

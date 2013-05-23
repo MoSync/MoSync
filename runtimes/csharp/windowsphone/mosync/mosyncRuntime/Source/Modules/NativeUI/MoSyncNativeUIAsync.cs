@@ -23,10 +23,8 @@ namespace MoSync
          */
         public class AsyncNativeUIWindowsPhone : UIManager
         {
-            private PhoneApplicationFrame mFrame;
-
             /**
-             * Contains a reference to the runtime Core - needed by the get operations.
+             * Contains a reference to the runtime - needed by the get operations.
              */
             private Runtime mRuntime;
 
@@ -35,11 +33,10 @@ namespace MoSync
              */
             private const string mValidateMethodName = "ValidateProperty";
 
-            public AsyncNativeUIWindowsPhone()
+            public AsyncNativeUIWindowsPhone(Runtime runtime)
                 : base()
             {
-                //This should always be a PhoneApplicationFrame.
-                mFrame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                this.mRuntime = runtime;
             }
 
             /**
@@ -57,7 +54,7 @@ namespace MoSync
                     Type widgetType = mRuntime.GetModule<NativeUIModule>().GetWidgetType(widget.GetHandle());
                     CheckPropertyValidity(widgetType, propertyName, propertyValue);
 
-                    WidgetOperation setOperation = new WidgetOperation(propertyName, propertyValue);
+                    WidgetOperation setOperation = WidgetOperation.CreateSetOperation(propertyName, propertyValue);
                     widget.AddOperation(setOperation);
                 }
                 else
@@ -75,19 +72,23 @@ namespace MoSync
              */
             public String GetProperty(IWidget widget, string propertyName)
             {
+                String propertyValue = null;
                 if (widget is WidgetBaseMock)
                 {
-                    String propertyValue = widget.GetLastValidSet(propertyName);
+                    propertyValue = widget.GetLastValidSet(propertyName);
 
-                    if (propertyValue != null)
+                    if (propertyValue == null)
                     {
-                        return propertyValue;
+                        widget = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(widget.GetHandle());
+                        propertyValue = widget.GetProperty(propertyName);
                     }
-
-                    widget = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(widget.GetHandle());
+                }
+                else
+                {
+                    propertyValue = widget.GetProperty(propertyName);
                 }
 
-                return widget.GetProperty(propertyName);
+                return propertyValue;
             }
 
             /**
@@ -101,7 +102,7 @@ namespace MoSync
             {
                 if (parent is WidgetBaseMock)
                 {
-                    WidgetOperation addChildOperation = new WidgetOperation(WidgetOperation.OperationType.ADD, child.GetHandle());
+                    WidgetOperation addChildOperation = WidgetOperation.CreateAddOperation(child.GetHandle());
                     parent.AddOperation(addChildOperation);
                 }
                 else
@@ -115,7 +116,7 @@ namespace MoSync
                     {
                         child.SetParent(parent);
                         parent.AddChild(child);
-                    }, false);
+                    }, true);
                 }
             }
 
@@ -130,7 +131,7 @@ namespace MoSync
             {
                 if (parent is WidgetBaseMock)
                 {
-                    WidgetOperation insertChildOperation = new WidgetOperation(child.GetHandle(), index);
+                    WidgetOperation insertChildOperation = WidgetOperation.CreateInsertOperation(child.GetHandle(), index);
                     parent.AddOperation(insertChildOperation);
                 }
                 else
@@ -144,7 +145,7 @@ namespace MoSync
                     {
                         child.SetParent(parent);
                         parent.InsertChild(child, index);
-                    }, false);
+                    }, true);
                 }
             }
 
@@ -156,10 +157,11 @@ namespace MoSync
              */
             public void RemoveChild(IWidget child)
             {
-                if (child.GetParent() is WidgetBaseMock)
+                IWidget parent = child.GetParent();
+                if (parent is WidgetBaseMock)
                 {
-                    WidgetOperation removeChildOperation = new WidgetOperation(WidgetOperation.OperationType.REMOVE, child.GetHandle());
-                    child.GetParent().AddOperation(removeChildOperation);
+                    WidgetOperation removeChildOperation = WidgetOperation.CreateRemoveOperation(child.GetHandle());
+                    parent.AddOperation(removeChildOperation);
                 }
                 else
                 {
@@ -171,13 +173,8 @@ namespace MoSync
                     MoSync.Util.RunActionOnMainThread(() =>
                     {
                         child.RemoveFromParent();
-                    }, false);
+                    }, true);
                 }
-            }
-
-            public void SetRuntime(Runtime runtime)
-            {
-                this.mRuntime = runtime;
             }
 
             #region Property validation
@@ -252,6 +249,8 @@ namespace MoSync
                 }
                 catch (Exception e)
                 {
+                    // TODO SA: should I throw the exception even if it's not InvalidPropertyValueException?
+
                     // if the exception caught is InvalidPropertyValueException, we pass it to the
                     // next level (syscall level)
                     if (e is InvalidPropertyValueException)
@@ -322,9 +321,6 @@ namespace MoSync
          */
         private int mIndex;
 
-        /**
-         * Public getter for the operation type.
-         */
         public OperationType Type
         {
             get
@@ -333,9 +329,6 @@ namespace MoSync
             }
         }
 
-        /**
-         * Public getter for the property name.
-         */
         public string Property
         {
             get
@@ -344,9 +337,6 @@ namespace MoSync
             }
         }
 
-        /**
-         * Public getter for the property value.
-         */
         public string Value
         {
             get
@@ -355,9 +345,6 @@ namespace MoSync
             }
         }
 
-        /**
-         * Public getter for the child widget handle.
-         */
         public int Handle
         {
             get
@@ -366,9 +353,6 @@ namespace MoSync
             }
         }
 
-        /**
-         * Public getter for the index property (used by the INSERT operation).
-         */
         public int Index
         {
             get
@@ -377,69 +361,48 @@ namespace MoSync
             }
         }
 
-        /**
-         * Constructor that creates a SET widget operation.
-         * @param property The name of the property that needs to be set.
-         * @param value The value of the property that needs to be set.
-         */
-        public WidgetOperation(string property, string value)
+        public WidgetOperation(OperationType type, string property, string value, int handle, int index)
         {
-            mType = OperationType.SET;
-            mHandle = -1;
-            mPropertyName = property;
-            mPropertyValue = value;
+            this.mType = type;
+            this.mPropertyName = property;
+            this.mPropertyValue = value;
+            this.mHandle = handle;
+            this.mIndex = index;
         }
 
-        /**
-         * Constructor that creates a GET widget operation.
-         * @param property The name of the property for the GET operation.
-         */
-        public WidgetOperation(string property)
+        static public WidgetOperation CreateSetOperation(string propertyName, string propertyValue)
         {
-            mType = OperationType.GET;
-            mHandle = -1;
-            mPropertyName = property;
-            mPropertyValue = "";
+            WidgetOperation op = new WidgetOperation(OperationType.SET, propertyName, propertyValue, -1, -1);
+
+            return op;
         }
 
-        /**
-         * Constructor that creates a ADD or REMOVE widget operation.
-         * @param type The operation type (ADD, INSERT or REMOVE).
-         * @param handle The handle of the child widget.
-         */
-        public WidgetOperation(OperationType type, int handle)
+        static public WidgetOperation CreateGetOperation(string propertyName)
         {
-            if (type == OperationType.ADD || type == OperationType.REMOVE)
-            {
-                mType = type;
-                mHandle = handle;
-                mPropertyName = "";
-                mPropertyValue = "";
-            }
-            else
-            {
-                // TODO SA: think of a better option for a default case
-                // if the type is not one of the mentioned before, ADD will be considered by default as
-                // the operation type;
-                mType = OperationType.ADD;
-                mHandle = handle;
-                mPropertyName = "";
-                mPropertyValue = "";
-            }
+            WidgetOperation op = new WidgetOperation(OperationType.GET, propertyName, "", -1, -1);
+
+            return op;
         }
 
-        /**
-         * Constructor that creates INSERT widget operation.
-         * @param handle The handle of the child widget.
-         * @param index The index where the child widget needs to be inserted.
-         */
-        public WidgetOperation(int handle, int index)
+        static public WidgetOperation CreateAddOperation(int handle)
         {
-            mType = OperationType.INSERT;
-            mHandle = handle;
-            mPropertyName = "";
-            mPropertyValue = "";
-            mIndex = index;
+            WidgetOperation op = new WidgetOperation(OperationType.ADD, "", "", handle, -1);
+
+            return op;
+        }
+
+        static public WidgetOperation CreateInsertOperation(int handle, int index)
+        {
+            WidgetOperation op = new WidgetOperation(OperationType.REMOVE, "", "", handle, index);
+
+            return op;
+        }
+
+        static public WidgetOperation CreateRemoveOperation(int handle)
+        {
+            WidgetOperation op = new WidgetOperation(OperationType.REMOVE, "", "", handle, -1);
+
+            return op;
         }
     }
 

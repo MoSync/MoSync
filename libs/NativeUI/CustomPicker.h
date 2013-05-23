@@ -98,6 +98,7 @@ namespace NativeUI
 		 * All its items should have the same height.
 		 * Calling this method will reload all its items.
 		 * Default value is the height of the widget.
+		 * Should be set before the widget is drawn on the screen.
 		 * Platform: iOS and Android.
 		 * @param height Height in pixels.
 		 */
@@ -117,6 +118,7 @@ namespace NativeUI
 		 * All its items should have the same width.
 		 * Calling this method will reload all its items.
 		 * Default value is the width of the widget.
+		 * Should be set before the widget is drawn on the screen.
 		 * Platform: iOS and Android.
 		 * @param width Width in pixels.
 		 */

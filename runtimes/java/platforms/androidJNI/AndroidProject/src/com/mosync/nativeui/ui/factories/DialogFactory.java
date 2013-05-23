@@ -41,7 +41,7 @@ public class DialogFactory implements AbstractViewFactory
 
 		FrameLayout layout = new FrameLayout( activity );
 		// Layout fills the entire dialog.
-		LayoutParams layoutParams = new LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT );
+		LayoutParams layoutParams = new LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT );
 		layout.setLayoutParams( layoutParams );
 
 		builder.setView(layout);

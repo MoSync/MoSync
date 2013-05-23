@@ -139,7 +139,7 @@ namespace MoSync
              * Sets the vertical alignment of the text displayed on the label
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
-			public String textVerticalAlignment
+			public String TextVerticalAlignment
 			{
 			    set
 			    {
@@ -175,7 +175,7 @@ namespace MoSync
              * Sets the horizontal alignment of the text displayed on the label
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT)]
-			public String textHorizontalAlignment
+			public String TextHorizontalAlignment
 			{
 				set
 				{
@@ -190,6 +190,8 @@ namespace MoSync
 						case MoSync.Constants.MAW_ALIGNMENT_CENTER:
 							mLabel.TextAlignment = TextAlignment.Center;
 							break;
+                        default:
+                            throw new InvalidPropertyValueException();
 					}
 				}
 				get
@@ -203,7 +205,7 @@ namespace MoSync
              * Sets the font size of the text displayed on the label
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_SIZE)]
-			public String fontSize
+			public String FontSize
 			{
 				set
 				{
@@ -211,10 +213,14 @@ namespace MoSync
                     NumberStyles style = NumberStyles.AllowDecimalPoint;
                     IFormatProvider provider = CultureInfo.InvariantCulture;
                     if (Double.TryParse(value, style, provider, out size))
-					{
+                    {
                         // for some values better use the default size of the platform
                         mLabel.FontSize = size <= 0 ? 11 : size;
-					}
+                    }
+                    else
+                    {
+                        throw new InvalidPropertyValueException();
+                    }
 				}
 			}
 
@@ -223,12 +229,12 @@ namespace MoSync
              * Sets the font color of the text displayed on the label
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_COLOR)]
-			public String fontColor
+			public String FontColor
 			{
 				set
 				{
 					System.Windows.Media.SolidColorBrush brush;
-					MoSync.Util.convertStringToColor(value, out brush);
+					MoSync.Util.ConvertStringToColor(value, out brush);
 					mLabel.Foreground = brush;
 				}
 			}
@@ -239,7 +245,7 @@ namespace MoSync
              * Accepts two values: 1 (meaning single line) and 0
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
-			public int maxNumberOfLines
+			public int MaxNumberOfLines
 			{
 				set
 				{
@@ -284,13 +290,50 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("textVerticalAlignment"))
                 {
-                    return false;
+                    if (!(propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_TOP") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_CENTER") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_BOTTOM")))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("textHorizontalAlignment"))
+                {
+                    if (!(propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_LEFT") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_RIGHT") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_CENTER")))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("fontSize"))
+                {
+                    double size = 0;
+                    NumberStyles style = NumberStyles.AllowDecimalPoint;
+                    IFormatProvider provider = CultureInfo.InvariantCulture;
+                    if (!Double.TryParse(propertyValue, style, provider, out size))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

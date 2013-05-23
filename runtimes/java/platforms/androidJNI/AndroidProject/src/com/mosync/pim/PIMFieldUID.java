@@ -3,8 +3,6 @@ package com.mosync.pim;
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
 
-import com.mosync.pim.PIMField.State;
-
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_UID;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING;
 

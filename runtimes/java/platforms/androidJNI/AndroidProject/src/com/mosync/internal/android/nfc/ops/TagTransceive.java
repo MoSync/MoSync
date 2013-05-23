@@ -5,7 +5,6 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_DATA
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.mosync.internal.android.nfc.INFCTag;
 import com.mosync.internal.android.nfc.ITransceivable;
 import com.mosync.internal.android.nfc.NFCEvent;
 

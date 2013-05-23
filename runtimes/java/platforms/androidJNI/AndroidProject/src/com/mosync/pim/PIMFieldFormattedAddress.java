@@ -2,8 +2,6 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 
-import com.mosync.pim.PIMField.Permission;
-
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_HOME;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_WORK;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_OTHER;

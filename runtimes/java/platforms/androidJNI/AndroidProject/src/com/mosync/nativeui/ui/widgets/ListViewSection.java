@@ -18,8 +18,6 @@ package com.mosync.nativeui.ui.widgets;
 
 import static com.mosync.nativeui.ui.widgets.ListLayout.ITEM_VIEW_TYPE_FOOTER;
 import static com.mosync.nativeui.ui.widgets.ListLayout.ITEM_VIEW_TYPE_HEADER;
-import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_SEGMENTED;
-import static com.mosync.internal.generated.IX_WIDGET.MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL;
 import java.util.ArrayList;
 
 import android.app.Activity;

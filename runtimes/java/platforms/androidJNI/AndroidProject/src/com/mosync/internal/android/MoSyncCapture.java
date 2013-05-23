@@ -41,6 +41,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_VIDEO_QUALIT
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -957,32 +958,65 @@ public class MoSyncCapture
 		}
 	}
 
-	private static boolean copyFile(File sourceFile, File destFile)
+	private static boolean copyFile(File sourceFile, File destFile) throws IOException
 	{
+		FileChannel source = null;
+		FileChannel destination = null;
+
 		try
 		{
-			FileChannel source = null;
-			FileChannel destination = null;
-
 			if (!destFile.exists())
 			{
 				destFile.createNewFile();
 			}
 
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
-			destination.transferFrom(source, 0, source.size());
+			source = openFile(sourceFile);
+			destination = openFile(destFile);
 
-			if (source != null) { source.close(); }
-			if (destination != null) { destination.close(); }
+			destination.transferFrom(source, 0, source.size());
 		}
-		catch (Exception ex)
+		catch (IOException ex)
 		{
 			return false;
+		}
+		finally
+		{
+			if (source != null) { source.close(); }
+			if (destination != null) { destination.close(); }
 		}
 
 		return true;
 	}
+
+
+	/*
+	 * @brief Opens a file (the safe way)
+	 *
+	 * @param	bitmap	The bitmap which is being recycled
+	 */
+	private static FileChannel openFile(File aFile) throws IOException
+	{
+		FileInputStream in = null;
+
+		try
+		{
+			in = new FileInputStream(aFile);
+		}
+		catch (IOException ex)
+		{
+			return null;
+		}
+		finally
+		{
+			if(in != null)
+			{
+				in.close();
+			}
+		}
+
+		return in.getChannel();
+	}
+
 
 	/*
 	 * @brief Recycles the bitmap

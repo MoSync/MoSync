@@ -34,8 +34,7 @@ namespace MoSyncCamera
 		{
 			if (MAK_BACK == keyCode || MAK_0 == keyCode)
 			{
-				// Call close to exit the application.
-				close();
+				mMoSyncCameraController->handleBackPress();
 			}
 		}
 

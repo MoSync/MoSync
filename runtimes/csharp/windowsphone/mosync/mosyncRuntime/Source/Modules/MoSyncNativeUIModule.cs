@@ -76,7 +76,20 @@ namespace MoSync
          */
         private void CreateWidgetAsync(int widgetHandle, Type widgetType)
         {
-            IWidget widget = null;
+            // create the widget on the UI thread sync
+            MoSync.Util.RunActionOnMainThread(() =>
+            {
+                CreateWidgetSync(widgetHandle, widgetType);
+            }, true);
+        }
+
+        /**
+         * Must be run on the UI thread. Creates a widget in a synchrounous way.
+         * @param widgetHandle The handle of the widget that needs to be created.
+         * @param widgetType The type of the widget that needs to be created.
+         */
+        private void CreateWidgetSync(int widgetHandle, Type widgetType)
+        {
             IWidget widgetMock = mWidgets[widgetHandle];
             // if the child was already created we won't create it again
             // this situation might rise in the following way:
@@ -88,43 +101,20 @@ namespace MoSync
             {
                 return;
             }
-            // create the widget on the UI thread sync
-            MoSync.Util.RunActionOnMainThread(() =>
-            {
-                widget = Activator.CreateInstance(widgetType) as IWidget;
-            }, true);
+
+            IWidget widget = Activator.CreateInstance(widgetType) as IWidget;
             widget.SetHandle(widgetHandle);
             widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
             widget.SetRuntime(widgetMock.GetRuntime());
+
+            // run the operation queue on the newly created widget
+            (widget as WidgetBaseWindowsPhone).RunOperationQueue();
+
             // lock the mWidgets array when this thread starts manipulating it
             lock (mWidgets)
             {
                 mWidgets[widgetHandle] = widget;
             }
-
-            // run the operation queue on the newly created widget
-            MoSync.Util.RunActionOnMainThread(() =>
-            {
-                (widget as WidgetBaseWindowsPhone).RunOperationQueue();
-            }, false);
-        }
-
-        /**
-         * Must be run on the UI thread. Creates a widget in a synchrounous way.
-         * @param widgetHandle The handle of the widget that needs to be created.
-         * @param widgetType The type of the widget that needs to be created.
-         */
-        private void CreateWidgetSync(int widgetHandle, Type widgetType)
-        {
-            IWidget widget = Activator.CreateInstance(widgetType) as IWidget;
-            IWidget widgetMock = mWidgets[widgetHandle];
-            widget.SetHandle(widgetHandle);
-            widget.AddOperations((widgetMock as WidgetBaseMock).OperationQueue);
-            widget.SetRuntime(widgetMock.GetRuntime());
-            // lock the mWidgets array when this thread starts manipulating it
-            mWidgets[widgetHandle] = widget;
-
-            (widget as WidgetBaseWindowsPhone).RunOperationQueue();
         }
 
         /**
@@ -151,7 +141,6 @@ namespace MoSync
                 if (widgetType != null)
                 {
                     CreateWidgetSync(widgetHandle, widgetType);
-                    return;
                 }
             }
             else
@@ -166,6 +155,25 @@ namespace MoSync
                     widgetCreationThread.Join();
                 }
             }
+        }
+
+        /**
+         * Checks if a widget creation thread is still running (meaning that the widget wasn't created yet).
+         * @param handle The handle of the widget.
+         * @return true if the widget hasn't been created yet and false otherwise
+         */
+        public bool IsWidgetCreated(int handle)
+        {
+            Thread widgetCreationThread = null;
+            mWidgetThreadDictionary.TryGetValue(handle, out widgetCreationThread);
+
+            bool isCreated = true;
+            if (widgetCreationThread != null && widgetCreationThread.IsAlive)
+            {
+                isCreated = false;
+            }
+
+            return isCreated;
         }
 
         /**
@@ -196,8 +204,7 @@ namespace MoSync
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
-            mNativeUI = new NativeUI.AsyncNativeUIWindowsPhone();
-            mNativeUI.SetRuntime(runtime);
+            mNativeUI = new NativeUI.AsyncNativeUIWindowsPhone(runtime);
             //mWidgets.Add(null); // why?
 
             // initialize the widget thread dictionary
@@ -257,25 +264,20 @@ namespace MoSync
                 IWidget widget = new WidgetBaseMock();
                 widget.SetRuntime(runtime);
 
-                for (int i = 0; i < mWidgets.Count; i++)
+                int widgetHandle = FindSpaceForWidget();
+                if (widgetHandle == -1)
                 {
-                    if (mWidgets[i] == null)
-                    {
-                        widget.SetHandle(i);
-                        mWidgets[i] = widget;
-
-                        StartWidgetCreationThread(i, widgetType);
-
-                        return i;
-                    }
+                    mWidgets.Add(widget);
+                    widgetHandle = mWidgets.Count - 1;
                 }
+                else
+                {
+                    mWidgets[widgetHandle] = widget;
+                }
+                widget.SetHandle(widgetHandle);
+                StartWidgetCreationThread(widgetHandle, widgetType);
 
-                mWidgets.Add(widget);
-                widget.SetHandle(mWidgets.Count - 1);
-
-                StartWidgetCreationThread(mWidgets.Count - 1, widgetType);
-
-                return mWidgets.Count - 1;
+                return widgetHandle;
             };
 
             ioctls.maWidgetDestroy = delegate(int _widget)
@@ -287,6 +289,18 @@ namespace MoSync
                 {
                     widget.RemoveFromParent();
                     mWidgets[_widget] = null;
+
+                    mWidgetTypeDictionary.Remove(_widget);
+                    Thread widgetCreationThread = null;
+                    mWidgetThreadDictionary.TryGetValue(_widget, out widgetCreationThread);
+                    if (widgetCreationThread != null)
+                    {
+                        if (widgetCreationThread.IsAlive)
+                        {
+                            widgetCreationThread.Abort();
+                        }
+                        mWidgetThreadDictionary.Remove(_widget);
+                    }
                 }
                 return MoSync.Constants.MAW_RES_OK;
             };
@@ -295,11 +309,13 @@ namespace MoSync
             {
 				if (_parent < 0 || _parent >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+                if (_child < 0 || _child >= mWidgets.Count)
+                    return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+
 				IWidget parent = mWidgets[_parent];
-				if (_child < 0 || _child >= mWidgets.Count)
-					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
                 mNativeUI.AddChild(parent, child);
+
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -307,9 +323,11 @@ namespace MoSync
             {
 				if (_child < 0 || _child >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+
                 IWidget child = mWidgets[_child];
                 // only the child is needed - it has a reference to its parent
                 mNativeUI.RemoveChild(child);
+
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -317,11 +335,13 @@ namespace MoSync
             {
 				if (_parent < 0 || _parent >= mWidgets.Count)
 					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+                if (_child < 0 || _child >= mWidgets.Count)
+                    return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+
                 IWidget parent = mWidgets[_parent];
-				if (_child < 0 || _child >= mWidgets.Count)
-					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
 				IWidget child = mWidgets[_child];
                 mNativeUI.InsertChild(parent, child, index);
+
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -342,10 +362,10 @@ namespace MoSync
 
             ioctls.maWidgetSetProperty = delegate(int _widget, int _property, int _value)
             {
+                if (_widget < 0 || _widget >= mWidgets.Count)
+                    return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
                 String value = core.GetDataMemory().ReadStringAtAddress(_value);
-				if (_widget < 0 || _widget >= mWidgets.Count)
-					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget widget = mWidgets[_widget];
                 try
                 {
@@ -353,12 +373,10 @@ namespace MoSync
                 }
                 catch (InvalidPropertyNameException)
                 {
-                    MoSync.Util.Log(widget.GetType().ToString() + " invalid property name: " + property);
                     return MoSync.Constants.MAW_RES_INVALID_PROPERTY_NAME;
                 }
-                catch (InvalidPropertyValueException e)
+                catch (InvalidPropertyValueException)
                 {
-                    MoSync.Util.Log(e);
                     return MoSync.Constants.MAW_RES_INVALID_PROPERTY_VALUE;
                 }
 
@@ -577,6 +595,27 @@ namespace MoSync
                     return menuIndex;
                 }
             };
+        }
+
+        /**
+         * Searches throught the widgets array to find space for a new widget.
+         * @returns The position of the empty space if found and -1 otherwise.
+         */
+        private int FindSpaceForWidget()
+        {
+            int widgetHandle = -1;
+            int i = 0;
+            while (i < mWidgets.Count)
+            {
+                if (mWidgets[i] == null)
+                {
+                    widgetHandle = i;
+                    break;
+                }
+                i++;
+            }
+
+            return widgetHandle;
         }
 
         #endregion
