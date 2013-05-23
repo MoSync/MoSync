@@ -169,6 +169,8 @@ int main(int argc, char **argv) {
 	string runtimePath = "Libraries\\mosyncRuntime\\mosyncRuntime.dll";
 	string runtimePathWP8 = "Libraries\\mosyncRuntime\\mosyncRuntime_WP8.dll";
 	string mosyncProjectPath = "";
+	string macroDefines = "";
+	string includePaths = "";
 
 	bool hasResourceFile = true;
 
@@ -252,8 +254,20 @@ int main(int argc, char **argv) {
 		if(strcmp("-mosync-project-path", argv[i]) == 0)
 		{
 			i++;
-			if(i>=argc) error("Invalid argument to -output-type.");
+			if(i>=argc) error("Invalid argument to -mosync-project-path.");
 			mosyncProjectPath = argv[i];
+		}
+		if(strcmp("-macro-defines", argv[i]) == 0)
+		{
+			i++;
+			if(i>=argc) error("Invalid argument to -macro-defines.");
+			macroDefines = argv[i];
+		}
+		if(strcmp("-include-paths", argv[i]) == 0)
+		{
+			i++;
+			if(i>=argc) error("Invalid argument to -include-paths.");
+			includePaths = argv[i];
 		}
 	}
 
@@ -519,6 +533,23 @@ int main(int argc, char **argv) {
 	{
 		//remove the reference to main.cpp
 		pugi::xml_node mainCppReferenceNode;
+		pugi::xml_node includePathNode;
+		pugi::xml_node definesNode;
+		pugi::xml_node parentNode;
+
+		definesNode = getNode(libraryProject,
+							  "ItemDefinitionGroup [@Condition=\"'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'\"]/ClCompile/PreprocessorDefinitions");
+
+		string newValue = definesNode.first_child().value();
+		newValue += ";" + macroDefines;
+		definesNode.first_child().set_value(newValue.c_str());
+
+		includePathNode = getNode(libraryProject, "PropertyGroup [@Condition=\"'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'\"]/IncludePath");
+
+		newValue = includePathNode.first_child().value();
+		newValue += ";" + includePaths;
+		includePathNode.first_child().set_value(newValue.c_str());
+
 		mainCppReferenceNode = getNode(libraryProject, "ItemGroup/ClCompile [@Include=\"main.cpp\"]");
 		mainCppReferenceNode.parent().remove_child(mainCppReferenceNode);
 
@@ -531,6 +562,13 @@ int main(int argc, char **argv) {
 			std::string nodeValue;
 			nodeValue.append(cppFilesReferences.back().filePath);
 			contentChild.append_attribute("Include").set_value(nodeValue.c_str());
+
+			if(strcmp(nodeValue.substr(nodeValue.length() - 2, 2).c_str(), ".c") == 0) //a .c file
+			{
+				pugi::xml_node conditionChild = contentChild.append_child("CompileAsWinRT");
+				conditionChild.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'");
+				conditionChild.append_child(pugi::node_pcdata).set_value("false");
+			}
 
 			cppFilesReferences.pop_back();
 		}

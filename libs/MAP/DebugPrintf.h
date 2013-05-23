@@ -83,7 +83,7 @@ inline void DebugAssert( bool condition )
 	//
 	if ( !condition )
 	{
-#ifndef WINDOWS_PHONE_8_LIB
+#ifndef WINDOWS_PHONE_8_MAP_LIB
 		__asm { int 3 }
 #endif
 	}

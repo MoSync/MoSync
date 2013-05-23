@@ -29,18 +29,18 @@
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>$(WP80ToolSetPath)include;$(WindowsSDK_IncludePath);C:\MoSync\Include\;</IncludePath>
+    <IncludePath>$(WP80ToolSetPath)include;$(WindowsSDK_IncludePath);$(MOSYNCDIR)\include</IncludePath>
     <LibraryPath>$(WP80ToolSetPath)lib\arm;$(WindowsSDK_LibraryPath_ARM);$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</LibraryPath>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'">
-    <IncludePath>$(WP80ToolSetPath)include;$(WindowsSDK_IncludePath);C:\MoSync\Include\;</IncludePath>
+    <IncludePath>$(WP80ToolSetPath)include;$(WindowsSDK_IncludePath);$(MOSYNCDIR)\include</IncludePath>
     <LibraryPath>$(WP80ToolSetPath)lib\arm;$(WindowsSDK_LibraryPath_ARM);$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</LibraryPath>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'">
     <ClCompile>
-      <PreprocessorDefinitions>_WINRT_DLL;WINDOWS_PHONE_8;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINRT_DLL;WINDOWS_PHONE_8;WINDOWS_PHONE_8_MAP_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalUsingDirectories>$(WindowsSDK_MetadataPath);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
