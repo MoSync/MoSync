@@ -585,9 +585,9 @@ void PIMContact::printBirthday()
 	// Get value from birthday field at position 0.
 	checkResultCode(maPimItemGetValue(&mArgs, 0));
 
-	// Print value on screen(the value it's in milliseconds - UNIX time).
+	// Print value on screen(the value it's in seconds - UNIX time).
 	int birthday = *(int*) mArgs.buf;
-	printf("Birthday: %d (in milliseconds)", birthday);
+	printf("Birthday: %d (in seconds)", birthday);
 }
 
 /**
@@ -738,12 +738,12 @@ void PIMContact::printRevision()
 	checkIfFieldIsSupported(mItemHandle, MA_PIM_FIELD_CONTACT_REVISION);
 
 	// Get value from revision field at position 0;
-	// Returned value is a date in milliseconds(UNIX time).
+	// Returned value is a date in seconds(UNIX time).
 	checkResultCode(maPimItemGetValue(&mArgs, 0));
 
 	// Print date on the screen.
 	int revisionDate = *(int*) mArgs.buf;
-	printf("Revision date: %d (in milliseconds)", revisionDate);
+	printf("Revision date: %d (in seconds)", revisionDate);
 }
 
 /**
@@ -1013,8 +1013,8 @@ void PIMContact::addBirthday()
 	mArgs.bufSize = sizeof(int);
 
 	// Print value on the screen.
-	// The date is in milliseconds(UNIX time).
-	printf("Birthday: %d (in milliseconds)", birthday);
+	// The date is in seconds(UNIX time).
+	printf("Birthday: %d (in seconds)", birthday);
 	*(int*) mArgs.buf = birthday;
 
 	// Add value to birthday field.
