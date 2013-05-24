@@ -19,7 +19,7 @@ static int sButtonClickCount = 0;
 /**
  * Helper method for setting a widget property integer value.
  */
-int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
+void widgetSetPropertyInt(MAHandle handle, const char *property, int value)
 {
 	char buffer[BUFFER_SIZE];
 	sprintf(buffer, "%i", value);
@@ -122,7 +122,7 @@ void handleWidgetEvent(MAWidgetEventData* widgetEvent)
 		char buffer[256];
 		if (1 == sButtonClickCount)
 		{
-			sprintf(buffer, "You clicked me once!", sButtonClickCount);
+			sprintf(buffer, "You clicked me once!");
 		}
 		else if (100 == sButtonClickCount)
 		{
