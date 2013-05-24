@@ -182,3 +182,9 @@ buildLib("testify", { 'src' => "-STestify/src", 'includes' => "-I#{ENV['MOSYNC_S
 buildLib("Notification", { 'src' => "-SNotification/**", 'modules' => "mautil" })
 buildLib("Wormhole", { 'src' => "-SWormhole/**", 'modules' => "mautil,mafs,yajl,nativeui,Notification" })
 buildLib("MoGraph", { 'src' => "-SMoGraph/**", 'modules' => "mautil" })
+
+# We do not ship stlport stuff
+File.delete "#{ENV['MOSYNCDIR']}/lib/android_armeabi_debug/libstlport_shared.so"
+File.delete "#{ENV['MOSYNCDIR']}/lib/android_armeabi_release/libstlport_shared.so"
+File.delete "#{ENV['MOSYNCDIR']}/lib/android_armeabi-v7a_debug/libstlport_shared.so"
+File.delete "#{ENV['MOSYNCDIR']}/lib/android_armeabi-v7a_release/libstlport_shared.so"
