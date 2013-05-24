@@ -5,12 +5,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="..\src\api">
-      <UniqueIdentifier>{387dc2ca-db67-4c06-9f4e-f86c8d87081a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="..\src\stdlib">
-      <UniqueIdentifier>{a7f88d7a-8269-486f-bc15-90e2dd6b27e8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\YAJLDom.cpp" />

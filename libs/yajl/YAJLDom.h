@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _YAJL_DOM_H_
 #define _YAJL_DOM_H_
 
-#ifndef WINDOWS_PHONE_8_LIB
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <MAUtil/Vector.h>
 #include <MAUtil/Map.h>
 #include <MAUtil/String.h>

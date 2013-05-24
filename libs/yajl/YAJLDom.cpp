@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 #include "YAJLDom.h"
-#ifndef WINDOWS_PHONE_8_LIB
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <MAUtil/util.h>
 #include <MAUtil/Stack.h>
 #include <conprint.h>

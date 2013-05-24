@@ -231,7 +231,7 @@ size_t strnlen(const char *s, size_t count);
 extern "C" {
 #endif
 
-#if defined(MAPIP) || defined(MOSYNC_NATIVE)
+#if defined(MAPIP) || defined(MOSYNC_NATIVE) && !defined(__WINDOWS_PHONE_8__)
 /**
 * Compares strings \a s1 with \a s2 without case sensitivity.
 * \returns
