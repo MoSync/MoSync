@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "RefCounted.h"
 #include "Vector.h"
 
-#ifndef WINDOWS_PHONE_8_LIB
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <ma.h>
 #else
 #include "../MAStd/ma.h"
@@ -346,7 +346,7 @@ namespace MAUtil {
 			return 11;
 		}
 		inline int transcribe(int t, char* dst) {
-#ifdef WINDOWS_PHONE_8
+#ifdef __WINDOWS_PHONE_8__
 			_itoa(t, dst, 10);
 #else
 			itoa(t, dst, 10);
