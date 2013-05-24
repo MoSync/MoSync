@@ -108,7 +108,6 @@ void createUI()
 	maWidgetScreenShow(screen);
 }
 
-
 /**
  * Function that processes widget events.
  */
