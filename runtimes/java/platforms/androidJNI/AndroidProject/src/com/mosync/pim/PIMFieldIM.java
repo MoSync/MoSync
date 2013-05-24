@@ -1,10 +1,8 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_CUSTOM;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_HOME;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_OTHER;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_WORK;
@@ -26,8 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.provider.ContactsContract.CommonDataKinds.Im;
-
-import com.mosync.api.Pointer;
 
 public class PIMFieldIM extends PIMStringArrayField {
 
