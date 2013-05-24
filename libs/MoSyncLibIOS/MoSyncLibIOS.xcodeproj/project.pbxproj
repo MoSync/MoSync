@@ -1771,7 +1771,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0B92B47A1712BAE1002DFDF6 /* Build configuration list for PBXNativeTarget "MoSyncLibIOS" */;
 			buildPhases = (
-				0B92CFD61715BE88002DFDF6 /* ShellScript */,
 				0B92B4681712BAE1002DFDF6 /* Sources */,
 				0B92B4691712BAE1002DFDF6 /* Frameworks */,
 				0B92B46A1712BAE1002DFDF6 /* CopyFiles */,
@@ -1810,22 +1809,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		0B92CFD61715BE88002DFDF6 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "line_1=$(sed -n '/char\\* strcpy/=' ../MAStd/maapi.h)\nlet \"line_2=$line_1-2\"\necho $line_2\n\nrm -r MAStdNative || echo MASTDNative already deleted\nmkdir MAStdNative\ncd ../MAStd\ncp -r IX_OPENGL_ES.h maapi.h madmath.h maxtoa.h maapi_defs.h maarg.h IX_WIDGET.h maheap.h matime.h conprint.h maassert.h mastdlib.h mavsprintf.h ma.h mactype.h mastring.h mawvsprintf.h mawstring.h IX_OPENGL_ES_MA.h IX_OPENGL_ES.h IX_GL1.h IX_GL2.h IX_PIM.h GLES GLES2  ../MoSyncLibIOS/MAStdNative\n\ncd ..\n\nfind . -path ./MoSyncLibIOS -prune -o -iname \"*.h*\" | cpio -pmud MoSyncLibIOS/MAStdNative/\n\ncd MoSyncLibIOS/MAStdNative\n\n\nline_1+=\"d\"\necho $line_1\nline_2+=\"d\"\necho $line_2\n\nsed -i.bak $line_1 maapi.h\nsed -i.bak $line_2 maapi.h\n\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0B92B4681712BAE1002DFDF6 /* Sources */ = {
@@ -2106,10 +2089,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoSyncLibIOS/MoSyncLibIOS-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				HEADER_SEARCH_PATHS = (
-					../,
-					MAStdNative/,
-				);
+				HEADER_SEARCH_PATHS = ../MAStdNative/;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-D__IOS__",
@@ -2135,10 +2115,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoSyncLibIOS/MoSyncLibIOS-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				HEADER_SEARCH_PATHS = (
-					../,
-					MAStdNative/,
-				);
+				HEADER_SEARCH_PATHS = ../MAStdNative/;
 				OTHER_CFLAGS = (
 					"-D__IOS__",
 					"-DUSE_NEWLIB",
