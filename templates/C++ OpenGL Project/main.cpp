@@ -190,11 +190,11 @@ private:
 
 	// ================== Instance variables ==================
 
-	/** Time stamp used to calculate rotation. */
-	GLfloat mStartTime;
-
 	/** Z-coordinate. */
 	GLfloat mDepth;
+
+	/** Time stamp used to calculate rotation. */
+	GLfloat mStartTime;
 };
 
 /**
