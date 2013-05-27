@@ -85,7 +85,6 @@ struct MAConn {
 	void close() {
 		cancel = true;
 		clo->close();	//should disrupt any ongoing ops
-		clo = NULL;
 
 		//wait on ops
 		while(true) {
@@ -101,6 +100,9 @@ struct MAConn {
 
 			ConnWaitEvent();	//wait until there are events to be processed
 		}
+
+        delete clo;
+        clo = NULL;
 	}
 
 	const MAHandle handle;
