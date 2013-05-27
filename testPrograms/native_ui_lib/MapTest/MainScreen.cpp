@@ -27,6 +27,8 @@
 #include <NativeUI/MapLocation.h>
 #include <mastdlib.h>
 
+#define PIN_NUMBER 20
+
 /**
  * Constructor.
  */
@@ -125,12 +127,12 @@ void MainScreen::createMapPinLayout()
 
 	mAddPinToMap = new Button();
 	mAddPinToMap->fillSpaceHorizontally();
-	mAddPinToMap->setText("Add pin");
+	mAddPinToMap->setText("Add " + MAUtil::integerToString(PIN_NUMBER,10) + " pins");
 	mPinsLayout->addChild(mAddPinToMap);
 
 	mRemovePinFromMap = new Button();
 	mRemovePinFromMap->fillSpaceHorizontally();
-	mRemovePinFromMap->setText("Remove pin");
+	mRemovePinFromMap->setText("Remove pins");
 	mPinsLayout->addChild(mRemovePinFromMap);
 
 	mMainLayout->addChild(mPinsLayout);
@@ -218,7 +220,7 @@ void MainScreen::buttonClicked(Widget* button)
 	}
 	else if (button == mAddPinToMap)
 	{
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < PIN_NUMBER; i++)
 		{
 			// generate random values for the coordinates
 			// get a random latitude and longitude
