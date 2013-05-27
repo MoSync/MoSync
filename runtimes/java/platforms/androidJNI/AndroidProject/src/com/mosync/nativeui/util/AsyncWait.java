@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.util;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A utility class that simplifies the waiting for asynchronous
@@ -54,6 +55,8 @@ public class AsyncWait<T>
 		catch(NullPointerException npe)
 		{
 			mActive = false;
+			// Cause an InterruptedException in getResult(), ensuring that it returns null.
+			MoSyncThread.getInstance().interrupt();
 		}
 	}
 
@@ -64,25 +67,24 @@ public class AsyncWait<T>
 	 * to the result array, or when the setter
 	 * function sets the mActive flag to false.
 	 *
-	 * TODO: Add timeout
-	 *
 	 * @return The result that has been set.
-	 * @throws InterruptedException
 	 */
-	public T getResult() throws InterruptedException
+	public T getResult()
 	{
 		while(mActive)
 		{
 			try
 			{
-				if(null != mResult.peek())
+				// Will return null if timeout is hit.
+				T r = mResult.poll(5, TimeUnit.SECONDS);
+				if(r == null)
 				{
-					return mResult.take( );
+					throw new Error("AsyncWait timeout hit");
 				}
+				return r;
 			}
 			catch(InterruptedException ie)
 			{
-
 			}
 		}
 		return null;
