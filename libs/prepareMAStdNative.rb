@@ -35,6 +35,16 @@ Dir.glob('**/*.h*').each do |file|
 	FileUtils.copy_file(file, File.join(dest,filename))
 end
 
+Dir.glob('**/*.inl').each do |file|
+	dir, filename = File.dirname(file), File.basename(file)
+	dest = File.join(@target_dir, dir)
+	FileUtils.mkdir_p(dest)
+	FileUtils.copy_file(file, File.join(dest,filename))
+end
+
+FileUtils.cp_r Dir.glob('MAStdNative/yajl/src/api/*.h'), "MAStdNative/yajl/"
+FileUtils.rm_r 'MAStdNative/yajl/src'
+
 lineBuffer = []
 tempfile = File.open("MAStdNative/maapi.h.new", 'w')
 File.open("MAStdNative/maapi.h").each do |line|
