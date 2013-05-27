@@ -29,17 +29,23 @@ MoSyncCLController* getLocationController()
 	return sLocationController;
 }
 
+// TODO Redo this so that it returns true availability
+// (depending on the users accept of sharing locaation).
 int maLocationStart()
 {
-	MoSyncCLController* locationController = getLocationController();
-	[locationController.locationManager startUpdatingLocation];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
+        MoSyncCLController* locationController = getLocationController();
+        [locationController.locationManager startUpdatingLocation];
+    }];
 	return MA_LPS_AVAILABLE;
 }
 
 int maLocationStop()
 {
-	MoSyncCLController* locationController = getLocationController();
-	[locationController.locationManager stopUpdatingLocation];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
+        MoSyncCLController* locationController = getLocationController();
+        [locationController.locationManager stopUpdatingLocation];
+    }];
 	return 0;
 }
 
@@ -50,8 +56,8 @@ int maLocationStop()
 - (id) init {
     self = [super init];
     if (self != nil) {
-        self.locationManager = [[[CLLocationManager alloc] init] autorelease];
-        self.locationManager.delegate = self; // send loc updates to myself
+            self.locationManager = [[CLLocationManager alloc] init];
+            [self.locationManager setDelegate:self];
     }
     return self;
 }
