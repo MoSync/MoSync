@@ -67,6 +67,9 @@ namespace ImageButtonTest
 		mPressedImageFromPathButton->addButtonListener(this);
 		mGetPressedImageHandleButton->addButtonListener(this);
 		mGetPressedImagePathButton->addButtonListener(this);
+
+		mGetPressedImageHandleButton->setEnabled(false);
+		mGetPressedImagePathButton->setEnabled(false);
 	}
 
 	/**
@@ -204,11 +207,15 @@ namespace ImageButtonTest
 		if (button == mPressedImageFromHandleButton)
 		{
 			mListener.selectPressedImageFromHandle();
+			mGetPressedImageHandleButton->setEnabled(true);
+			mGetPressedImagePathButton->setEnabled(false);
 		}
 		else if (button == mPressedImageFromPathButton)
 		{
 			MAUtil::String path = mPathEditBox->getText();
 			mListener.selectPressedImageFromPath(path);
+			mGetPressedImageHandleButton->setEnabled(false);
+			mGetPressedImagePathButton->setEnabled(true);
 		}
 		else if (button == mGetPressedImageHandleButton)
 		{
