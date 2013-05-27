@@ -25,8 +25,8 @@ MA 02110-1301, USA.
  */
 
 #include <MAUtil/Moblet.h>
-#include <conprint.h>
 #include <wchar.h>
+#include <conprint.h>
 #include <mavsprintf.h>
 #include <mastring.h>
 #include <MAUtil/String.h>
