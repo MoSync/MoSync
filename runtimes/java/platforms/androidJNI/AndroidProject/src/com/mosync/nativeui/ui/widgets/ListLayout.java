@@ -415,7 +415,10 @@ public class ListLayout extends Layout
 			mSelectedItemHandle = m_children.get(position).getHandle();
 			//mSelectedItem = (ListItemWidget) m_viewAdapter.getView(position, null, null);
 			// Assume that the view's id is always the same as the handle.
-			EventQueue.getDefault( ).postWidgetItemClickedEvent( m_handle, position );
+			EventQueue.getDefault( ).postWidgetItemClickedEvent(
+				m_handle,
+				IX_WIDGET.MAW_RES_INVALID_INDEX,
+				position );
 		}
 	}
 
@@ -465,14 +468,29 @@ public class ListLayout extends Layout
 					// Store the selected state of the item.
 					mSelectedItemHandle = section.getItem(itemPosition).getHandle();
 					// The index ignores the header.
+					// Deprecated in MoSync 3.3
 					EventQueue.getDefault().
 							postSegmentedListItemClicked(m_handle, sectionIndex, itemPosition);
+
+					// This event should be handled instead.
+					EventQueue.getDefault( ).postWidgetItemClickedEvent(
+							m_handle,
+							sectionIndex,
+							itemPosition );
+
 					return;
 				}
 				sectionPosition += section.itemsCount();
 			}
+			// Deprecated in MoSync 3.3
 			EventQueue.getDefault().
 					postSegmentedListItemClicked(m_handle, sectionIndex, itemPosition);
+
+			// This event should be handled instead.
+			EventQueue.getDefault( ).postWidgetItemClickedEvent(
+					m_handle,
+					sectionIndex,
+					itemPosition );
 		}
 	}
 

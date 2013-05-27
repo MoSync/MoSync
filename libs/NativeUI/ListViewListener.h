@@ -51,6 +51,7 @@ namespace NativeUI
 	public:
 		/**
 		 * This method is called when a list view item is clicked.
+		 * @deprecated
 		 * @param listView The list view object that generated the event.
 		 * @param listViewItem The ListViewItem object that was clicked.
 		 */
@@ -60,15 +61,17 @@ namespace NativeUI
 
 		/**
 		 * This method is called when a list view item is clicked.
+		 * @deprecated
 		 * @param listView The list view object that generated the event.
 		 * @param index The index on which the list view item is positioned.
 		 */
 		virtual void listViewItemClicked(
 			ListView* listView,
-			int index){};
+			int index) {};
 
 		/**
 		 * This method is called when a segmented/alphabetical list view item is clicked.
+		 * @deprecated Use #listViewItemClicked instead.
 		 * @param listView The list view object that generated the event.
 		 * @param sectionIndex The index of the section that contains the selected item.
 		 * @param itemIndex The index (within the parent section) of the list view item clicked.
@@ -76,10 +79,11 @@ namespace NativeUI
 		virtual void segmentedListViewItemClicked(
 			ListView* listView,
 			int sectionIndex,
-			int itemIndex){};
+			int itemIndex) {};
 
 		/**
 		 * This method is called when a segmented/alphabetical list view item is clicked.
+		 * @deprecated Use #listViewItemClicked instead.
 		 * @param listView The list view object that generated the event.
 		 * @param listViewSection The ListViewSection object that contains the selected item.
 		 * @param listViewItem The ListViewItem objet clicked.
@@ -87,12 +91,13 @@ namespace NativeUI
 		virtual void segmentedListViewItemClicked(
 			ListView* listView,
 			ListViewSection* listViewSection,
-			ListViewItem* listViewItem){};
+			ListViewItem* listViewItem) {};
 
 		/**
 		 * This method is called when an item's insert button is clicked.
 		 * The list type must be segmented and in editing mode.
 		 * Platform: iOS
+		 * @deprecated Use #listViewItemInsert instead.
 		 * @param listView The list view object that generated the event.
 		 * @param listViewSection The ListViewSection object that contains the item.
 		 * Will be null if list view type is default.
@@ -101,12 +106,13 @@ namespace NativeUI
 		virtual void segmentedListViewItemInsert(
 			ListView* listView,
 			ListViewSection* listViewSection,
-			ListViewItem* listViewItem){};
+			ListViewItem* listViewItem) {};
 
 		/**
 		 * This method is called when an item's delete button is clicked.
 		 * The list type must be segmented and in editing mode.
 		 * Platform: iOS
+		 * @deprecated Use #listViewItemDelete instead.
 		 * @param listView The list view object that generated the event.
 		 * @param listViewSection The ListViewSection object that contains the item.
 		 * Will be null if list view type is default.
@@ -115,8 +121,60 @@ namespace NativeUI
 		virtual void segmentedListViewItemDelete(
 			ListView* listView,
 			ListViewSection* listViewSection,
-			ListViewItem* listViewItem){};
+			ListViewItem* listViewItem) {};
 
+		/**
+		 * This method is called when a list view item is clicked.
+		 * @param listView The list view object that generated the event.
+		 * @param sectionIndex The index of the section that contains the selected item.
+		 * Will be #MAW_RES_INVALID_INDEX for default type list views.
+		 * @param itemIndex The index (within the parent section if the section is valid)
+		 * of the list view item clicked.
+		 */
+		virtual void listViewItemClicked(
+			ListView *listView,
+			const int sectionIndex,
+			const int itemIndex) {};
+
+		/**
+		 * This method is called when a list view item is clicked.
+		 * @param listView The list view object that generated the event.
+		 * @param listViewSection The section object that contains the selected item.
+		 * Will be null for default type list views.
+		 * @param listViewItem The item object that was clicked.
+		 */
+		virtual void listViewItemClicked(
+			ListView *listView,
+			ListViewSection *listViewSection,
+			ListViewItem *listViewItem) {};
+
+		/**
+		 * This method is called when an item's insert button is clicked.
+		 * The list view must be in editing mode.
+		 * Platform: iOS
+		 * @param listView The list view object that generated the event.
+		 * @param listViewSection The section object that contains the item.
+		 * Will be null for default type list views.
+		 * @param listViewItem The item object whose insert button was clicked.
+		 */
+		virtual void listViewItemInsert(
+			ListView *listView,
+			ListViewSection *listViewSection,
+			ListViewItem *listViewItem) {};
+
+		/**
+		 * This method is called when an item's delete button is clicked.
+		 * The list view must be in editing mode.
+		 * Platform: iOS
+		 * @param listView The list view object that generated the event.
+		 * @param listViewSection The section object that contains the item.
+		 * Will be null for default type list views.
+		 * @param listViewItem The item object whose delete button was clicked.
+		 */
+		virtual void listViewItemDelete(
+			ListView *listView,
+			ListViewSection *listViewSection,
+			ListViewItem *listViewItem) {};
 	};
 
 } // namespace NativeUI

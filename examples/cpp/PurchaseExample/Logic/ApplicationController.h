@@ -80,23 +80,18 @@ public:
      */
     virtual void buttonClicked(Widget* button);
 
-    /**
-     * This method is called when a list view item is clicked.
-     * @param listView The list view object that generated the event.
-     * @param listViewItem The ListViewItem object that was clicked.
-     */
-    virtual void listViewItemClicked(
-        ListView* listView,
-        ListViewItem* listViewItem){}
-
-    /**
-     * This method is called when a list view item is clicked.
-     * @param listView The list view object that generated the event.
-     * @param index The index on which the list view item is positioned.
-     */
-    virtual void listViewItemClicked(
-        ListView* listView,
-        int index);
+	/**
+	 * This method is called when a list view item is clicked.
+	 * @param listView The list view object that generated the event.
+	 * @param sectionIndex The index of the section that contains the selected item.
+	 * Will be #MAW_RES_INVALID_INDEX for default type list views.
+	 * @param itemIndex The index (within the parent section if the section is valid)
+	 * of the list view item clicked.
+	 */
+	virtual void listViewItemClicked(
+		ListView *listView,
+		const int sectionIndex,
+		const int itemIndex);
 
     // From PurchaseListener
 	/**
