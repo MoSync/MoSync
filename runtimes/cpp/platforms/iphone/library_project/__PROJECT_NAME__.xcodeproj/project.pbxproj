@@ -28,7 +28,7 @@
 		85DF23F0126745DA003A0FF6 /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85DF23EF126745DA003A0FF6 /* libMoSyncLib.a */; };
 		85F2555A11AC155D00EB47EE /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85F2555B11AC155D00EB47EE /* data_section.bin in Resources */ = {isa = PBXBuildFile; fileRef = 8519011E1199B90400B71F58 /* data_section.bin */; };
-		85F2557E11AC155D00EB47EE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		85F2557E11AC155D00EB47EE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		85F2557F11AC155D00EB47EE /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		85F2558011AC155D00EB47EE /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		85F2558111AC155D00EB47EE /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */; };
