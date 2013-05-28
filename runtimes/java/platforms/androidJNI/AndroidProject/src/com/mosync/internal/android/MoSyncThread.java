@@ -692,7 +692,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			return nativeGetMemorySlice(addr, len);
 		} else {
 			mMemDataSection.position(addr);
-			ByteBuffer slice = mMemDataSection.slice();
+			ByteBuffer slice = mMemDataSection.slice().order(null);
 			if(-1 != len)
 				slice.limit(len);
 			return slice;
