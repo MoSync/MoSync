@@ -970,8 +970,10 @@ public class MoSyncCapture
 				destFile.createNewFile();
 			}
 
-			source = openFile(sourceFile);
-			destination = openFile(destFile);
+			//No need to use the extra protection of OpenFile here
+			// WE will close the resources in the Finally block
+			source = new FileInputStream(sourceFile).getChannel();
+			destination = new FileOutputStream(destFile).getChannel();
 
 			destination.transferFrom(source, 0, source.size());
 		}
