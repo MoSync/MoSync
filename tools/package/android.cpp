@@ -369,8 +369,7 @@ static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, stri
 	// 3. Look in the modules directory
 	for (size_t i = 0; i < modules.size(); i++) {
 		string module = modules[i];
-		string moduleDir = mosyncdir() + string("/modules/") + module + string("/lib/Android/Debug/");
-		string moduleLibPath = moduleDir + arch;
+		string moduleLibPath = mosyncdir() + string("/modules/") + module + string("/lib/") + variantDirName;
 		paths.push_back(moduleLibPath);
 	}
 

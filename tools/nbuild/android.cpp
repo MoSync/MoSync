@@ -80,21 +80,31 @@ int generateMakefile(Arguments* params, string& configName) {
 		bootstrapModules.clear();
 	}
 
+	bool useSTLSupport = params->isFlagSet("--android-stl-support");
+
 	vector<string> modules(bootstrapModules);
 	split(modules, params->getSwitchValue(MODULE_LIST), ",");
 
 	DefaultContext rootCtx(NULL);
 	for (size_t i = 0; i < modules.size(); i++) {
 		String moduleName = modules[i];
+		DefaultContext* moduleCtx = new DefaultContext(&rootCtx);
+		moduleCtx->setParameter("name", moduleName);
 		if (!isSTL(moduleName)) {
-			DefaultContext* moduleCtx = new DefaultContext(&rootCtx);
 			// TODO: Clean up
-			moduleCtx->setParameter("name", moduleName);
 			string initFunc = initFuncs[moduleName];
 			if (!initFunc.empty()) {
 				moduleCtx->setParameter("init", initFunc);
 			}
 			rootCtx.addChild("modules", moduleCtx);
+		} else if (!useSTLSupport) {
+			// TODO: All modules should use manifests + parameters like this.
+			string stlportInc = getStlportDir(params, true) + "stlport/";
+			string stlportLib = getStlportDir(params, true) + "libs/$(TARGET_ARCH_ABI)";
+			moduleCtx->setParameter("includepath", stlportInc);
+			moduleCtx->setParameter("libpath", stlportLib);
+			moduleCtx->setParameter("libname", "stlport_shared");
+			rootCtx.addChild("stlport", moduleCtx);
 		}
 	}
 	vector<string> sourceFiles = getSourceFiles(params);
@@ -253,13 +263,6 @@ int executeNdkBuild(Arguments* params) {
 		}
 	}
 
-	//vector<string> modules;
-	//split(modules, params->getSwitchValue(MODULE_LIST), ",");
-	bool useSTL = true;
-	/*for (size_t i = 0; i < modules.size(); i++) {
-		useSTL |= isSTL(modules[i]);
-	}*/
-
 	for (size_t i = 0; i < configNames.size(); i++) {
 		for (size_t j = 0; j < archs.size(); j++) {
 			string configName = configNames[i];
@@ -310,6 +313,10 @@ int executeNdkBuild(Arguments* params) {
 
 			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 
+			// A flag to indicate that we rely on the ndk build system to find
+			// and copy the stlport library
+			bool useSTLSupport = params->isFlagSet("--android-stl-support");
+
 			string libDir = string(mosyncdir()) + "/lib";
 			toSlashes(libDir);
 			string moduleDir = string(mosyncdir()) + "/modules";
@@ -327,14 +334,16 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
 			cmd << arg("NDK_PROJECT_PATH=.") << " ";
 			cmd << arg("APP_ABI=" + arch) << " ";
-			if (useSTL) {
+			string appstl = string(useSTLSupport ? "stlport_shared" : "none");
+			cmd << arg("APP_STL=" + appstl) << " ";
+			/*if (useSTL) {
 				// TODO: beta
 				if (useStatic) {
 					error("Static STL not supported!");
 				}
 				string appstl = string("APP_STL=stlport_shared");
 				cmd << arg(appstl) << " ";
-			}
+			}*/
 			string androidVersion = getAppPlatform(params);
 			cmd << arg("APP_PLATFORM=android-" + androidVersion) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
@@ -360,16 +369,25 @@ int executeNdkBuild(Arguments* params) {
 			}
 			copyFile(fullOutputFile.c_str(), libFile.c_str());
 			// TODO: The important thing is: is the STL static, not the result?
-			if (useSTL) {
-				string stlLibFile = tmpBuildDir + "libs/" + arch + "/libstlport_shared.so";
-				string stlOutputFile = fullOutputDir + "libstlport_shared.so";
-				if (existsFile(stlLibFile.c_str())) {
-					copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
-				}
+			string stlLibDir = useSTLSupport ? tmpBuildDir : getStlportDir(params, false);
+			string stlLibFile = stlLibDir + "libs/" + arch + "/libstlport_shared.so";
+			string stlOutputFile = fullOutputDir + "libstlport_shared.so";
+			if (existsFile(stlLibFile.c_str())) {
+				copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
 			}
 		}
 	}
 	return 0;
+}
+
+string getStlportDir(Arguments* params, bool useMakeParam) {
+	if (useMakeParam) {
+		return string("$(NDK_ROOT)/sources/cxx-stl/stlport/");
+	} else {
+		string ndkDir = require(params, "--android-ndk-location");
+		toDir(ndkDir);
+		return ndkDir + "sources/cxx-stl/stlport/";
+	}
 }
 
 string getNdkBuildScript(Arguments* params) {

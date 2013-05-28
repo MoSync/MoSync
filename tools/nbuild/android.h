@@ -15,8 +15,9 @@ string toMakefileFile(string file);
 string getNdkBuildScript(Arguments* params);
 string getNdkBuildCommand(string commandLine);
 string getAppPlatform(Arguments* params);
-int executeNdkBuild(Arguments* args);
+int executeNdkBuild(Arguments* params);
 string getTempBuildDir(Arguments* params, string* cfg = NULL);
+string getStlportDir(Arguments* params, bool useMakeParam);
 #ifdef WIN32
 string getCygpath(bool& exists);
 #endif
