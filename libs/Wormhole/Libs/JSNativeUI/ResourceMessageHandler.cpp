@@ -130,6 +130,11 @@ namespace Wormhole
 					imageHandle);
 			mWebView->callJS(buffer);
 		}
+		else if (0 == strcmp("DestroyPlaceholder", action))
+		{
+			MAHandle handle =  stringToInteger(stream.getNext());
+			maDestroyPlaceholder(handle);
+		}
 		else if (0 == strcmp("sendRemoteLogMessage", action))
 		{
 			const char* url = stream.getNext();

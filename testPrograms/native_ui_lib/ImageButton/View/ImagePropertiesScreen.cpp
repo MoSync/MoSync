@@ -75,6 +75,9 @@ namespace ImageButtonTest
 		mBackgroundImageFromPathButton->addButtonListener(this);
 		mBackgroundImageFromHandleButton->addButtonListener(this);
 		mGetBackgroundImagePathButton->addButtonListener(this);
+
+		mGetForegroundImagePathButton->setEnabled(false);
+		mGetBackgroundImagePathButton->setEnabled(false);
 	}
 
 	/**
@@ -277,11 +280,13 @@ namespace ImageButtonTest
 		if (button == mForegroundImageFromHandleButton)
 		{
 			mListener.selectForegroundImageFromHandle();
+			mGetForegroundImagePathButton->setEnabled(false);
 		}
 		else if (button == mForegroundImageFromPathButton)
 		{
 			MAUtil::String path = mPathForegroundEditBox->getText();
 			mListener.selectForegroundImageFromPath(path);
+			mGetForegroundImagePathButton->setEnabled(true);
 		}
 		else if (button == mGetForegroundImagePathButton)
 		{
@@ -290,11 +295,13 @@ namespace ImageButtonTest
 		else if (button == mBackgroundImageFromHandleButton)
 		{
 			mListener.selectBackgroundImageFromHandle();
+			mGetBackgroundImagePathButton->setEnabled(false);
 		}
 		else if (button == mBackgroundImageFromPathButton)
 		{
 			MAUtil::String path = mPathBackgroundEditBox->getText();
 			mListener.selectBackgroundImageFromPath(path);
+			mGetBackgroundImagePathButton->setEnabled(true);
 		}
 		else if (button == mGetBackgroundImagePathButton)
 		{
