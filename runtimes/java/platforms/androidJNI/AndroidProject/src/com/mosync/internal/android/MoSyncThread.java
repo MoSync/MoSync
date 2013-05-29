@@ -3159,12 +3159,7 @@ public class MoSyncThread extends Thread
 	void destroyResource(int resourceIndex)
 	{
 		SYSLOG("destroyResource :" + resourceIndex);
-		/*
-		if(null != mBinaryResources.get(resourceIndex))
-		{
-			mBinaryResources.remove(resourceIndex);
-		}
-		*/
+
 		if(null != mUBinaryResources.get(resourceIndex))
 		{
 			mUBinaryResources.remove(resourceIndex);
@@ -3172,20 +3167,20 @@ public class MoSyncThread extends Thread
 		else
 		{
 			ImageCache img = mImageResources.get(resourceIndex);
-			if(null != img && img.mBitmap != null && !img.mBitmap.isRecycled())
+			if(null != img)
 			{
-				Log.e("MoSyncThread", "recycle the bitmap" + img.mBitmap);
-				img.mBitmap.recycle();
+				// recycle only if possible
+				if(img.mBitmap != null && !img.mBitmap.isRecycled())
+				{
+				    Log.e("MoSyncThread", "recycle the bitmap" + img.mBitmap);
+				    img.mBitmap.recycle();
+				}
+
 				img.mBitmap = null;
 				mImageResources.remove(resourceIndex);
 			}
 		}
-		//else
-		//{
-		//	Log.e("MoSyncThread", "destroyResource bad handle: " + resourceIndex);
-		//}
 
-		//Log.i("MoSyncThread", "Resource deleted, force GC");
 		System.gc();
 	}
 
