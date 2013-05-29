@@ -97,7 +97,16 @@ class RuntimeBuilder
 
 	def androidBuilder(runtime_dir, mode, platform, version)
 		debug = (mode=="debug") ? "D" : ""
-		android_tools = "#{$SETTINGS[:android_sdk]}/platform-tools"
+
+		if File.exist?"#{$SETTINGS[:android_sdk]}/platform-tools/aapt.exe"
+			android_tools = "#{$SETTINGS[:android_sdk]}/platform-tools"
+		else
+			Dir.foreach("#{$SETTINGS[:android_sdk]}/build-tools") do |dir|
+				android_tools = "#{$SETTINGS[:android_sdk]}/build-tools/#{dir}"
+				break if File.exist?"#{$SETTINGS[:android_sdk]}/build-tools/#{dir}/aapt.exe"
+			end
+		end
+
 		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-#{platform}"
 		android_ndk = "#{$SETTINGS[:android_ndk]}"
 
