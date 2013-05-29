@@ -347,6 +347,7 @@ int executeNdkBuild(Arguments* params) {
 			string androidVersion = getAppPlatform(params);
 			cmd << arg("APP_PLATFORM=android-" + androidVersion) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
+			cmd << arg("NDK_ROOT_DIR=" + getNdkRoot(params));
 
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
 			_mkdir(fullOutputDir.c_str());
@@ -382,17 +383,22 @@ int executeNdkBuild(Arguments* params) {
 
 string getStlportDir(Arguments* params, bool useMakeParam) {
 	if (useMakeParam) {
-		return string("$(NDK_ROOT)/sources/cxx-stl/stlport/");
+		// *Not* the NDK_ROOT, which uses cygwin style paths
+		return string("$(NDK_ROOT_DIR)/sources/cxx-stl/stlport/");
 	} else {
-		string ndkDir = require(params, "--android-ndk-location");
-		toDir(ndkDir);
+		string ndkDir = getNdkRoot(params);
 		return ndkDir + "sources/cxx-stl/stlport/";
 	}
 }
 
-string getNdkBuildScript(Arguments* params) {
+string getNdkRoot(Arguments* params) {
 	string ndkDir = require(params, "--android-ndk-location");
 	toDir(ndkDir);
+	return ndkDir;
+}
+
+string getNdkBuildScript(Arguments* params) {
+	string ndkDir = getNdkRoot(params);
 	string buildCmdRel = params->getSwitchValue("--android-ndkbuild-cmd");
 	if (buildCmdRel.empty()) {
 		buildCmdRel = "ndk-build";
@@ -402,8 +408,7 @@ string getNdkBuildScript(Arguments* params) {
 }
 
 string getAppPlatform(Arguments* params) {
-	string ndkDir = require(params, "--android-ndk-location");
-	toDir(ndkDir);
+	string ndkDir = getNdkRoot(params);
 	string androidVersion = require(params, "--android-version");
 	string platformDir = ndkDir + "/platforms/android-" + androidVersion;
 	toOSSlashes(platformDir);
