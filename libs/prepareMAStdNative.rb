@@ -64,6 +64,8 @@ end
 
 tempfile.close()
 
+FileUtils.rm_rf "MAStdNative/maapi.h"
+
 FileUtils.mv "MAStdNative/maapi.h.new", "MAStdNative/maapi.h"
 
 FileUtils.mkpath([mosyncdir+"/include"])
