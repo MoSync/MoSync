@@ -45,9 +45,11 @@ end
 FileUtils.cp_r Dir.glob('MAStdNative/yajl/src/api/*.h'), "MAStdNative/yajl/"
 FileUtils.rm_r 'MAStdNative/yajl/src'
 
+FileUtils.mv "MAStdNative/maapi.h", "MAStdNative/maapi.h.old"
+
 lineBuffer = []
-tempfile = File.open("MAStdNative/maapi.h.new", 'w')
-File.open("MAStdNative/maapi.h").each do |line|
+tempfile = File.open("MAStdNative/maapi.h", 'w')
+File.open("MAStdNative/maapi.h.old").each do |line|
 	if(line['char* strcpy']) then
 		lineBuffer = []
 	else
@@ -63,10 +65,6 @@ lineBuffer.each() do |line|
 end
 
 tempfile.close()
-
-FileUtils.rm_rf "MAStdNative/maapi.h"
-
-FileUtils.mv "MAStdNative/maapi.h.new", "MAStdNative/maapi.h"
 
 FileUtils.mkpath([mosyncdir+"/include"])
 FileUtils.cp_r "MAStdNative", mosyncdir + "/include/"
