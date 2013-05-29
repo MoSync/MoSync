@@ -92,13 +92,18 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("inProgress"))
                 {
-                    return false;
+                    bool myValue;
+                    if (!bool.TryParse(propertyValue, out myValue))
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

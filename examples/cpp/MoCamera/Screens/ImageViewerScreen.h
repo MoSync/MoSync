@@ -93,6 +93,23 @@ namespace MoSyncCamera
          */
         void toggleImageSavingInProgress(bool isInProgress);
 
+        /**
+		 * Changes the state of the button that dismisses this screen.
+		 *
+		 * @param enabled true if button must be enabled,
+		 * false if it must be disabled.
+		 */
+        void toogleBackButton(bool enabled);
+
+        /**
+		 * Changes the state of the button that exports the snapshot
+		 * to the device gallery.
+		 *
+		 * @param enabled true if button must be enabled,
+		 * false if it must be disabled.
+		 */
+        void toogleSaveSnapshotButton(bool enabled);
+
 	private:
 
         void createUI();

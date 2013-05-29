@@ -55,6 +55,7 @@ namespace MoSyncCamera
 
 		mCameraScreen->registerCameraListener(this);
 		MAUtil::Environment::getEnvironment().addMediaExportListener(this);
+		MAUtil::Environment::getEnvironment().addPointerListener(this);
 
 		setScreenTransitions();
 	}
@@ -74,6 +75,7 @@ namespace MoSyncCamera
 
 		mCameraScreen->unregisterCameraListener(this);
 		MAUtil::Environment::getEnvironment().removeMediaExportListener(this);
+		MAUtil::Environment::getEnvironment().removePointerListener(this);
 
 		delete mCameraScreen;
 		delete mImageViewerScreen;
@@ -196,6 +198,37 @@ namespace MoSyncCamera
 	}
 
 
+	void MoCameraController::handleBackPress()
+	{
+		if ( isDisplayed(*mImageViewerScreen) )
+		{
+			imageViewingDone();
+		}
+		else
+		{
+			// This will be replaced to "send to background" in the near future.
+			maExit(0);
+		}
+	}
+
+
+	void MoCameraController::pointerPressEvent(MAPoint2d point)
+	{
+		if ( isDisplayed(*mCameraScreen) )
+		{
+			mCameraScreen->triggerAutoFocus();
+		}
+	}
+
+
+    void MoCameraController::pointerMoveEvent(MAPoint2d point)
+    {}
+
+
+    void MoCameraController::pointerReleaseEvent(MAPoint2d point)
+    {}
+
+
 	void MoCameraController::setScreenTransitions()
 	{
 		switch (MAUtil::Environment::getEnvironment().getCurrentPlatform())
@@ -226,6 +259,6 @@ namespace MoSyncCamera
 
 	bool MoCameraController::isDisplayed( const NativeUI::Screen& currentScreen )
 	{
-		return mDisplayedScreen == currentScreen.getWidgetHandle();
+		return (mDisplayedScreen == currentScreen.getWidgetHandle());
 	}
 } // MoSyncCamera

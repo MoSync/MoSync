@@ -668,18 +668,19 @@ public:
 			return false;
 #else
 	bool LoadVMApp(int modFd, int resFd, bool isNative) {
-		InitVM();
+		if (!isNative)
+		{
+			InitVM();
 
-		FileStream mod(modFd);
+			FileStream mod(modFd);
 
-		if(!LoadVM(mod))
-			return false;
-
-		// MOSYNC NATIVE: JUST RESET THE MEM_DS:
-		if (isNative) {
+			if(!LoadVM(mod))
+				return false;
+		}
+		else
+		{
 			mem_ds = 0;
 		}
-
 		//-2 means that the mosync application does not need any resources.
 		if(-2 != resFd)
 		{

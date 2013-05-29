@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\ActivityIndicator.cpp" />
     <ClCompile Include="..\Button.cpp" />
+    <ClCompile Include="..\Camera.cpp" />
     <ClCompile Include="..\CameraPreview.cpp" />
     <ClCompile Include="..\CheckBox.cpp" />
     <ClCompile Include="..\DatePicker.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="..\ActivityIndicator.h" />
     <ClInclude Include="..\Button.h" />
     <ClInclude Include="..\ButtonListener.h" />
+    <ClInclude Include="..\Camera.h" />
     <ClInclude Include="..\CameraPreview.h" />
     <ClInclude Include="..\CheckBox.h" />
     <ClInclude Include="..\CheckBoxListener.h" />
@@ -163,12 +165,12 @@
   <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug\</OutDir>
     <TargetName>NativeUI</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release</OutDir>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release\</OutDir>
     <TargetName>NativeUI</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
@@ -180,7 +182,7 @@
       <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
       <ExceptionHandling />
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -199,7 +201,7 @@
       <ExceptionHandling>
       </ExceptionHandling>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>

@@ -13,9 +13,7 @@ import com.mosync.internal.android.MoSyncError;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
-import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.RawContacts;
 
 public class PIMItem {

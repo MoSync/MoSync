@@ -86,10 +86,9 @@ namespace MoSync
             public new void RunOperationQueue()
             {
                 // run all the pending operations from the widget operation queue
-                while (mOperationQueue.Count != 0)
+                while (mOperationQueue.Count > 0)
                 {
                     WidgetOperation currentOperation = mOperationQueue.Dequeue();
-
                     RunOperation(currentOperation);
                 }
             }
@@ -99,14 +98,12 @@ namespace MoSync
              * @param operation The widget operation (could be a ADD, INSERT, REMOVE, SET or GET) that
              * needs to be applied on the current widget.
              */
-            protected void RunOperation(WidgetOperation operation)
+            public new void RunOperation(WidgetOperation operation)
             {
                 switch (operation.Type)
                 {
                     case WidgetOperation.OperationType.SET:
                         SetProperty(operation);
-                        break;
-                    case WidgetOperation.OperationType.GET:
                         break;
                     case WidgetOperation.OperationType.ADD:
                         AddChild(operation);
@@ -116,6 +113,12 @@ namespace MoSync
                         break;
                     case WidgetOperation.OperationType.REMOVE:
                         RemoveChild(operation);
+                        break;
+                    case WidgetOperation.OperationType.GET:
+                        // do nothing - when a get syscall is called and the widget is not created,
+                        // the last valid set value is returned and if it doesn't exist, we wait for
+                        // the widget creation and run the get operation. A get operation never
+                        // gets into the queue
                         break;
                 }
             }
@@ -160,7 +163,7 @@ namespace MoSync
             protected void InsertChild(WidgetOperation operation)
             {
                 IWidget child = mRuntime.GetModule<NativeUIModule>().GetWidgetSync(operation.Handle);
-//                child.SetParent(this);
+                child.SetParent(this);
                 this.InsertChild(child, operation.Index);
             }
 
@@ -327,7 +330,7 @@ namespace MoSync
                 set
                 {
                     System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
+                    MoSync.Util.ConvertStringToColor(value, out brush);
                     if (View is System.Windows.Controls.Control) ((System.Windows.Controls.Control)View).Background = brush;
                     else if (View is System.Windows.Controls.Panel) ((System.Windows.Controls.Panel)View).Background = brush;
                 }
@@ -414,10 +417,10 @@ namespace MoSync
                     System.Windows.Media.GradientStop secondGradientStop = new System.Windows.Media.GradientStop();
 
                     System.Windows.Media.SolidColorBrush firstBrush;
-                    Util.convertStringToColor(value.Split(',')[0], out firstBrush);
+                    Util.ConvertStringToColor(value.Split(',')[0], out firstBrush);
 
                     System.Windows.Media.SolidColorBrush secondBrush;
-                    Util.convertStringToColor(value.Split(',')[1], out secondBrush);
+                    Util.ConvertStringToColor(value.Split(',')[1], out secondBrush);
 
                     firstGradientStop.Color = firstBrush.Color;
                     secondGradientStop.Color = secondBrush.Color;
@@ -459,13 +462,44 @@ namespace MoSync
 
             public static bool ValidateProperty(String propertyName, String propertyValue)
             {
+                bool isPropertyValid = true;
                 if (propertyName.Equals("enabled") || propertyName.Equals("visible"))
                 {
                     bool val;
-                    if (!Boolean.TryParse(propertyValue, out val)) return false;
+                    if (!Boolean.TryParse(propertyValue, out val)) isPropertyValid = false;
+                }
+                else if (propertyName.Equals("backgroundColor"))
+                {
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("backgroundGradient"))
+                {
+                    try
+                    {
+                        System.Windows.Media.GradientStop firstGradientStop = new System.Windows.Media.GradientStop();
+                        System.Windows.Media.GradientStop secondGradientStop = new System.Windows.Media.GradientStop();
+
+                        System.Windows.Media.SolidColorBrush firstBrush;
+                        Util.ConvertStringToColor(propertyValue.Split(',')[0], out firstBrush);
+
+                        System.Windows.Media.SolidColorBrush secondBrush;
+                        Util.ConvertStringToColor(propertyValue.Split(',')[1], out secondBrush);
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

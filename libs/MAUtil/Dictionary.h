@@ -22,7 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _SE_MSAB_MAUTIL_DICTIONARY_H_
 #define _SE_MSAB_MAUTIL_DICTIONARY_H_
 
-#ifndef WINDOWS_PHONE_8_LIB
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <ma.h>
 #include <maassert.h>
 #include <kazlib/dict.h>

@@ -25,8 +25,6 @@ import java.util.Map;
 
 import android.provider.ContactsContract.CommonDataKinds.Im;
 
-import com.mosync.api.Pointer;
-
 public class PIMFieldIM extends PIMStringArrayField {
 
 	Map<Integer, String> mProtocols;

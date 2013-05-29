@@ -22,7 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _CONSOLE_H_
 #define _CONSOLE_H_
 
-#ifdef MOSYNC_NATIVE
+#if defined(MOSYNC_NATIVE) && !defined(__WINDOWS_PHONE_8__)
 #include <stdio.h>
 #endif
 
@@ -31,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mastring.h"
 #include "mavsprintf.h"
 
-#ifdef MOSYNC_NATIVE
+#if defined(MOSYNC_NATIVE) && !defined(__WINDOWS_PHONE_8__)
 #define CON(ret, fn) ret con_##fn
 #undef printf
 #define printf con_printf

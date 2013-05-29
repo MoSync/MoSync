@@ -60,8 +60,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
-#define SYSLOG(...)
+#include "syslog.h"
 
 namespace Base
 {
@@ -302,7 +301,7 @@ namespace Base
 
 	void Syscall::setJNIEnvironment(JNIEnv* je, jobject jthis)
 	{
-		SYSLOG("setJNIEnvironment")
+		SYSLOG("setJNIEnvironment");
 
 		mJNIEnv = je;
 		mJThis = jthis;
@@ -316,7 +315,6 @@ namespace Base
 
 	int Syscall::getEventQueueSize()
 	{
-		SYSLOG("getEventQueueSize");
 		return gEventFifo.count();
 	}
 
@@ -1101,8 +1099,6 @@ namespace Base
 
 	SYSCALL(void,  maWait(int timeout))
 	{
-		SYSLOG("maWait");
-
 		if(gEventFifo.count() != 0)
 			return;
 
@@ -1334,6 +1330,7 @@ namespace Base
 	 */
 	int maOpenGLInitFullscreen(int glApi)
 	{
+		SYSLOG("maOpenGLInitFullscreen");
 		return _maOpenGLInitFullscreen(glApi, mJNIEnv, mJThis);
 	}
 
@@ -1344,6 +1341,7 @@ namespace Base
 	 */
 	int maOpenGLCloseFullscreen()
 	{
+		SYSLOG("maOpenGLCloseFullscreen");
 		return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
 	}
 
@@ -1386,7 +1384,7 @@ namespace Base
 	*/
 	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
-		SYSLOG("maIOCtl");
+		SYSLOG("maIOCtl: %d", function);
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		//handlePendingExceptions(mJNIEnv);
 
@@ -1399,7 +1397,8 @@ namespace Base
 		maIOCtl_IX_GL2_caselist
 #endif
 		maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
-#else
+#endif
+
 		case maIOCtl_maOpenGLInitFullscreen:
 			return _maOpenGLInitFullscreen(a, mJNIEnv, mJThis);
 		case maIOCtl_maOpenGLCloseFullscreen:
@@ -1408,7 +1407,6 @@ namespace Base
 			return _maOpenGLTexImage2D(a, mJNIEnv, mJThis);
 		case maIOCtl_maOpenGLTexSubImage2D:
 			return _maOpenGLTexSubImage2D(a, mJNIEnv, mJThis);
-#endif
 
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
@@ -1946,11 +1944,12 @@ namespace Base
 		case maIOCtl_maActionBarAddMenuItem:
 		{
 			SYSLOG("maIOCtl_maActionBarAddMenuItem");
-			//int displayFlag = SYSCALL_THIS->GetValidatedStackValue(0);
+			//int displayFlag = ARG_NO_4;
 			//return _maActionBarAddMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), c, displayFlag, mJNIEnv, mJThis);
 			int _handle = a;
 			const char *_title = SYSCALL_THIS->GetValidatedStr(b);
-			int _flag = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _flag = ARG_NO_4;
+
 			MA_ACTION_BAR_ITEM_ICON* args = (MA_ACTION_BAR_ITEM_ICON*) SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MA_ACTION_BAR_ITEM_ICON));
 			return _maActionBarAddMenuItem(
 				_handle,

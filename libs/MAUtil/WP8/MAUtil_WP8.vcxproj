@@ -120,12 +120,12 @@
   <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug\</OutDir>
     <TargetName>MAUtil</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release</OutDir>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release\</OutDir>
     <TargetName>MAUtil</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
@@ -136,8 +136,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <PreprocessorDefinitions>WIN32;NDEBUG;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
@@ -158,8 +158,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <PreprocessorDefinitions>WIN32;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>

@@ -46,7 +46,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'debug_lib_build|AnyCPU'">
-    <OutputPath>bin\debug_lib_build\</OutputPath>
+    <OutputPath>..\..\mosync\Libraries\Media\debug_lib_build\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Windows" />

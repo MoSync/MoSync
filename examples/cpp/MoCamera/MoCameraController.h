@@ -38,8 +38,9 @@ namespace MoSyncCamera
 	class MoCameraController:
 		public CameraScreenController,
 		public ImageViewerScreenController,
+		public NativeUI::CameraSnapshotListener,
 		public MAUtil::MediaExportListener,
-		public NativeUI::CameraSnapshotListener
+		public MAUtil::PointerListener
 	{
 	public:
 		MoCameraController();
@@ -99,6 +100,20 @@ namespace MoSyncCamera
          */
         void imageExportToGalleryFinished( const MAHandle& imageHandle,
 			int resultCode);
+
+        /**
+         * Handles the hardware back press.
+         */
+        void handleBackPress();
+
+        /**
+         * Pointer event listeners. Used here to trigger auto focus.
+         *
+         * From PointerListener
+         */
+        virtual void pointerPressEvent(MAPoint2d point);
+        virtual void pointerMoveEvent(MAPoint2d point);
+        virtual void pointerReleaseEvent(MAPoint2d point);
 
 	private:
 		/**

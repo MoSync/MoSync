@@ -157,8 +157,9 @@ namespace MoSyncCamera
 
     void ImageViewerScreen::toggleImageSavingInProgress(bool isInProgress)
     {
-        mSaveImageButton->setEnabled(!isInProgress);
-        mDismissButton->setEnabled(!isInProgress);
+        toogleBackButton(!isInProgress);
+        toogleSaveSnapshotButton(!isInProgress);
+
         if ( isInProgress )
         {
             mActivityIndicator->show();
@@ -167,5 +168,39 @@ namespace MoSyncCamera
         {
             mActivityIndicator->hide();
         }
+    }
+
+
+    void ImageViewerScreen::toogleBackButton(bool enabled)
+	{
+		if ( enabled )
+		{
+			// Use enabled images
+			mDismissButton->setBackgroundImage(RES_BACK_IMG);
+			mDismissButton->setPressedImage(RES_BACK_IMG_PRESSED);
+		}
+		else
+		{
+			// Use disabled images
+			mDismissButton->setBackgroundImage(RES_BACK_IMG_DISABLED);
+		}
+		mDismissButton->setEnabled(enabled);
+    }
+
+
+    void ImageViewerScreen::toogleSaveSnapshotButton(bool enabled)
+	{
+		if ( enabled )
+		{
+			// Use enabled images
+			mSaveImageButton->setBackgroundImage(RES_SAVE_IMG);
+			mSaveImageButton->setPressedImage(RES_SAVE_IMG_PRESSED);
+		}
+		else
+		{
+			// Use disabled images
+			mSaveImageButton->setBackgroundImage(RES_SAVE_IMG_DISABLED);
+		}
+		mSaveImageButton->setEnabled(enabled);
     }
 } // MoSyncCamera

@@ -1,6 +1,8 @@
 #include "android.h"
 #include "util.h"
 #include "nbuild.h"
+#include "fileset.h"
+#include <filelist/filelist.h>
 #include "mustache/mustache.h"
 #include "profiledb/profiledb.h"
 #include "helpers/mkdir.h"
@@ -65,14 +67,20 @@ int generateMakefile(Arguments* params, string& configName) {
 	_mkdir(tmpBuildDir.c_str());
 
 	vector<string> bootstrapModules;
+	// TODO: Duplicated in package tool, should use manifest instead!
+	map<string, string> initFuncs;
+	initFuncs["mosynclib"] = "resource_selector";
 	split(bootstrapModules, params->getSwitchValue(BOOT_MODULE_LIST), ",");
 	if (bootstrapModules.empty()) {
 		// Default
+		bootstrapModules.push_back("stlport");
 		bootstrapModules.push_back("mosync");
 		bootstrapModules.push_back("mosynclib");
 	} else if (bootstrapModules[0] == ".") {
 		bootstrapModules.clear();
 	}
+
+	bool useSTLSupport = params->isFlagSet("--android-stl-support");
 
 	vector<string> modules(bootstrapModules);
 	split(modules, params->getSwitchValue(MODULE_LIST), ",");
@@ -80,11 +88,23 @@ int generateMakefile(Arguments* params, string& configName) {
 	DefaultContext rootCtx(NULL);
 	for (size_t i = 0; i < modules.size(); i++) {
 		String moduleName = modules[i];
+		DefaultContext* moduleCtx = new DefaultContext(&rootCtx);
+		moduleCtx->setParameter("name", moduleName);
 		if (!isSTL(moduleName)) {
-			DefaultContext* moduleCtx = new DefaultContext(&rootCtx);
 			// TODO: Clean up
-			moduleCtx->setParameter("name", moduleName);
+			string initFunc = initFuncs[moduleName];
+			if (!initFunc.empty()) {
+				moduleCtx->setParameter("init", initFunc);
+			}
 			rootCtx.addChild("modules", moduleCtx);
+		} else if (!useSTLSupport) {
+			// TODO: All modules should use manifests + parameters like this.
+			string stlportInc = getStlportDir(params, true) + "stlport/";
+			string stlportLib = getStlportDir(params, true) + "libs/$(TARGET_ARCH_ABI)";
+			moduleCtx->setParameter("includepath", stlportInc);
+			moduleCtx->setParameter("libpath", stlportLib);
+			moduleCtx->setParameter("libname", "stlport_shared");
+			rootCtx.addChild("stlport", moduleCtx);
 		}
 	}
 	vector<string> sourceFiles = getSourceFiles(params);
@@ -243,14 +263,6 @@ int executeNdkBuild(Arguments* params) {
 		}
 	}
 
-	vector<string> modules;
-	split(modules, params->getSwitchValue(MODULE_LIST), ",");
-	bool useSTL = false;
-	for (size_t i = 0; i < modules.size(); i++) {
-		useSTL |= isSTL(modules[i]);
-		printf("USE STL? %s, %d\n", modules[i].c_str(), useSTL);
-	}
-
 	for (size_t i = 0; i < configNames.size(); i++) {
 		for (size_t j = 0; j < archs.size(); j++) {
 			string configName = configNames[i];
@@ -264,6 +276,28 @@ int executeNdkBuild(Arguments* params) {
 			bool isVerbose = params->isFlagSet(VERBOSE);
 			bool doClean = params->isFlagSet(CLEAN);
 
+			if (doClean) {
+				DefaultFileSet* libs = new DefaultFileSet(tmpBuildDir, "libs/**", false, NULL);
+				DefaultFileSet* objs = new DefaultFileSet(tmpBuildDir, "obj/**", false, NULL);
+				FileSetList* dfs = new FileSetList();
+				dfs->addFileSet(libs);
+				dfs->addFileSet(objs);
+				vector<string> files;
+				dfs->listFiles(files);
+				if (isVerbose) {
+					printf("Removing %d files from %s.\n", (int) files.size(), tmpBuildDir.c_str());
+				}
+				for (size_t k = 0; k < files.size(); k++) {
+					// TODO: dirs?
+					string file = tmpBuildDir + files[k];
+					remove(file.c_str());
+					printf("Removed %s.\n", files[k].c_str());
+				}
+				delete libs;
+				delete objs;
+				delete dfs;
+			}
+
 			ostringstream cmd;
 			string ndkBuildCmd = getNdkBuildScript(params);
 			cmd << ndkBuildCmd << " -C " << toMakefileFile(file(tmpBuildDir)) << " ";
@@ -276,6 +310,13 @@ int executeNdkBuild(Arguments* params) {
 			if (doClean) {
 				cmd << "-B ";
 			}
+
+			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
+
+			// A flag to indicate that we rely on the ndk build system to find
+			// and copy the stlport library
+			bool useSTLSupport = params->isFlagSet("--android-stl-support");
+
 			string libDir = string(mosyncdir()) + "/lib";
 			toSlashes(libDir);
 			string moduleDir = string(mosyncdir()) + "/modules";
@@ -293,14 +334,21 @@ int executeNdkBuild(Arguments* params) {
 			cmd << arg("MOSYNC_LIB_VARIANT=" + libVariant) << " ";
 			cmd << arg("NDK_PROJECT_PATH=.") << " ";
 			cmd << arg("APP_ABI=" + arch) << " ";
-			if (useSTL) {
-				cmd << arg("APP_STL=stlport_static") << " ";
-			}
+			string appstl = string(useSTLSupport ? "stlport_shared" : "none");
+			cmd << arg("APP_STL=" + appstl) << " ";
+			/*if (useSTL) {
+				// TODO: beta
+				if (useStatic) {
+					error("Static STL not supported!");
+				}
+				string appstl = string("APP_STL=stlport_shared");
+				cmd << arg(appstl) << " ";
+			}*/
 			string androidVersion = getAppPlatform(params);
 			cmd << arg("APP_PLATFORM=android-" + androidVersion) << " ";
 			cmd << arg("MOSYNCDIR=" + toMakefileFile(mosyncdir())) << " ";
+			cmd << arg("NDK_ROOT_DIR=" + getNdkRoot(params));
 
-			bool useStatic = "static" == params->getSwitchValue("--android-lib-type");
 			string fullOutputDir = outputDir + "android_" + arch + "_" + libVariant + "/";
 			_mkdir(fullOutputDir.c_str());
 
@@ -311,20 +359,46 @@ int executeNdkBuild(Arguments* params) {
 			string fullOutputFile = fullOutputDir + "lib" + moduleName + libExt;
 
 			file(libFile.c_str());
+			remove(libFile.c_str());
 			string fullCmd = getNdkBuildCommand(cmd.str());
 			if (sh(fullCmd.c_str(), !isVerbose)) {
 				error("NDK build command failed!\n", 1);
 			}
 
+			if (!existsFile(libFile.c_str())) {
+				error("NDK build failed!\n", 1);
+			}
 			copyFile(fullOutputFile.c_str(), libFile.c_str());
+			// TODO: The important thing is: is the STL static, not the result?
+			string stlLibDir = useSTLSupport ? tmpBuildDir : getStlportDir(params, false);
+			string stlLibFile = stlLibDir + "libs/" + arch + "/libstlport_shared.so";
+			string stlOutputFile = fullOutputDir + "libstlport_shared.so";
+			if (existsFile(stlLibFile.c_str())) {
+				copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
+			}
 		}
 	}
 	return 0;
 }
 
-string getNdkBuildScript(Arguments* params) {
+string getStlportDir(Arguments* params, bool useMakeParam) {
+	if (useMakeParam) {
+		// *Not* the NDK_ROOT, which uses cygwin style paths
+		return string("$(NDK_ROOT_DIR)/sources/cxx-stl/stlport/");
+	} else {
+		string ndkDir = getNdkRoot(params);
+		return ndkDir + "sources/cxx-stl/stlport/";
+	}
+}
+
+string getNdkRoot(Arguments* params) {
 	string ndkDir = require(params, "--android-ndk-location");
 	toDir(ndkDir);
+	return ndkDir;
+}
+
+string getNdkBuildScript(Arguments* params) {
+	string ndkDir = getNdkRoot(params);
 	string buildCmdRel = params->getSwitchValue("--android-ndkbuild-cmd");
 	if (buildCmdRel.empty()) {
 		buildCmdRel = "ndk-build";
@@ -334,8 +408,7 @@ string getNdkBuildScript(Arguments* params) {
 }
 
 string getAppPlatform(Arguments* params) {
-	string ndkDir = require(params, "--android-ndk-location");
-	toDir(ndkDir);
+	string ndkDir = getNdkRoot(params);
 	string androidVersion = require(params, "--android-version");
 	string platformDir = ndkDir + "/platforms/android-" + androidVersion;
 	toOSSlashes(platformDir);

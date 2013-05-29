@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Environment.h>
 #include <glm/glm.hpp>
-#include <hash_map>
+#include "Utils.h"
 
 namespace MoGraph
 {

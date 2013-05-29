@@ -76,7 +76,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.net.SSLCertificateSocketFactory;
-import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 
