@@ -3172,9 +3172,11 @@ public class MoSyncThread extends Thread
 		else
 		{
 			ImageCache img = mImageResources.get(resourceIndex);
-			if(null != img)
+			if(null != img && img.mBitmap != null && !img.mBitmap.isRecycled())
 			{
+				Log.e("MoSyncThread", "recycle the bitmap" + img.mBitmap);
 				img.mBitmap.recycle();
+				img.mBitmap = null;
 				mImageResources.remove(resourceIndex);
 			}
 		}
