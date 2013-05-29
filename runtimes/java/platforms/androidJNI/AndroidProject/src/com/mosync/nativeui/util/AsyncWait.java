@@ -20,6 +20,8 @@ package com.mosync.nativeui.util;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import com.mosync.internal.android.MoSyncThread;
+
 /**
  * A utility class that simplifies the waiting for asynchronous
  * events. This class is only intended to be used for sharing
