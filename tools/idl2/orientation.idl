@@ -25,15 +25,21 @@ group OrientationConstants "Orientation constants" {
 		DYNAMIC = 0xF;
 	}
 
-	/**
-	* @deprecated Use use @maScreenSetSupportedOrientations instead.
-	*/
 	constset int SCREEN_ORIENTATION_ {
-		/// Landscape screen orientation.
+		/**
+		 * Landscape screen orientation.
+		 * @deprecated Use #maScreenSetSupportedOrientations with #MA_SCREEN_ORIENTATION_LANDSCAPE instead.
+		 */
 		LANDSCAPE = 1;
-		/// Portrait screen orientation.
+		/**
+		 * Portrait screen orientation.
+		 * @deprecated Use #maScreenSetSupportedOrientations with #MA_SCREEN_ORIENTATION_PORTRAIT instead.
+		 */
 		PORTRAIT = 2;
-		/// Screen orientation is based on device sensor.
+		/**
+		 * Screen orientation is based on device sensor.
+		 * @deprecated Use #maScreenSetSupportedOrientations with #MA_SCREEN_ORIENTATION_PORTRAIT instead.
+		 */
 		DYNAMIC = 3;
 	}
 } // end of OrientationConstants
@@ -51,7 +57,7 @@ group OrientationResultCodes "Orientation result codes" {
 
 group OrientationFunctions "Orientation functions" {
 	/**
-	 * @deprecated Use @maScreenSetSupportedOrientations instead.
+	 * @deprecated Use #maScreenSetSupportedOrientations instead.
 	 * Set the screen orientation.
 	 * Currently implemented only on Android and Windows Phone.
 	 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE

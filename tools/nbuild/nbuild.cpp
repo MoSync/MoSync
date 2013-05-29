@@ -81,7 +81,7 @@ string validateConfiguration(string& configName) {
 }
 
 bool isSTL(string& moduleName) {
-	return "STL" == moduleName;
+	return "stlport" == moduleName;
 }
 
 const char* mosyncdir() {

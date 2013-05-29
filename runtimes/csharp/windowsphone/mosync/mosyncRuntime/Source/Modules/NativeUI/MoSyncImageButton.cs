@@ -23,14 +23,15 @@ MA 02110-1301, USA.
  *
  * @platform WP 7.1
  **/
-
+using System;
 using Microsoft.Phone.Controls;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Navigation;
-using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Windows.Media.Imaging;
+using System.IO;
 using System.IO.IsolatedStorage;
 
 namespace MoSync
@@ -112,7 +113,7 @@ namespace MoSync
             /**
              * Function that creates the TextBlock object and setts the alignment of the text
              */
-            private void createTextBlock()
+            private void CreateTextBlock()
             {
                 mText = new System.Windows.Controls.TextBlock();
                 mText.TextWrapping = TextWrapping.NoWrap;
@@ -125,7 +126,7 @@ namespace MoSync
             /**
              * Function that that creates the foreground image
              */
-            private void createForegroundImage()
+            private void CreateForegroundImage()
             {
                 /**
                  * Create the foreground image and display it in the center of the button
@@ -170,7 +171,7 @@ namespace MoSync
             /**
              * Function that creates the background image
              */
-            private void createBackgroundImage()
+            private void CreateBackgroundImage()
             {
                 mBackgroundImage = new System.Windows.Controls.Image();
                 mBackgroundImage.VerticalAlignment = VerticalAlignment.Center;
@@ -188,9 +189,9 @@ namespace MoSync
                 mStretchBackground = new System.Windows.Media.Stretch();
                 mStretchBackground = System.Windows.Media.Stretch.Fill;
 
-                this.createBackgroundImage();
-                this.createTextBlock();
-                this.createForegroundImage();
+                this.CreateBackgroundImage();
+                this.CreateTextBlock();
+                this.CreateForegroundImage();
 
                 /**
                  * Grid object that holds the text and the foreground and background images
@@ -339,7 +340,7 @@ namespace MoSync
                 set
                 {
                     System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
+                    MoSync.Util.ConvertStringToColor(value, out brush);
                     mText.Foreground = brush;
                 }
             }
@@ -378,10 +379,23 @@ namespace MoSync
 
                         mForegroundImage.Stretch = mStretchForeground;
 
-                        System.Windows.Media.Imaging.BitmapSource bmpSource =
-                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						Object bmpSource = null;
+						Object internalObj = res.GetInternalObject();
+						if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+						{
+							bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						}
+						else if (internalObj is Stream)
+						{
+							bmpSource = new WriteableBitmap(0, 0);
+							(bmpSource as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+						}
+						else if (internalObj is WriteableBitmap)
+						{
+							bmpSource = res.GetInternalObject();
+						}
 
-                        mForegroundImage.Source = bmpSource;
+						mForegroundImage.Source = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
                         mForegroundImageHandle = value;
                         mForegroundImagePath = "";
                     }
@@ -405,10 +419,23 @@ namespace MoSync
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
                     if (null != res && null != res.GetInternalObject())
                     {
-                        System.Windows.Media.Imaging.BitmapSource bmpSource =
-                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						Object bmpSource = null;
+						Object internalObj = res.GetInternalObject();
+						if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+						{
+							bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						}
+						else if (internalObj is Stream)
+						{
+							bmpSource = new WriteableBitmap(0, 0);
+							(bmpSource as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+						}
+						else if (internalObj is WriteableBitmap)
+						{
+							bmpSource = res.GetInternalObject();
+						}
 
-                        mBackgroundImage.Source = bmpSource;
+						mBackgroundImage.Source = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
 
                         mBackgroundImageHandle = value;
                         mBackgroundImagePath = "";
@@ -433,10 +460,23 @@ namespace MoSync
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
                     if (null != res && null != res.GetInternalObject())
                     {
-                        System.Windows.Media.Imaging.BitmapSource bmpSource =
-                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						Object bmpSource = null;
+						Object internalObj = res.GetInternalObject();
+						if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+						{
+							bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						}
+						else if (internalObj is Stream)
+						{
+							bmpSource = new WriteableBitmap(0, 0);
+							(bmpSource as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+						}
+						else if (internalObj is WriteableBitmap)
+						{
+							bmpSource = res.GetInternalObject();
+						}
 
-                        mPressedBackgroundImageSource = bmpSource;
+						mPressedBackgroundImageSource = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
                         mPressedImageHandle = value;
                         mPressedImagePath = "";
                     }
@@ -595,13 +635,66 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("imagePath") ||
+                    propertyName.Equals("backgroundImagePath") ||
+                    propertyName.Equals("pressedImagePath"))
                 {
-                    return false;
+                    //Take the store for the application (an image of the sandbox)
+                    IsolatedStorageFile f = IsolatedStorageFile.GetUserStoreForApplication();
+
+                    //Verify that the file exists on the isolated storage
+                    if (f.FileExists(propertyValue))
+                    {
+                        try
+                        {
+                            //Create a file stream for the required file
+                            IsolatedStorageFileStream fs = new IsolatedStorageFileStream(propertyValue, System.IO.FileMode.Open, f);
+                        }
+                        catch
+                        {
+                            // There was a problem reading the image file.
+                            isPropertyValid = false;
+                        }
+                    }
+                    else
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("textVerticalAlignment"))
+                {
+                    if (!(propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_TOP") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_BOTTOM") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_CENTER")))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("textHorizontalAlignment"))
+                {
+                    if (!(propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_LEFT") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_RIGHT") ||
+                        propertyValue.Equals("MoSync.Constants.MAW_ALIGNMENT_CENTER")))
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

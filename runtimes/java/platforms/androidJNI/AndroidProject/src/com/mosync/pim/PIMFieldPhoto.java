@@ -2,7 +2,6 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -17,9 +16,7 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_INT;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.provider.BaseColumns;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
-import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 
 public class PIMFieldPhoto extends PIMIntegerField {

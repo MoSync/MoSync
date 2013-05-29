@@ -25,6 +25,7 @@ using namespace std;
 #define EXCLUDE_FILES "--exclude-files"
 #define VERBOSE "--verbose"
 #define CLEAN "--clean"
+#define COMPILER_SWITCHES "--compiler-switches"
 
 #define IOS_SDK "--ios-sdk"
 #define IOS_SDK_VERSION "--ios-sdk-version"

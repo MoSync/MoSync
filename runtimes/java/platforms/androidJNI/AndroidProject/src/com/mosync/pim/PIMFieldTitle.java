@@ -2,8 +2,6 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 
-import com.mosync.pim.PIMField.State;
-
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_WORK;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_OTHER;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_CUSTOM;

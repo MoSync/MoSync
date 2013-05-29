@@ -1,4 +1,4 @@
-#ifndef WINDOWS_PHONE_8_LIB
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <mastdlib.h>
 #include <maheap.h>
 #else

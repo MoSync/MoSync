@@ -142,6 +142,8 @@ namespace test_mosync
                     InitExtensions(machine.GetCore(), machine.GetRuntime());
 				}
             };
+
+			RootFrame.BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -260,5 +262,28 @@ namespace test_mosync
         }
 
         #endregion
+
+		/**
+        * The BackKeyPress event handler.
+        * Currently it contains the functionality for the back event when a StackScreen is a child of a TabScreen.
+        * When this handler does not cover the functionality required it should be updated.
+        * @param from Object the object that triggers the event.
+        * @param args System.ComponentModel.CancelEventArgs the event arguments.
+        */
+		public void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
+		{
+			NativeUIModule nativeUIModule = machine.GetRuntime().GetModule<NativeUIModule>();
+
+			//EVENT_TYPE_KEY_RELEASED event data
+			Memory eventData = new Memory(8);
+			const int MAEventData_eventType = 0;
+			const int MAEventData_backButtonKeyCode = 4;
+			eventData.WriteInt32(MAEventData_eventType, MoSync.Constants.EVENT_TYPE_KEY_PRESSED);
+			eventData.WriteInt32(MAEventData_backButtonKeyCode, MoSync.Constants.MAK_BACK);
+			//Posting a CustomEvent
+			machine.GetRuntime().PostEvent(new Event(eventData));
+
+			args.Cancel = nativeUIModule.HandleBackButtonPressed();
+		}
     }
 }

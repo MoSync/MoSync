@@ -70,7 +70,6 @@ namespace MoSync
 				});
 			}
 
-
             /**
              * Property for setting and getting the state of the check box.
              * set: a String containing the values "true" or "false" must be provided.
@@ -105,13 +104,18 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("checked"))
                 {
-                    return false;
+                    bool val;
+                    if (!bool.TryParse(propertyValue, out val))
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

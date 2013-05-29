@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <maxtoa.h>
 #include "PhoneGapMessageHandler.h"
+#include "PhoneGapFileUtils.h"
 #include "PhoneGapCapture.h"
 
 using namespace MAUtil;
@@ -61,11 +62,11 @@ namespace Wormhole
 			if(duration > 0)
 			{
 				char durationString[16];
-#ifdef WINDOWS_PHONE_8
+#ifdef __WINDOWS_PHONE_8__
 				maCaptureSetProperty(MA_CAPTURE_MAX_DURATION, _itoa(duration,durationString,10));
 #else
 				maCaptureSetProperty(MA_CAPTURE_MAX_DURATION, itoa(duration,durationString,10));
-#endif //WINDOWS_PHONE_8
+#endif //__WINDOWS_PHONE_8__
 			}
 
 			mCaptureCallBack = message.getParam("PhoneGapCallBackId");
@@ -150,7 +151,7 @@ namespace Wormhole
 						sizeof(pathBuffer));
 					sprintf(
 						messageBuffer,
-						"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
+						"[{\"fullPath\":\"%s\",\"name\":\"%s\"}]",
 						pathBuffer,
 						FileNameFromPath(pathBuffer));
 					mMessageHandler->callSuccess(
@@ -200,11 +201,26 @@ namespace Wormhole
 						eventData.handle,
 						pathBuffer,
 						sizeof(pathBuffer));
+
+					// TODO: What should we do if FileGetSize fails?
+					// Return an error?
+					// Set size to zero for now.
+					int size = FileGetSize(pathBuffer);
+					if (size < 0)
+					{
+						size = 0;
+					}
+					char sizeBuf[64];
+					sprintf(sizeBuf, "%i", size);
+
 					sprintf(
 						messageBuffer,
-						"{\"message\":[{\"fullPath\":\"%s\",\"name\":\"%s\"}]}",
+						"[{\"fullPath\":\"%s\",\"name\":\"%s\",\"lastModifiedDate\":\"%s\",\"size\":\"%s\",\"type\":\"%s\"}]",
 						pathBuffer,
-						FileNameFromPath(pathBuffer));
+						FileNameFromPath(pathBuffer),
+						FileGetDate(pathBuffer).c_str(),
+						sizeBuf,
+						FileGetMimeType(pathBuffer).c_str());
 
 					if (result == MA_CAPTURE_RES_OK)
 					{

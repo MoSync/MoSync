@@ -73,6 +73,7 @@ int buildIOSNative(Arguments* params) {
 	}
 
 	bool isVerbose = params->isFlagSet(VERBOSE);
+	string compilerSwitches = params->getSwitchValue(COMPILER_SWITCHES);
 
 	//List of architectures to build
 	vector<string> archs;
@@ -118,6 +119,7 @@ int buildIOSNative(Arguments* params) {
 			cmd << "-isysroot " << xcodeLocation << "/Platforms/" << archSDKName << ".platform/Developer/SDKs/" << archSDKName << sdkVersion << ".sdk ";
 			cmd << "-miphoneos-version-min=" << sdkVersion << " ";
 			cmd << "-D__IOS__ -DUSE_NEWLIB -DMOSYNC_NATIVE" << " ";
+			cmd << compilerSwitches << " ";
 			cmd << "-I" << nativeHeaderDir << " ";
 			cmd << "-I" << outputDir << " ";
 			cmd << sourceFileList.str() << " ";

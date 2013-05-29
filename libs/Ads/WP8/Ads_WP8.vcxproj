@@ -51,12 +51,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <TargetName>Ads</TargetName>
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug</OutDir>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <TargetName>Ads</TargetName>
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release</OutDir>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
@@ -65,7 +65,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../;../../MAStd;../../MAUtil;../../NativeUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
     </ClCompile>
@@ -82,7 +82,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../;../../MAStd;../../MAUtil;../../NativeUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_DEPRECATE;WINDOWS_PHONE_8_LIB;WINDOWS_PHONE_8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
     </ClCompile>

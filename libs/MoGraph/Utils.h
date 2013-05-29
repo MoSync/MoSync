@@ -22,6 +22,28 @@ MA 02110-1301, USA.
 #include <vector>
 #include <string>
 
+#if defined(MOSYNC_NATIVE) && defined(__IOS__)
+#include <ext/hash_map>
+
+namespace std {
+	using namespace __gnu_cxx;
+}
+
+namespace __gnu_cxx
+{
+	template<> struct hash< std::string >
+	{
+		size_t operator()( const std::string& x ) const
+		{
+			return hash< const char* >()( x.c_str() );
+		}
+	};
+}
+
+#else
+#include <hash_map>
+#endif
+
 /**
  * \brief namespace Utils	, small global functions encapsulated under the namespace Utils
  */

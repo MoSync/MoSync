@@ -1,6 +1,7 @@
 <resources>
 	<image id="RES_TAKE_PICTURE_IMG" resource="Buttons/b_record_idle.png"/>
 	<image id="RES_TAKE_PICTURE_IMG_PRESSED" resource="Buttons/b_record_pressed.png"/>
+	<image id="RES_TAKE_PICTURE_IMG_DISABLED" resource="Buttons/b_record_disabled.png"/>
 
 	<image id="RES_SHOW_PICTURE_IMG" resource="Buttons/b_picture_idle.png"/>
 	<image id="RES_SHOW_PICTURE_IMG_PRESSED" resource="Buttons/b_picture_pressed.png"/>
@@ -18,18 +19,25 @@
 	<image id="RES_FLASH_TORCH_IMG" resource="Buttons/b_flash_idle_torch.png"/>
 	<image id="RES_FLASH_TORCH_IMG_PRESSED" resource="Buttons/b_flash_pressed_torch.png"/>
 
+	<image id="RES_FLASH_IMG_DISABLED" resource="Buttons/b_flash_idle_disabled.png"/>
+
 	<image id="RES_CAMERA_SWAP_IMG" resource="Buttons/b_rotate_idle.png"/>
 	<image id="RES_CAMERA_SWAP_IMG_PRESSED" resource="Buttons/b_rotate_pressed.png"/>
+	<image id="RES_CAMERA_SWAP_IMG_DISABLED" resource="Buttons/b_rotate_disabled.png"/>
 
 	<image id="RES_ZOOM_IN_IMG" resource="Buttons/b_plus_idle.png"/>
 	<image id="RES_ZOOM_IN_IMG_PRESSED" resource="Buttons/b_plus_pressed.png"/>
+	<image id="RES_ZOOM_IN_IMG_DISABLED" resource="Buttons/b_plus_disabled.png"/>
 
 	<image id="RES_ZOOM_OUT_IMG" resource="Buttons/b_minus_idle.png"/>
 	<image id="RES_ZOOM_OUT_IMG_PRESSED" resource="Buttons/b_minus_pressed.png"/>
+	<image id="RES_ZOOM_OUT_IMG_DISABLED" resource="Buttons/b_minus_disabled.png"/>
 
 	<image id="RES_BACK_IMG" resource="Buttons/b_back_idle.png"/>
 	<image id="RES_BACK_IMG_PRESSED" resource="Buttons/b_back_pressed.png"/>
+	<image id="RES_BACK_IMG_DISABLED" resource="Buttons/b_back_disabled.png"/>
 
 	<image id="RES_SAVE_IMG" resource="Buttons/b_save_idle.png"/>
 	<image id="RES_SAVE_IMG_PRESSED" resource="Buttons/b_save_pressed.png"/>
+	<image id="RES_SAVE_IMG_DISABLED" resource="Buttons/b_save_disabled.png"/>
 </resources>

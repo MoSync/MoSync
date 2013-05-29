@@ -326,10 +326,23 @@ namespace MoSync
                             mStretch = System.Windows.Media.Stretch.Fill;
                             mIcon.Stretch = mStretch;
 
-                            System.Windows.Media.Imaging.BitmapSource bmpSource =
-                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+							Object bmpSource = null;
+							Object internalObj = res.GetInternalObject();
+							if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+							{
+								bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+							}
+							else if (internalObj is System.IO.Stream)
+							{
+								bmpSource = new System.Windows.Media.Imaging.WriteableBitmap(0, 0);
+								(bmpSource as System.Windows.Media.Imaging.WriteableBitmap).SetSource((System.IO.Stream)res.GetInternalObject());
+							}
+							else if (internalObj is System.Windows.Media.Imaging.WriteableBitmap)
+							{
+								bmpSource = res.GetInternalObject();
+							}
 
-                            mIcon.Source = bmpSource;
+                            mIcon.Source = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
                         }
                         else throw new InvalidPropertyValueException();
                     }
@@ -359,18 +372,11 @@ namespace MoSync
 			{
 				set
 				{
-                    try
-                    {
-                        System.Windows.Media.SolidColorBrush brush;
-                        MoSync.Util.convertStringToColor(value, out brush);
-                        mText.Foreground = brush;
-                        mFontColor = brush;
-                        ReloadParentListItem();
-                    }
-                    catch
-                    {
-                        throw new InvalidPropertyValueException();
-                    }
+                    System.Windows.Media.SolidColorBrush brush;
+                    MoSync.Util.ConvertStringToColor(value, out brush);
+                    mText.Foreground = brush;
+                    mFontColor = brush;
+                    ReloadParentListItem();
 				}
 			}
 
@@ -420,13 +426,30 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("icon"))
                 {
-                    return false;
+                    int val = 0;
+                    if (!int.TryParse(propertyValue, out val))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

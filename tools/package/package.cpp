@@ -24,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "package.h"
 #include "util.h"
 
+#define BUFFER_SIZE 4096
+
 // Maximum line length: 80 characters.
 static const char* sUsage =
 "This program turns compiled MoSync programs into packages that can be\n"
@@ -125,6 +127,7 @@ static void onExit() {
 
 int main(int argc, const char** argv) {
 	SETTINGS s;
+
 	memset(&s, 0, sizeof(s));
 
 	atexit(&onExit);
@@ -198,6 +201,26 @@ int main(int argc, const char** argv) {
 			s.WPgenerateOnly = true;
 		} else if(streq(argv[i], "--wp-vs-build-path")) {
 			setString(i, argc, argv, s.WPvsBuildPath);
+		} else if(streq(argv[i], "--wp-include-paths")) {
+			setString(i, argc, argv, s.WPIncludePaths);
+		} else if(streq(argv[i], "--wp-macro-define")){
+			i++;
+			if(i == argc)
+			{
+				printf("Too few arguments!\n");
+				exit(1);
+			}
+
+			if(s.WPMacroDefines == 0)
+			{
+				s.WPMacroDefines = new char[BUFFER_SIZE];
+				strcpy(s.WPMacroDefines, argv[i]);
+			}
+			else
+			{
+				strcat(s.WPMacroDefines, ";");
+				strcat(s.WPMacroDefines, argv[i]);
+			}
 		} else if(streq(argv[i], "--cs-output")) {
 			setString(i, argc, argv, s.csOutputDir);
 		} else if(streq(argv[i], "--cpp-output")) {
@@ -245,6 +268,9 @@ int main(int argc, const char** argv) {
 	}
 
 	package(s);
+	delete s.WPMacroDefines;
+	s.WPMacroDefines = 0;
+
 	return 0;
 }
 
