@@ -1650,7 +1650,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maDrawImage");
 
-		ImageCache imageResource = mImageResources.get(new Integer(image));
+		ImageCache imageResource = mImageResources.get(Integer.valueOf(image));
 		if (imageResource == null)
 		{
 			return;
@@ -1826,7 +1826,7 @@ public class MoSyncThread extends Thread
 	int maGetImageSize(int image)
 	{
 		SYSLOG("maGetImageSize");
-		ImageCache imageResource = mImageResources.get(new Integer(image));
+		ImageCache imageResource = mImageResources.get(Integer.valueOf(image));
 		if (imageResource == null)
 		{
 			logError("maGetImageSize : no such resource");
@@ -1936,7 +1936,6 @@ public class MoSyncThread extends Thread
 	 * @param srcHeight
 	 * @param scanLength
 	 */
-	@SuppressWarnings("unused")
 	private void _maGetImageDataFast(
 		int image,
 		ImageCache imageResource,
@@ -2087,7 +2086,7 @@ public class MoSyncThread extends Thread
 		}
 		else
 		{
-			ImageCache imageResource = mImageResources.get(new Integer(image));
+			ImageCache imageResource = mImageResources.get(Integer.valueOf(image));
 			if (null == imageResource)
 			{
 				return -1;
@@ -2356,7 +2355,7 @@ public class MoSyncThread extends Thread
 			}
 
 			mMaxStoreId++;
-			mStores.put(new Integer(mMaxStoreId), filePath);
+			mStores.put(Integer.valueOf(mMaxStoreId), filePath);
 			return mMaxStoreId;
 		}
 		catch(Exception e)
@@ -2375,7 +2374,7 @@ public class MoSyncThread extends Thread
 		try
 		{
 			File f = mContext.getFileStreamPath(
-				mStores.get(new Integer(store)));
+				mStores.get(Integer.valueOf(store)));
 			if (f.isFile())
 			{
 				ByteBuffer bb = mBinaryResources.get(data);
@@ -2436,7 +2435,7 @@ public class MoSyncThread extends Thread
 		try
 		{
 			File file = mContext.getFileStreamPath(
-				mStores.get(new Integer(store)));
+				mStores.get(Integer.valueOf(store)));
 			byte[] buffer;
 			int length = 0;
 			if (file.isFile())
@@ -2486,14 +2485,14 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maCloseStore");
 
-		String filePath = mStores.get(new Integer(store));
+		String filePath = mStores.get(Integer.valueOf(store));
 		if (remove != 0)
 		{
 			File f = mContext.getFileStreamPath(filePath);
 			f.delete();
 		}
 
-		if (!(mStores.remove(new Integer(store)) == filePath))
+		if (!(mStores.remove(Integer.valueOf(store)) == filePath))
 		{
 			maPanic(1, "maCloseStore failed!");
 		}
