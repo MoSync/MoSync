@@ -631,7 +631,7 @@ public class MoSyncThread extends Thread
 	public synchronized ByteBuffer getMemorySlice(int addr, int len)
 	{
 		mMemDataSection.position(addr);
-		ByteBuffer slice = mMemDataSection.slice();
+		ByteBuffer slice = mMemDataSection.slice().order(null);
 		if(-1 != len)
 			slice.limit(len);
 		return slice;
@@ -1258,7 +1258,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1320,7 +1320,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1679,7 +1679,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(mem);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(mem, -1).order(null).asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, -1).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{
@@ -1951,7 +1951,7 @@ public class MoSyncThread extends Thread
 		{
 			int pixels[] = new int[srcWidth * srcHeight];
 
-			IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
+			IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
 			imageResource.mBitmap.getPixels(
 				pixels,
@@ -2023,7 +2023,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
 		try
 		{

@@ -40,7 +40,7 @@ public class PIMUtil {
 	 * @param length
 	 */
 	static void copyBufferToMemory(int address, char[] str, int length) {
-		ByteBuffer buffer = sMoSyncThread.getMemorySlice(address, length * 2 + 1).order(null);
+		ByteBuffer buffer = sMoSyncThread.getMemorySlice(address, length * 2 + 1);
 		for (int i = 0; i < length; i++) {
 			buffer.putChar(str[i]);
 		}
@@ -55,7 +55,7 @@ public class PIMUtil {
 	 */
 	static char[] readBufferFromMemory(int address, int length) {
 		char[] buffer = new char[length];
-		ByteBuffer byteBuffer = sMoSyncThread.getMemorySlice(address, length * 2).order(null);
+		ByteBuffer byteBuffer = sMoSyncThread.getMemorySlice(address, length * 2);
 		for (int i = 0; i < length; i++) {
 			buffer[i] = byteBuffer.getChar();
 		}
