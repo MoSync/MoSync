@@ -303,7 +303,11 @@ SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
     switch (property) {
         case MA_FPROP_IS_BACKED_UP:
         {
-            if (&NSURLIsExcludedFromBackupKey == nil)
+            if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"5.0"))
+            {
+                returnValue = MA_FERR_GENERIC;
+            }
+            else if (&NSURLIsExcludedFromBackupKey == nil)
             {
                 // For iOS <= 5.0.1.
                 const char* filePath = [[url path] fileSystemRepresentation];

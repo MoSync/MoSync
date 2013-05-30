@@ -1287,10 +1287,22 @@ mosync.nativeui.create = function(widgetType, widgetID, params,
  */
 mosync.nativeui.destroyAll = function()
 {
-	for (var widget in mosync.nativeui.widgetIDList)
+	if(mosync.nativeui.widgetIDList)
 	{
-		// Destroy all widgets and do not wait for anything.
-		mosync.nativeui.maWidgetDestroy(widget, null, null, null);
+		for (var widget in mosync.nativeui.widgetIDList)
+		{
+			// Destroy all widgets and do not wait for anything.
+			mosync.nativeui.maWidgetDestroy(widget, null, null, null);
+		}
+	}
+	if(mosync.resource.imageHandleTable)
+	{
+		for (var image in mosync.resource.imageHandleTable)
+		{
+			// Destroy all widgets and do not wait for anything.
+			mosync.resource.DestroyPlaceholder(mosync.resource.imageHandleTable[image]);
+		}
+
 	}
 };
 
