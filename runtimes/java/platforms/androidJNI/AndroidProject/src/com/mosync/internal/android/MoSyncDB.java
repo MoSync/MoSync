@@ -156,7 +156,7 @@ public class MoSyncDB
 			if (MA_DB_TYPE_INT == type)
 			{
 				int value = buffer.getInt();
-				params[i] = Integer.valueOf(value);
+				params[i] = value;
 				//Log.i("@@@@@", "MA_DB_TYPE_INT params[i]: " + params[i]);
 			}
 			else

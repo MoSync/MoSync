@@ -34,7 +34,8 @@ NativeScreen::NativeScreen() :
 	mMainLayout(-1),
 	mLabel(-1),
 	mScreenWidth(-1),
-	mScreenHeight(-1)
+	mScreenHeight(-1),
+	mLastDisplayedImageHandle(-1)
 {
 	// Get the screen size.
 	MAExtent screenSize = maGetScrSize();
@@ -56,8 +57,16 @@ NativeScreen::NativeScreen() :
  */
 NativeScreen::~NativeScreen()
 {
+	// Remove the listener
+	MAUtil::Environment::getEnvironment().removeCustomEventListener(this);
+
 	// Delete the main widget, also deletes child widgets.
 	maWidgetDestroy(mMainLayout);
+
+	if (mLastDisplayedImageHandle != -1)
+	{
+		maDestroyPlaceholder(mLastDisplayedImageHandle);
+	}
 }
 
 /**
@@ -69,6 +78,61 @@ void NativeScreen::showScreen()
 {
 	maWidgetScreenShow(mScreen);
 }
+
+
+int NativeScreen::handleImageData(MAHandle myImageData)
+{
+	printf("handleImageData(%d)", myImageData);
+
+	int resCode = -1;
+
+	MAHandle hImage = maCreatePlaceholder();
+	int dataSize = maGetDataSize(myImageData);
+	int createImageRes = maCreateImageFromData(hImage, myImageData, 0, dataSize);
+
+	// Used for testing only.
+	MAUtil::String info = "Ready.Size = " + MAUtil::integerToString(dataSize)
+			            + " res = " + MAUtil::integerToString(createImageRes);
+	printf("\n%s\n", info.c_str());
+
+	if (createImageRes != RES_OK) {
+		// If the Android VM gets an out of memory exception, get the image handle instead.
+		maAlert("Memory Warning", " The image cannot be created. Try again", NULL, NULL, NULL);
+		maWidgetSetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, "false");
+		maImagePickerOpen();
+	} else {
+		char imgHandle[256];
+		sprintf(imgHandle, "%d", hImage);
+		printf("imgHandle=%s---hImage=%d", imgHandle, hImage);
+
+		// display the preview
+		resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, imgHandle);
+	}
+
+	// at this point the new selected image is either displayed or non-existent (out of memory)
+	// the former displayed image (if exists) can be now safely deleted and reused
+	if (mLastDisplayedImageHandle != -1) {
+		maDestroyPlaceholder(mLastDisplayedImageHandle);
+	}
+	mLastDisplayedImageHandle = hImage;
+
+	return resCode;
+}
+
+
+int NativeScreen::handleImage(MAHandle myImage)
+{
+	printf("handleImage(%d)", myImage);
+	char buffer[256];
+	sprintf(buffer, "%d", myImage);
+	printf("imgHandle=%s---hImage=%d", buffer, myImage);
+
+	// display the preview
+	int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
+
+	return resCode;
+}
+
 
 /**
  * Handle widget events.
@@ -83,47 +147,25 @@ void NativeScreen::customEvent(const MAEvent& event)
 	{
 		if ( event.imagePickerState == 1 )
 		{
-			// ready, get handle
-			MAHandle myImage = event.imagePickerItem;
-
 			char checkboxBuffer[BUF_SIZE];
 			maWidgetGetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, checkboxBuffer, BUF_SIZE);
 	        MAUtil::String value = MAUtil::lowerString(checkboxBuffer);
+
+	        int resCode = -1;
+
 	        if ( strcmp(value.c_str(),"true") == 0 )
-			{
-				MAHandle hImage = maCreatePlaceholder();
-				int dataSize = maGetDataSize(event.imagePickerItem);
-				int createImageRes= maCreateImageFromData(hImage, event.imagePickerItem, 0, dataSize);
-
-				// Used for testing only.
-				MAUtil::String info = "Ready.Size = " + MAUtil::integerToString(dataSize) +
-						"res = " + MAUtil::integerToString(createImageRes) +
-						", mime type = " + MAUtil::integerToString(event.imagePickerEncodingType);
-
-				if ( createImageRes != RES_OK )
-				{
-					maAlert("Memory Warning", " The image cannot be created. Try again", NULL, NULL, NULL);
-					maWidgetSetProperty(mEventReturnTypeCheckbox, MAW_CHECK_BOX_CHECKED, "false");
-					// If the Android VM gets an out of memory exception, get the image handle instead.
-					maImagePickerOpen();
-				}
-				else
-				{
-					char imgHandle[256];
-					sprintf(imgHandle, "%d", hImage);
-					int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, imgHandle);
-				}
-
-				maDestroyPlaceholder(hImage);
+	        {
+	        	resCode = handleImageData(event.imagePickerItem);
 			}
 			else
 			{
-				char buffer[256];
-				sprintf(buffer, "%d", myImage);
-				int resCode = maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
+				resCode = handleImage(event.imagePickerItem);
 			}
 
-			setLabelText(mLabel, "Preview is available");
+	        if (resCode == RES_OK)
+				setLabelText(mLabel, "Preview is available");
+	        else
+	        	setLabelText(mLabel, "Preview is not available");
 		}
 		else
 		{
@@ -390,9 +432,6 @@ MAWidgetHandle NativeScreen::createMainLayout()
 	mPreview = maWidgetCreate(MAW_IMAGE);
 	maWidgetSetProperty(mPreview, MAW_WIDGET_WIDTH, "-1");
 	maWidgetSetProperty(mPreview, MAW_WIDGET_HEIGHT, "-1");
-//    char buffer[256];
-//    sprintf(buffer, "%d", RES_IMAGE_START);
-//	maWidgetSetProperty(mPreview, MAW_IMAGE_IMAGE, buffer);
 	maWidgetSetProperty(mPreview, MAW_IMAGE_SCALE_MODE, "scalePreserveAspect");
 	maWidgetAddChild(mainLayout, mPreview);
 

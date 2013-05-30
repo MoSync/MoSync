@@ -123,7 +123,7 @@ public class MoSyncFont
 		 * The new font is saved in the list of available fonts.
 		 * Skip 0 value for font handles.
 		 */
-		mFonts.put(Integer.valueOf(1), newMosyncFont);
+		mFonts.put(1, newMosyncFont);
 	}
 
 	/************************ Syscalls ************************/
@@ -183,7 +183,7 @@ public class MoSyncFont
 			/*
 			 * The new font is saved in the list of available fonts.
 			 */
-			mFonts.put(Integer.valueOf(mFontHandle), newMosyncFont);
+			mFonts.put(mFontHandle, newMosyncFont);
 
 			// Return the handle to the new font family, style and size combination.
 			return mFontHandle;
@@ -381,7 +381,7 @@ public class MoSyncFont
 			/*
 			 * The new font is saved in the list of available fonts.
 			 */
-			mFonts.put(Integer.valueOf(mFontHandle), newMosyncFont);
+			mFonts.put(mFontHandle, newMosyncFont);
 
 			return mFontHandle;
 		}
