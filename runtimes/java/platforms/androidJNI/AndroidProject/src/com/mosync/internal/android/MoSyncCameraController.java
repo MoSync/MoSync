@@ -276,14 +276,14 @@ public class MoSyncCameraController {
 	 * Adds a custom size to the list of sizes  requested by the user
 	 * @param index the index used for addressing the specific size
 	 * @param width width of the desired picture
-	 * @param height height of the desired picutre
+	 * @param height height of the desired picture
 	 * @return RES_OK
 	 */
 	public int addSize(int index, int width, int height)
 	{
 		//TODO: move the optimal calculation here for better performance
-		userWidths.add(index, Integer.valueOf(width));
-		userHeights.add(index, Integer.valueOf(height));
+		userWidths.add(index, width);
+		userHeights.add(index, height);
 		return MA_CAMERA_RES_OK;
 	}
 

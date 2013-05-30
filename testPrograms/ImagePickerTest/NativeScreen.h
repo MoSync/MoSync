@@ -162,8 +162,18 @@ private: // methods
 	 */
 	void setupUI();
 
+	/**
+	 * the way to proceed when the image picker returns image data
+	 */
+	int handleImageData(MAHandle myImageData);
 
-private: // members
+	/**
+	 * the way to proceed when the image picker returns an image
+	 */
+	int handleImage(MAHandle myImage);
+
+private:
+	// members
 	/** NativeUI widgets handles. */
 	MAWidgetHandle mScreen;
 
@@ -182,6 +192,7 @@ private: // members
 	MAWidgetHandle mEventReturnTypeLabel;
 
 	MAHandle mExitButton;
+	MAHandle mLastDisplayedImageHandle;
 
 	/** Screen size. */
 	int mScreenWidth;
