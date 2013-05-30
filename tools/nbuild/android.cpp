@@ -394,6 +394,7 @@ string getStlportDir(Arguments* params, bool useMakeParam) {
 string getNdkRoot(Arguments* params) {
 	string ndkDir = require(params, "--android-ndk-location");
 	toDir(ndkDir);
+	toSlashes(ndkDir);
 	return ndkDir;
 }
 
