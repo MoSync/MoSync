@@ -140,7 +140,7 @@ public class MoSyncDB
 		ByteBuffer buffer = mosync.getMemorySlice(
 			paramsAddress,
 			paramCount * sizeofMADBValue
-			).order(null);
+			);
 
 		// Set parameter values.
 		// http://stackoverflow.com/questions/9558657/binding-ints-longs-and-blobs-byte-to-android-sql
@@ -495,7 +495,7 @@ public class MoSyncDB
 
 			// Write to MoSync memory. Size of an int is 4 - take care of endianess
 			// TODO: Replace with high-level call to write int.
-			ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4).order(null);
+			ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4);
 			buffer.putInt(value);
 
 			return MA_DB_OK;
@@ -547,7 +547,7 @@ public class MoSyncDB
 
 			// Write to MoSync memory. Size of a double is 8 - take care of endianess
 			// TODO: Replace with high-level call to write double.
-			ByteBuffer buffer = mosync.getMemorySlice(doubleValueAddress, 8).order(null);
+			ByteBuffer buffer = mosync.getMemorySlice(doubleValueAddress, 8);
 			buffer.putLong(Double.doubleToLongBits(value));
 
 			return MA_DB_OK;
