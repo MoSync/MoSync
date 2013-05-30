@@ -1768,12 +1768,9 @@ public class MoSyncNetwork
 			int port;
 			if (splitUrl.length == 2)
 			{
-				int end =
-					(splitUrl[0].length() + realUrl.length())
-					- (splitUrl[0].length() + splitUrl[1].length());
-				port = Integer.valueOf(
-					realUrl.substring(
-						splitUrl[0].length() + 1, end)).intValue();
+				int end =(splitUrl[0].length() + realUrl.length()) - (splitUrl[0].length() + splitUrl[1].length());
+
+				port = Integer.valueOf(realUrl.substring(splitUrl[0].length() + 1, end));
 				newUrl += splitUrl[1];
 			}
 			else if(splitUrl.length == 1 && splitUrl[0].length() > 0)
