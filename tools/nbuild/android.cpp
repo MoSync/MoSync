@@ -374,6 +374,7 @@ int executeNdkBuild(Arguments* params) {
 			string stlLibFile = stlLibDir + "libs/" + arch + "/libstlport_shared.so";
 			string stlOutputFile = fullOutputDir + "libstlport_shared.so";
 			if (existsFile(stlLibFile.c_str())) {
+				toOSSlashes(stlOutputFile);
 				copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
 			}
 		}
