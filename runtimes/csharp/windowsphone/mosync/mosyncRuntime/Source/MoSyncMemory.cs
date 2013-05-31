@@ -395,7 +395,7 @@ namespace MoSync
 			for (int i = 0; i < str.Length; i++)
 			{
 				if (1 == sizeChar) WriteUInt8(address + i, (byte)str[i]);
-				else if (2 == sizeChar) WriteUInt16(address + i, (UInt16)str[i]);
+				else if (2 == sizeChar) WriteUInt16(address + i*2, (UInt16)str[i]);
 			}
 		}
 
@@ -409,8 +409,8 @@ namespace MoSync
 
 			for (int i = 0; i < str.Length; i++)
 			{
-				if (2 == sizeChar) WriteUInt16(address + i, (UInt16)str[i]);
-				else if (4 == sizeChar) WriteUInt32(address + i, (UInt32)str[i]);
+				if (2 == sizeChar) WriteUInt16(address + i*2, (UInt16)str[i]);
+				else if (4 == sizeChar) WriteUInt32(address + i*4, (UInt32)str[i]);
 			}
 		}
 
