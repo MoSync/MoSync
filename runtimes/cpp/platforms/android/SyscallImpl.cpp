@@ -1397,7 +1397,8 @@ namespace Base
 		maIOCtl_IX_GL2_caselist
 #endif
 		maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
-#else
+#endif
+
 		case maIOCtl_maOpenGLInitFullscreen:
 			return _maOpenGLInitFullscreen(a, mJNIEnv, mJThis);
 		case maIOCtl_maOpenGLCloseFullscreen:
@@ -1406,7 +1407,6 @@ namespace Base
 			return _maOpenGLTexImage2D(a, mJNIEnv, mJThis);
 		case maIOCtl_maOpenGLTexSubImage2D:
 			return _maOpenGLTexSubImage2D(a, mJNIEnv, mJThis);
-#endif
 
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");

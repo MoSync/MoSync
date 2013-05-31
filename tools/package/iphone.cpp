@@ -100,7 +100,7 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 		chdir(xcodeprojOutput.c_str());
 		string filteredProjName = filterWhiteSpace(string(s.name));
 		buildCmd << "xcodebuild -project " << arg(filteredProjName) << ".xcodeproj";
-		buildCmd << " -target " << arg(s.name);
+		buildCmd << " -target " << filteredProjName;
 		if (isNative) {
 			buildCmd << "Native";
 		}

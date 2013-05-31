@@ -179,7 +179,11 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 				copyFile(assetDst.c_str(), assetSrc.c_str());
 				string extLib = extensionDir + extension + ".jar";
 				extensionDex.append(" " + file(extLib));
-			}
+			} /*else {
+				printf("Error: no extension manifest for extension %s (tried %s)!\n",
+						extension.c_str(), assetSrc.c_str());
+				exit(1);
+			}*/
 		}
 	}
 
@@ -255,13 +259,13 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 			string module = modules[j];
 			bool staticLib = false;
 			string nativeLib = findNativeLibrary(s, modules, module, arch, s.debug, staticLib);
-			bool mustExist = !staticLib;//&& "stlport_shared" != module;
-			if (!nativeLib.empty() && mustExist) {
+			bool mustExist = !staticLib;
+			if (!nativeLib.empty()) {
 				string dstLibDir = addlib + "/" + arch + "/";
 				_mkdir(dstLibDir.c_str());
 				string dstLib = dstLibDir + "lib" + module + ".so";
 				copyFile(dstLib.c_str(), nativeLib.c_str());
-			} else if (nativeLib.empty()) {
+			} else if (mustExist) {
 				printf("Could not find library %s!\n", module.c_str());
 				exit(1);
 			}
@@ -369,8 +373,7 @@ static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, stri
 	// 3. Look in the modules directory
 	for (size_t i = 0; i < modules.size(); i++) {
 		string module = modules[i];
-		string moduleDir = mosyncdir() + string("/modules/") + module + string("/lib/Android/Debug/");
-		string moduleLibPath = moduleDir + arch;
+		string moduleLibPath = mosyncdir() + string("/modules/") + module + string("/lib/") + variantDirName;
 		paths.push_back(moduleLibPath);
 	}
 

@@ -102,6 +102,7 @@ if (createTest == true)
 end
 
 FileUtils.rm_rf(mosyncdir+"/profiles/runtimes/iphoneos/1/template")
+FileUtils.mkpath(mosyncdir+"/profiles/runtimes/iphoneos/1/")
 FileUtils.cp_r "template", mosyncdir+"/profiles/runtimes/iphoneos/1/"
 
 FileUtils.cd "../../../../libs/MoSyncLibIOS"
