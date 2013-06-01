@@ -16,12 +16,12 @@
 
 if ENV['OS'] == "Windows_NT"
 	$SETTINGS = {
-		:android_ndk => "C:/Android/android-ndk-r8c",
-		:android_version => 17,
+		:android_ndk => "C:/Android/android-ndk-r8b",
+		:android_version => "17,16,15,14,13,12,11,10,9",
 	}
 else
 	$SETTINGS = {
-		:android_ndk => "/home/runtimebuilder/SDK/android/android-ndk-r8c",
-		:android_version => 17,
+		:android_ndk => "/home/mosyncbuilder/SDK/android/android-ndk-r8b",
+		:android_version => "17,16,15,14,13,12,11,10,9",
 	}
 end

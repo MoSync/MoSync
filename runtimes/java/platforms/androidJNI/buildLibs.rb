@@ -31,7 +31,11 @@ include FileUtils::Verbose
 
 alias :old_sh :sh
 def sh(cmd)
-	old_sh(cmd)
+	old_sh(cmd) do |ok, res|
+		if (!ok)
+			exit 1
+		end
+	end
 	return true
 end
 
@@ -89,9 +93,6 @@ if ($androidNDKPath == '@')
 	$androidVersion = $SETTINGS[:android_version]
 end
 
-# Converts the android version to an Integer
-androidVersionInt = Integer($androidVersion)
-
 if ENV['MOSYNC_SRC'] == nil
 	cd "../../../../"
 	ENV['MOSYNC_SRC'] = pwd
@@ -99,17 +100,6 @@ end
 
 scriptPath = "#{ENV['MOSYNC_SRC']}/runtimes/java/platforms/androidJNI"
 cd scriptPath
-
-#We need two different make files for android due to some restrictions in JNI
-
-puts "Android version is: #{$androidVersion}"
-if(androidVersionInt < 7)
-	ENV['ANDROID_API_BELOW_7'] = "true"
-end
-
-if(androidVersionInt >= 15)
-	ENV['ANDROID_API_15_OR_ABOVE'] = "true"
-end
 
 if $androidNDKPath == nil
 	puts "missing argument, android NDK path is unknown!"

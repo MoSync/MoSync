@@ -396,6 +396,11 @@ string getNdkRoot(Arguments* params) {
 	string ndkDir = require(params, "--android-ndk-location");
 	toDir(ndkDir);
 	toSlashes(ndkDir);
+	string ndkOSDir = ndkDir;
+	toOSSlashes(ndkOSDir);
+	if (!existsDir(ndkOSDir.c_str())) {
+		error("Could not find android NDK! Set --android-ndk-location to a proper directory.\n", 2);
+	}
 	return ndkDir;
 }
 
@@ -411,11 +416,18 @@ string getNdkBuildScript(Arguments* params) {
 
 string getAppPlatform(Arguments* params) {
 	string ndkDir = getNdkRoot(params);
-	string androidVersion = require(params, "--android-version");
-	string platformDir = ndkDir + "/platforms/android-" + androidVersion;
-	toOSSlashes(platformDir);
-	if (!existsDir(platformDir.c_str())) {
-		error("Could not find android platform version given by --android-version, set another!", 2);
+	string androidVersionParam = require(params, "--android-version");
+	vector<string> androidVersions;
+	split(androidVersions, androidVersionParam, ",");
+	for (size_t i = 0; i < androidVersions.size(); i++) {
+		string androidVersion = androidVersions[i];
+		string platformDir = ndkDir + "/platforms/android-" + androidVersion;
+		toOSSlashes(platformDir);
+		if (existsDir(platformDir.c_str())) {
+			return androidVersion;
+		}
 	}
-	return androidVersion;
+
+	error("Could not find android platform version given by --android-version, set another!", 2);
+	return "";
 }
