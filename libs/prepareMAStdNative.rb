@@ -18,7 +18,7 @@
 
 require "../rules/util.rb"
 require "../rules/mosync_util.rb"
-require "FileUtils"
+require "fileutils"
 
 FileUtils.mkpath(["MAStdNative"])
 
