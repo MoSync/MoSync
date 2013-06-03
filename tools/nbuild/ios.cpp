@@ -12,16 +12,16 @@
 #include <iterator>
 
 #define LLVM_GCC_LOC "/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-gcc"
+#define OUTPUT_FILE_NAME "userCode.o"
 
 using namespace std;
 
-int buildIOSNative(Arguments* params) {
+int compileIOSUserCode(Arguments* params) {
 	int result = 1;
 
 	string xcodeLocation = require(params, IOS_XCODE_LOCATION);
 	string sdkVersion = require(params, IOS_SDK_VERSION);
 	string projectDir = require(params, PROJECT_DIR);
-	string finalOutputFileName = "userCode.o"; //Should be taked from the command options eventually
 
 	//Special header folder for the native ios build, which does not include headers
 	//that already exist in the iphone SDK
@@ -98,7 +98,7 @@ int buildIOSNative(Arguments* params) {
 			string arch = archs[j];
 
 			//Simulator uses a different sdk
-			string archSDKName = (archs[j] == "i386")?"iPhoneSimulator":"iPhoneOS";
+			string archSDKName = (arch == "i386")?"iPhoneSimulator":"iPhoneOS";
 
 			string outputFile = outputDir + string("/userCode") + arch + ".o";
 			sh((string("rm -f ") + outputFile).c_str());
@@ -130,10 +130,25 @@ int buildIOSNative(Arguments* params) {
 			sh(cmd.str().c_str(), !isVerbose);
 		}
 		ostringstream cmd;
-		sh((string("rm -f ") + outputDir + "/" + finalOutputFileName).c_str());
+		sh((string("rm -f ") + outputDir + "/" + OUTPUT_FILE_NAME).c_str());
 		//Combine all architecture files into one universal .o file
-		cmd << "lipo " << oFileList << " -create -output " + outputDir + "/" + finalOutputFileName;
+		cmd << "lipo " << oFileList << " -create -output " + outputDir + "/" + OUTPUT_FILE_NAME;
 		sh(cmd.str().c_str(), !isVerbose);
 	}
+	return result;
+}
+
+int prepareIOSFramework(Arguments* params) {
+
+	return 1;
+}
+
+int buildIOSNative(Arguments* params) {
+	int result = compileIOSUserCode(params);
+	if(!result) {
+		return result;
+	}
+
+	result = prepareIOSFramework(params);
 	return result;
 }
