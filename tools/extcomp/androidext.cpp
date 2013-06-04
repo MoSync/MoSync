@@ -44,7 +44,9 @@ void generateAndroidFiles(string& outputDir, Interface& ext, string& androidPack
 	string androidMFOut = androidManifestOut + extName + ".xml";
 	ofstream androidMFfile(androidMFOut.c_str());
 
-	writeJNIBridge(outputDir, ext, androidPackageName);
+	// TODO: We can use the same mechanism for native and interpreted
+	// at least until we know it works satisfactorily
+	//writeJNIBridge(outputDir, ext, androidPackageName);
 
 	streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
 	androidMFfile.close();
