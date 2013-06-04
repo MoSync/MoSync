@@ -22,7 +22,7 @@ MA 02110-1301, USA.
 //
 // Supports BMFont (BitMap Font Generator)
 //
-#include "Gfont.h"
+#include "GFont.h"
 #include "Utils.h"
 #include "ReadCSV.h"
 #include <GLES2/gl2.h>
