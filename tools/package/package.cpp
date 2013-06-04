@@ -243,6 +243,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.androidManifestTemplate);
 		} else if(streq(argv[i], "--android-heap")) {
 			setString(i, argc, argv, s.androidHeap);
+		} else if(streq(argv[i], "--android-sdk-location")) {
+			setString(i, argc, argv, s.androidSdkLocation);
 		} else if(streq(argv[i], "--blackberry-jde")) {
 			setString(i, argc, argv, s.blackberryJde);
 		} else if(streq(argv[i], "--blackberry-signkey")) {

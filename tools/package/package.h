@@ -75,6 +75,7 @@ struct SETTINGS {
     const char* androidInstallLocation;
     const char* androidManifestTemplate;
     const char* androidHeap;
+    const char* androidSdkLocation;
 
     // BlackBerry specific settings
     const char* blackberryJde;
