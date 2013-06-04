@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "AxisMgr.h"
-#include "graph.h"
+#include "Graph.h"
 #include <GLES2/gl2.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
