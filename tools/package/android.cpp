@@ -136,6 +136,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	set<string> staticModules;
 	map<string,string> initFuncs;
 
+	bool isDebug = s.debug;
 	bool isNative = !strcmp("native", s.outputType);
 
 	// TODO: beta
