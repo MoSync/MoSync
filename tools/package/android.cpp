@@ -258,8 +258,8 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		for (size_t j = 0; j < modules.size(); j++) {
 			string module = modules[j];
 			bool staticLib = false;
-			string nativeLib = findNativeLibrary(s, modules, module, arch, s.debug, staticLib);
-			bool mustExist = !staticLib;
+			string nativeLib = findNativeLibrary(s, modules, module, arch, isDebug, staticLib);
+			bool mustExist = !staticLib && module != "stlport_shared";
 			if (!nativeLib.empty()) {
 				string dstLibDir = addlib + "/" + arch + "/";
 				_mkdir(dstLibDir.c_str());
