@@ -375,7 +375,17 @@ int executeNdkBuild(Arguments* params) {
 			string stlOutputFile = fullOutputDir + "libstlport_shared.so";
 			if (existsFile(stlLibFile.c_str())) {
 				toOSSlashes(stlOutputFile);
+				toOSSlashes(stlLibFile);
 				copyFile(stlOutputFile.c_str(), stlLibFile.c_str());
+			}
+
+			// Debug?
+			if (isDebug) {
+				string gdbServerSrc = tmpBuildDir + "libs/" + arch + "/gdbserver";
+				string gdbServerDst = fullOutputDir + "gdbserver";
+				toOSSlashes(gdbServerDst);
+				toOSSlashes(gdbServerSrc);
+				copyFile(gdbServerDst.c_str(), gdbServerSrc.c_str());
 			}
 		}
 	}

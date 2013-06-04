@@ -270,6 +270,14 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 				exit(1);
 			}
 		}
+
+		// Copy the gdbserver thingy
+		if (isDebug) {
+			string variantDirName = string("android_") + arch + (isDebug ? "_debug" : "_release");
+			string gdbServerDst = addlib + "/" + arch + "/gdbserver";
+			string gdbServerSrc = string(s.dst) + "/../" + variantDirName + "/gdbserver";
+			copyFile(gdbServerDst.c_str(), gdbServerSrc.c_str());
+		}
 	}
 
 	// run android/dx.jar
