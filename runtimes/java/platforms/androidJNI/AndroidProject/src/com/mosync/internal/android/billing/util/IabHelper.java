@@ -382,8 +382,7 @@ public class IabHelper {
                 mPurchaseListener = listener;
                 act.startIntentSenderForResult(pendingIntent.getIntentSender(),
                                                requestCode, new Intent(Consts.METHOD_REQUEST_PURCHASE),
-                                               Integer.valueOf(0), Integer.valueOf(0),
-                                               Integer.valueOf(0));
+                                               0, 0, 0);
             }
         }
         catch (SendIntentException e) {

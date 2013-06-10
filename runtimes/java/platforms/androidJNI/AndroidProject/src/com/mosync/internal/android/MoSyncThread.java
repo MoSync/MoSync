@@ -631,7 +631,7 @@ public class MoSyncThread extends Thread
 	public synchronized ByteBuffer getMemorySlice(int addr, int len)
 	{
 		mMemDataSection.position(addr);
-		ByteBuffer slice = mMemDataSection.slice();
+		ByteBuffer slice = mMemDataSection.slice().order(null);
 		if(-1 != len)
 			slice.limit(len);
 		return slice;
@@ -1240,7 +1240,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1302,7 +1302,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).order(null).asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1632,7 +1632,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maDrawImage");
 
-		ImageCache imageResource = mImageResources.get(new Integer(image));
+		ImageCache imageResource = mImageResources.get(image);
 		if (imageResource == null)
 		{
 			return;
@@ -1661,7 +1661,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(mem);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(mem, -1).order(null).asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, -1).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{
@@ -1808,7 +1808,7 @@ public class MoSyncThread extends Thread
 	int maGetImageSize(int image)
 	{
 		SYSLOG("maGetImageSize");
-		ImageCache imageResource = mImageResources.get(new Integer(image));
+		ImageCache imageResource = mImageResources.get(image);
 		if (imageResource == null)
 		{
 			logError("maGetImageSize : no such resource");
@@ -1918,7 +1918,6 @@ public class MoSyncThread extends Thread
 	 * @param srcHeight
 	 * @param scanLength
 	 */
-	@SuppressWarnings("unused")
 	private void _maGetImageDataFast(
 		int image,
 		ImageCache imageResource,
@@ -1933,7 +1932,7 @@ public class MoSyncThread extends Thread
 		{
 			int pixels[] = new int[srcWidth * srcHeight];
 
-			IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
+			IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
 			imageResource.mBitmap.getPixels(
 				pixels,
@@ -2005,7 +2004,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).order(null).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
 		try
 		{
@@ -2069,7 +2068,7 @@ public class MoSyncThread extends Thread
 		}
 		else
 		{
-			ImageCache imageResource = mImageResources.get(new Integer(image));
+			ImageCache imageResource = mImageResources.get(image);
 			if (null == imageResource)
 			{
 				return -1;
@@ -2338,7 +2337,7 @@ public class MoSyncThread extends Thread
 			}
 
 			mMaxStoreId++;
-			mStores.put(new Integer(mMaxStoreId), filePath);
+			mStores.put(mMaxStoreId, filePath);
 			return mMaxStoreId;
 		}
 		catch(Exception e)
@@ -2356,8 +2355,7 @@ public class MoSyncThread extends Thread
 		SYSLOG("maWriteStore");
 		try
 		{
-			File f = mContext.getFileStreamPath(
-				mStores.get(new Integer(store)));
+			File f = mContext.getFileStreamPath(mStores.get(store));
 			if (f.isFile())
 			{
 				ByteBuffer bb = mBinaryResources.get(data);
@@ -2417,8 +2415,7 @@ public class MoSyncThread extends Thread
 
 		try
 		{
-			File file = mContext.getFileStreamPath(
-				mStores.get(new Integer(store)));
+			File file = mContext.getFileStreamPath(mStores.get(store));
 			byte[] buffer;
 			int length = 0;
 			if (file.isFile())
@@ -2468,14 +2465,14 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maCloseStore");
 
-		String filePath = mStores.get(new Integer(store));
+		String filePath = mStores.get(store);
 		if (remove != 0)
 		{
 			File f = mContext.getFileStreamPath(filePath);
 			f.delete();
 		}
 
-		if (!(mStores.remove(new Integer(store)) == filePath))
+		if (!(mStores.remove(store) == filePath))
 		{
 			maPanic(1, "maCloseStore failed!");
 		}
@@ -3145,12 +3142,7 @@ public class MoSyncThread extends Thread
 	void destroyResource(int resourceIndex)
 	{
 		SYSLOG("destroyResource :" + resourceIndex);
-		/*
-		if(null != mBinaryResources.get(resourceIndex))
-		{
-			mBinaryResources.remove(resourceIndex);
-		}
-		*/
+
 		if(null != mUBinaryResources.get(resourceIndex))
 		{
 			mUBinaryResources.remove(resourceIndex);
@@ -3160,16 +3152,18 @@ public class MoSyncThread extends Thread
 			ImageCache img = mImageResources.get(resourceIndex);
 			if(null != img)
 			{
-				img.mBitmap.recycle();
+				// recycle only if possible
+				if(img.mBitmap != null && !img.mBitmap.isRecycled())
+				{
+				    Log.e("MoSyncThread", "recycle the bitmap" + img.mBitmap);
+				    img.mBitmap.recycle();
+				}
+
+				img.mBitmap = null;
 				mImageResources.remove(resourceIndex);
 			}
 		}
-		//else
-		//{
-		//	Log.e("MoSyncThread", "destroyResource bad handle: " + resourceIndex);
-		//}
 
-		//Log.i("MoSyncThread", "Resource deleted, force GC");
 		System.gc();
 	}
 
