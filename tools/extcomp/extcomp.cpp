@@ -196,7 +196,7 @@ void writeHeaders(string& headerOut, Interface& ext, bool includeFunctions) {
 		headerfile << "typedef struct {\n";
 		for (size_t j = 0; j < s.members.size(); j++) {
 			Member m = s.members[j];
-			headerfile << "\t" << cType(ext, m.pod[0].type) << " " << m.pod[0].name << ";\n";
+			headerfile << "\t" << directCType(ext, m.pod[0].type) << " " << m.pod[0].name << ";\n";
 		}
 		headerfile << "} __attribute__ ((aligned(4))) " << s.name << ";\n\n";
 	}
