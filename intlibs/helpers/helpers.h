@@ -180,6 +180,7 @@ namespace MoSyncError {
 #endif
 
 #define SAFE_DELETE(ptr) { if(ptr) { delete (ptr); (ptr) = NULL; } }
+#define SAFE_DELETE_ARRAY(array, size) {if(array != NULL){for(int i=0; i<size; i++) SAFE_DELETE(array[i]); delete(array);array=NULL;}}
 
 #ifdef BIG_PHAT_ERROR
 #undef BIG_PHAT_ERROR

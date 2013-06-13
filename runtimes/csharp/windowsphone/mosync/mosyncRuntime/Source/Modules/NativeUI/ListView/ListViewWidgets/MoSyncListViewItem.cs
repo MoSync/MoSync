@@ -359,18 +359,11 @@ namespace MoSync
 			{
 				set
 				{
-                    try
-                    {
-                        System.Windows.Media.SolidColorBrush brush;
-                        MoSync.Util.convertStringToColor(value, out brush);
-                        mText.Foreground = brush;
-                        mFontColor = brush;
-                        ReloadParentListItem();
-                    }
-                    catch
-                    {
-                        throw new InvalidPropertyValueException();
-                    }
+                    System.Windows.Media.SolidColorBrush brush;
+                    MoSync.Util.ConvertStringToColor(value, out brush);
+                    mText.Foreground = brush;
+                    mFontColor = brush;
+                    ReloadParentListItem();
 				}
 			}
 
@@ -420,13 +413,30 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("icon"))
                 {
-                    return false;
+                    int val = 0;
+                    if (!int.TryParse(propertyValue, out val))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("fontColor"))
+                {
+                    try
+                    {
+                        System.Windows.Media.SolidColorBrush brush;
+                        MoSync.Util.ConvertStringToColor(propertyValue, out brush);
+                    }
+                    catch (InvalidPropertyValueException)
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

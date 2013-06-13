@@ -1,6 +1,5 @@
 package com.mosync.internal.android;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
@@ -92,9 +91,9 @@ public class MoSyncDB
 	 * query result, a cursor handle is returned.
 	 * @param databaseHandle Handle to the database.
 	 * @param sql The SQL statement.
-	 * @return MA_DB_ERROR on error, MA_DB_OK on success,
-	 * > 0 if there is a cursor to a query result, in this
-	 * case the return value is the cursor handle.
+	 * @return (i)   cursor handler,
+	 * 		   (ii)  MA_DB_OK for success but no cursor or empty cursor,
+	 * 		   (iii) error code.
 	 */
 	public int maDBExecSQL(int databaseHandle, String sql)
 	{
@@ -141,7 +140,7 @@ public class MoSyncDB
 		ByteBuffer buffer = mosync.getMemorySlice(
 			paramsAddress,
 			paramCount * sizeofMADBValue
-			).order(null);
+			);
 
 		// Set parameter values.
 		// http://stackoverflow.com/questions/9558657/binding-ints-longs-and-blobs-byte-to-android-sql
@@ -157,21 +156,21 @@ public class MoSyncDB
 			if (MA_DB_TYPE_INT == type)
 			{
 				int value = buffer.getInt();
-				params[i] = new Integer(value);
+				params[i] = value;
 				//Log.i("@@@@@", "MA_DB_TYPE_INT params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_INT64 == type)
 			{
 				long value = buffer.getLong();
-				params[i] = new Long(value);
+				params[i] = Long.valueOf(value);
 				//Log.i("@@@@@", "MA_DB_TYPE_INT64 params[i]: " + params[i]);
 			}
 			else
 			if (MA_DB_TYPE_DOUBLE == type)
 			{
 				double value = buffer.getDouble();
-				params[i] = new Double(value);
+				params[i] = Double.valueOf(value);
 				//Log.i("@@@@@", "MA_DB_TYPE_DOUBLE params[i]: " + params[i]);
 			}
 			else
@@ -236,7 +235,9 @@ public class MoSyncDB
 	 * @param databaseHandle
 	 * @param sql
 	 * @param params
-	 * @return Success or error code.
+	 * @return (i)   cursor handler,
+	 * 		   (ii)  MA_DB_OK for success but no cursor or empty cursor,
+	 * 		   (iii) error code.
 	 */
 	protected int execSQLHelper(
 		int databaseHandle,
@@ -262,6 +263,7 @@ public class MoSyncDB
 			}
 			else
 			{
+				// no cursor or empty cursor
 				return MA_DB_OK;
 			}
 		}
@@ -491,7 +493,7 @@ public class MoSyncDB
 			// Get data as an int value.
 			int value = getCursor(cursorHandle).getInt(columnIndex);
 
-			// Write to MoSync memory. Size of an int is 4.
+			// Write to MoSync memory. Size of an int is 4 - take care of endianess
 			// TODO: Replace with high-level call to write int.
 			ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4);
 			buffer.putInt(value);
@@ -543,7 +545,7 @@ public class MoSyncDB
 			// Get data as a float value.
 			double value = getCursor(cursorHandle).getDouble(columnIndex);
 
-			// Write to MoSync memory. Size of a double is 8.
+			// Write to MoSync memory. Size of a double is 8 - take care of endianess
 			// TODO: Replace with high-level call to write double.
 			ByteBuffer buffer = mosync.getMemorySlice(doubleValueAddress, 8);
 			buffer.putLong(Double.doubleToLongBits(value));
@@ -758,9 +760,9 @@ public class MoSyncDB
 				query.close();
 			}
 
-			// If we got a cursor, we return it wrapped in a MoSync
-			// cursor object.
-			if (null == cursor)
+			// a cursor that holds no data is considered a null cursor
+			// if exist, the cursor is wrapped in a mosync cursor
+			if (null == cursor || cursor.getCount() == 0 )
 			{
 				return null;
 			}

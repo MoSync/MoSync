@@ -17,14 +17,10 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.notifications;
 
-import com.mosync.nativeui.util.properties.BooleanConverter;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
-import android.util.Log;
-
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_TICKER_TEXT;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_CONTENT_BODY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_CONTENT_TITLE;
@@ -35,7 +31,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_S
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_VIBRATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_VIBRATE_DURATION;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_FLAG;
-import static com.mosync.internal.android.notifications.LocalNotificationsService.LOCAL_NOTIFICATION_ID;
 
 /**
  * Utility class for storing and accessing

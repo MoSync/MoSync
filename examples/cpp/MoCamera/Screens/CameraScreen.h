@@ -127,6 +127,12 @@ namespace MoSyncCamera
 		 */
 		void hideSnapshotInProgress(bool snapshotIsValid);
 
+		/**
+		 * Triggers auto focus.
+		 * This is for the devices that do not have continuous auto focus.
+		 */
+		void triggerAutoFocus();
+
 	private:
         void createUI();
 
@@ -142,7 +148,7 @@ namespace MoSyncCamera
 		 * Sets the default values for the camera
 		 * parameters (e.q. flash, focus etc.).
 		 */
-        void resetCameraPropeties();
+        void resetCameraProperties();
 
         void setupButtons();
 
@@ -160,11 +166,12 @@ namespace MoSyncCamera
         void toogleShowSnapshotButton(bool enabled);
 
         /**
-         * Changes the state of the take snapshot button.
-         *
-         * @param enabled true if button must be enabled,
-         * false if it must be disabled.
-         */
+		 * Changes the state of the button that captures a
+		 * snapshot
+		 *
+		 * @param enabled true if button must be enabled,
+		 * false if it must be disabled.
+		 */
         void toogleTakeSnapshotButton(bool enabled);
 
         /**
@@ -184,6 +191,12 @@ namespace MoSyncCamera
          */
         void zoomIn();
         void zoomOut();
+
+        /**
+         * Starts camera preview, resets the camera values
+         * and setups other UI related functionalities.
+         */
+        void startCameraPreview();
 
 	private:
 

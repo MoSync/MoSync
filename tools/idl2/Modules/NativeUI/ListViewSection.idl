@@ -28,7 +28,7 @@ group WidgetListViewSection "List View Section" {
 			/**
 			* @brief Set or get the list section type.
 			* Set this property before adding list view items and adding it to the list.
-			* Platform: Android, iOS and Windows Phone 7.
+			* Platform: Android and iOS.
 			*
 			* @validvalue One of the \link #MAW_LIST_VIEW_SECTION_TYPE_ALPHABETICAL MAW_LIST_VIEW_TYPE \endlink constants.
 			*

@@ -40,6 +40,8 @@ mosync.resource.imageCallBackTable = {};
 
 mosync.resource.imageIDTable = {};
 
+mosync.resource.imageHandleTable = {};
+
 mosync.resource.imageDownloadQueue = [];
 
 /**
@@ -84,7 +86,7 @@ mosync.resource.imageLoaded = function(imageID, imageHandle)
 	if (undefined != callbackFun)
 	{
 		var args = Array.prototype.slice.call(arguments);
-
+		mosync.resource.imageHandleTable[args[0]] = args[1];
 		// Call the function.
 		callbackFun.apply(null, args);
 	}
@@ -128,6 +130,8 @@ mosync.resource.loadRemoteImage = function(imageURL, imageID, callBackFunction)
 mosync.resource.imageDownloadStarted = function(imageID, imageHandle)
 {
 	mosync.resource.imageIDTable[imageHandle] = imageID;
+	mosync.resource.imageHandleTable[imageID] = imageHandle;
+
 };
 
 mosync.resource.imageDownloadFinished = function(imageHandle)
@@ -200,3 +204,16 @@ mosync.resource.sendRemoteLogMessage = function(message, url)
  * The log message will show up in the Reload user interface.
  */
 mosync.rlog = mosync.resource.sendRemoteLogMessage;
+
+/*
+ *
+ *
+ */
+mosync.resource.DestroyPlaceholder = function(imageHandle)
+{
+	mosync.bridge.send([
+		"Resource",
+		"DestroyPlaceholder",
+		imageHandle
+	]);
+};

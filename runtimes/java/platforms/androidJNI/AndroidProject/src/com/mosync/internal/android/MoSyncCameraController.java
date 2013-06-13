@@ -85,6 +85,13 @@ public class MoSyncCameraController {
 	private int mCurrentCameraIndex;
 
 	/**
+	* Indicates the maximum picture size.
+	* Used only for the result of getSupportedPictureSizes(),
+	* method that will always return a list with at least one element.
+	*/
+	private int mMaxPictureSizeIndex;
+
+	/**
 	* Stores the paramters for each camera
 	*/
 	List<Camera.Parameters> mCameraParametersList;
@@ -162,7 +169,7 @@ public class MoSyncCameraController {
 		initializeCameras();
 		rawMode = false;
 		mCurrentCameraIndex = 0;
-
+		mMaxPictureSizeIndex = 0;
 	}
 
 	/**
@@ -269,14 +276,14 @@ public class MoSyncCameraController {
 	 * Adds a custom size to the list of sizes  requested by the user
 	 * @param index the index used for addressing the specific size
 	 * @param width width of the desired picture
-	 * @param height height of the desired picutre
+	 * @param height height of the desired picture
 	 * @return RES_OK
 	 */
 	public int addSize(int index, int width, int height)
 	{
 		//TODO: move the optimal calculation here for better performance
-		userWidths.add(index, Integer.valueOf(width));
-		userHeights.add(index, Integer.valueOf(height));
+		userWidths.add(index, width);
+		userHeights.add(index, height);
 		return MA_CAMERA_RES_OK;
 	}
 
@@ -431,11 +438,20 @@ public class MoSyncCameraController {
 			if ( (mPreviousPreview == null) || (mPreviousPreview == mPreview) )
 			{
 				mCamera.stopPreview();
-				Camera.Parameters param = getCurrentParameters();
-				mCamera.setParameters(param);
+				mCamera.setParameters(getCurrentParameters());
 			}
 
+			resetMaxPictureSizeIndex();
+
 			mCamera.startPreview();
+
+			/*
+			 * If focus is set to auto trigger it after the camera starts.
+			 */
+			if ( getCurrentParameters().getFocusMode().equals(Camera.Parameters.FOCUS_MODE_AUTO) )
+			{
+				mCamera.autoFocus(autoFocusCallback);
+			}
 		}
 		catch (Exception e)
 		{
@@ -444,6 +460,29 @@ public class MoSyncCameraController {
 		}
 
 		return MA_CAMERA_RES_OK;
+	}
+
+	/*
+	 * Retrieves the maximum picture size. Used when taking a snapshot.
+	 */
+	private void resetMaxPictureSizeIndex()
+	{
+		mMaxPictureSizeIndex = 0;
+
+		Camera.Parameters params = getCurrentParameters();
+		List <Camera.Size> sizeList = params.getSupportedPictureSizes();
+
+		// getSupportedPictureSizes() will always return a list with at least one element.
+		int maxWidth = sizeList.get(0).width;
+		for ( int i = 1; i < sizeList.size(); i++ )
+		{
+			int currentWidth = sizeList.get(i).width;
+			if ( currentWidth > maxWidth )
+			{
+				mMaxPictureSizeIndex = i;
+				maxWidth = currentWidth;
+			}
+		}
 	}
 
 	/**
@@ -481,11 +520,8 @@ public class MoSyncCameraController {
 		// available
 		if ( MA_CAMERA_SNAPSHOT_MAX_SIZE == formatIndex )
 		{
-			Camera.Parameters parameters = getCurrentParameters();
-			List <Camera.Size> sizeList = parameters.getSupportedPictureSizes();
-			formatIndex = sizeList.size() - 1;
+			formatIndex = mMaxPictureSizeIndex;
 		}
-
 		if(formatIndex >= 0)
 		{
 			setNewSize(formatIndex);
@@ -522,9 +558,7 @@ public class MoSyncCameraController {
 		// available
 		if ( MA_CAMERA_SNAPSHOT_MAX_SIZE == sizeIndex )
 		{
-			Camera.Parameters parameters = getCurrentParameters();
-			List <Camera.Size> sizeList = parameters.getSupportedPictureSizes();
-			sizeIndex = sizeList.size() - 1;
+			sizeIndex = mMaxPictureSizeIndex;
 		}
 		if(sizeIndex >= 0)
 		{
@@ -567,13 +601,19 @@ public class MoSyncCameraController {
 			{
 				if(value.equals(MA_CAMERA_FOCUS_AUTO))
 				{
-					if(false == param.getSupportedFocusModes().contains(value))
+					if ( param.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) )
 					{
-
-						return MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+						mCamera.cancelAutoFocus();
+						value = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE;
 					}
-
-					mCamera.autoFocus(autoFocusCallback);
+					else
+					{
+						if (false == param.getSupportedFocusModes().contains(value))
+						{
+							return MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+						}
+						mCamera.autoFocus(autoFocusCallback);
+					}
 				}
 				else if(value.equals(MA_CAMERA_FOCUS_MACRO))
 				{
@@ -659,6 +699,17 @@ public class MoSyncCameraController {
 				result = "true";
 			else
 				result = "false";
+		}
+		else if (key.equals(MA_CAMERA_FOCUS_MODE))
+		{
+			if ( param.getFocusMode().equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) )
+			{
+				result = MA_CAMERA_FOCUS_AUTO;
+			}
+			else
+			{
+				result = param.get(key);
+			}
 		}
 		else
 		{
