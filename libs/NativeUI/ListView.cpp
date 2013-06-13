@@ -443,12 +443,6 @@ namespace NativeUI
 			listViewItem = (ListViewItem*) getChild(itemIndex);
 		}
 
-        // List view is not in section mode, try regular childs instead
-        if (listViewItem == NULL)
-        {
-            listViewItem = (ListViewItem*)this->getChild(itemIndexWithinSection);
-        }
-
 		for (int i = 0; i < mListViewListeners.size(); i++)
 		{
 			mListViewListeners[i]->segmentedListViewItemInsert(
@@ -478,12 +472,6 @@ namespace NativeUI
 		{
 			listViewItem = (ListViewItem*) getChild(itemIndex);
 		}
-
-        // List view is not in section mode, try regular childs instead
-        if (listViewItem == NULL)
-        {
-            listViewItem = (ListViewItem*)this->getChild(itemIndexWithinSection);
-        }
 
 		for (int i = 0; i < mListViewListeners.size(); i++)
 		{
