@@ -294,12 +294,16 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	// run android/apkbuilder.jar
 	string unsignedUnalignedApk = dstDir + "/" + string(s.name) + "_unsigned_unaligned.apk";
 	cmd.str("");
-	cmd <<"java -jar "<<getBinary("android/apkbuilder.jar")<<
-		" "<<file(unsignedUnalignedApk)<<
+	cmd <<"java -classpath "<<getBinary("android/apkbuilder.jar")<<
+		" com.android.sdklib.build.ApkBuilderMain "
+		<<file(unsignedUnalignedApk)<<
 		" -u -z "<<file(resourcesAp_)<<
 		" -f "<<file(classesDex)<<
 		" -nf "<<file(addlib);
-	sh(cmd.str().c_str());
+	if (isDebug) {
+		cmd<<" -d";
+	}
+	sh(cmd.str().c_str(), true);
 
 	// sign the apk
 	string signedUnalignedApk = dstDir + "/" + string(s.name) + "_unaligned.apk";
