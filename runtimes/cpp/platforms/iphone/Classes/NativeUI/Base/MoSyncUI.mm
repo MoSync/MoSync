@@ -209,6 +209,40 @@ static IWidget* sOldScreen = nil;
 	[widgetArray addObject:mosyncScreen];
 	[mosyncScreen setHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE
 
+	const BOOL isIPad = ([[UIDevice currentDevice] respondsToSelector:@selector(userInterfaceIdiom)]
+						&& ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad));
+
+	NSMutableString* resourceName = [[NSMutableString alloc] initWithString:@"Default"];
+	if ([[UIScreen mainScreen] bounds].size.height == 568)
+	{
+		[resourceName appendString:@"-568h"];
+	}
+	else if (isIPad)
+	{
+		UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+		if(UIInterfaceOrientationIsPortrait(interfaceOrientation))
+			[resourceName appendString:@"-Portrait"];
+		else
+			[resourceName appendString:@"-Landscape"];
+	}
+
+	if ([UIScreen mainScreen].scale > 1)
+		[resourceName appendString:@"@2x"];
+
+	NSString* filePath = [[NSBundle mainBundle] pathForResource:resourceName ofType:@"png"];
+	if (filePath != nil)
+	{
+		MAHandle imageHandle = [self createWidget:@"Image"];
+		IWidget* imageWidget = [self getWidget:imageHandle];
+		[imageWidget setPropertyWithKey:@MAW_IMAGE_PATH toValue:filePath];
+
+		if (!isIPad)
+			[imageWidget setOriginY:-10.0f]; // For status bar
+
+		[mosyncScreen addChild:imageWidget];
+	}
+	[resourceName release];
+
 	sOldScreen = nil; // show will set this after the screen is shown.
 	[self show: mosyncScreen];
 	return self;
