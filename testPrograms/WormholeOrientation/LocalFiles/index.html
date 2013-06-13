@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<!--
+* @file index.html
+*
+* Template application that shows how to send custom messages to C++
+* using the HybridMoblet class. The C++ support code is implemented
+* in file main.cpp.
+-->
+<html>
+	<head>
+		<meta name="viewport" content="width=320, user-scalable=no">
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Wormhole Orientation</title>
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script src="main.js" charset="utf-8"></script>
+	</head>
+<body onload="initialize()">
+	<div id="NativeUI">
+	<div data-widgetType="TabScreen" id="tabScreen">
+		<div data-widgetType="Screen" id="firstScreen" data-title="Setter">
+				<div data-widgetType="VerticalLayout"
+					id="mainLayout"
+					data-width="FILL_AVAILABLE_SPACE"
+					data-height="FILL_AVAILABLE_SPACE"
+					data-backgroundColor = "0xFF0000">
+
+					<!-- Portrait up -->
+					<div data-widgetType="HorizontalLayout"
+						id="hLayoutPortraitUp"
+						data-width="FILL_AVAILABLE_SPACE">
+						<div data-widgetType="CheckBox"
+							id="OCBPortraitUp"
+							data-onevent="checkBoxClicked();">
+						</div>
+						<div data-widgetType="Label"
+							id="portraitUpLabel"
+							data-width="FILL_AVAILABLE_SPACE"
+							data-fontSize="20"
+							data-text="Portrait Up">
+						</div>
+					</div>
+
+					<!-- Portrait Upside Down -->
+					<div data-widgetType="HorizontalLayout"
+						id="hLayoutPortraitUpsideDown"
+						data-width="FILL_AVAILABLE_SPACE">
+						<div data-widgetType="CheckBox"
+							id="OCBPortraitUpsideDown"
+							data-onevent="checkBoxClicked();">
+						</div>
+						<div data-widgetType="Label"
+							id="portraitUpsideDownLabel"
+							data-width="FILL_AVAILABLE_SPACE"
+							data-fontSize="20"
+							data-text="Portrait Upside Down">
+						</div>
+					</div>
+
+					<!-- Portrait -->
+					<div data-widgetType="HorizontalLayout"
+						id="hLayoutPortrait"
+						data-width="FILL_AVAILABLE_SPACE">
+						<div data-widgetType="CheckBox"
+							id="OCBPortrait"
+							data-onevent="checkBoxClicked();">
+						</div>
+						<div data-widgetType="Label"
+							id="portraitLabel"
+							data-width="FILL_AVAILABLE_SPACE"
+							data-fontSize="20"
+							data-text="Portrait">
+						</div>
+					</div>
+
+					<!-- Landscape Left -->
+					<div data-widgetType="HorizontalLayout"
+						id="hLayoutLandscapeLeft"
+						data-width="FILL_AVAILABLE_SPACE">
+						<div data-widgetType="CheckBox"
+							id="OCBLandscapeLeft"
+							data-onevent="checkBoxClicked();">
+						</div>
+						<div data-widgetType="Label"
+							id="landscapeLeftLabel"
+							data-width="FILL_AVAILABLE_SPACE"
+							data-fontSize="20"
+							data-text="Landscape Left">
+						</div>
+					</div>
+
+					<!-- Landscape Right -->
+					<div data-widgetType="HorizontalLayout"
+						id="hLayoutLandscapeRight"
+						data-width="FILL_AVAILABLE_SPACE">
+						<div data-widgetType="CheckBox"
+							id="OCBLandscapeRight"
+							data-onevent="checkBoxClicked();">
+						</div>
+						<div data-widgetType="Label"
+							id="landscapeLeftRight"
+							data-width="FILL_AVAILABLE_SPACE"
+							data-fontSize="20"
+							data-text="Landscape Right">
+						</div>
+					</div>
+
+					<!-- Landscape -->
+					<div data-widgetType="HorizontalLayout"
+						id="hLayoutLandscape"
+						data-width="FILL_AVAILABLE_SPACE">
+						<div data-widgetType="CheckBox"
+							id="OCBLandscape"
+							data-onevent="checkBoxClicked();">
+						</div>
+						<div data-widgetType="Label"
+							id="landscapeLeft"
+							data-width="FILL_AVAILABLE_SPACE"
+							data-fontSize="20"
+							data-text="Landscape">
+						</div>
+					</div>
+
+					<!-- Dynamic -->
+					<div data-widgetType="HorizontalLayout"
+						id="hLayoutDynamic"
+						data-width="FILL_AVAILABLE_SPACE">
+						<div data-widgetType="CheckBox"
+							id="OCBDynamic"
+							data-onevent="checkBoxClicked();">
+						</div>
+						<div data-widgetType="Label"
+							id="dynamicLabel"
+							data-width="FILL_AVAILABLE_SPACE"
+							data-fontSize="20"
+							data-text="Dynamic">
+						</div>
+					</div>
+
+					<div data-widgetType="Button"
+						id="setOrientationButton"
+						data-width="FILL_AVAILABLE_SPACE"
+						data-fontSize="24"
+						data-text="Set orientation"
+						data-onevent="setOrientationButtonClicked();">
+					</div>
+
+				</div> <!-- mainLayout -->
+		</div> <!-- firstScreen -->
+		<div data-widgetType="Screen" id="secondScreen" data-title="Getter & events">
+			<div data-widgetType="VerticalLayout"
+					id="mainLayoutSecondScreen"
+					data-width="FILL_AVAILABLE_SPACE"
+					data-height="FILL_AVAILABLE_SPACE">
+					<div data-widgetType="Button"
+						id="getOrientationButton"
+						data-width="FILL_AVAILABLE_SPACE"
+						data-fontSize="20"
+						data-text="Get orientation"
+						data-onevent="getOrientationButtonClicked();">
+					</div>
+					<div data-widgetType="Button"
+						id="getCurrentOrientationButton"
+						data-width="FILL_AVAILABLE_SPACE"
+						data-fontSize="20"
+						data-text="Get current orientation"
+						data-onevent="getCurrentOrientationButtonClicked()">
+					</div>
+					<div data-widgetType="Button"
+						id="clearLabelsButton"
+						data-width="FILL_AVAILABLE_SPACE"
+						data-fontSize="20"
+						data-text="Clear labels"
+						data-onevent="clearLabelsButtonClicked()">
+					</div>
+					<div widgetType="Label"
+						id="appOrientationDidChangeLabel"
+						data-width="FILL_AVAILABLE_SPACE"
+						data-fontSize="20"
+						data-text="">
+					</div>
+					<div widgetType="Label"
+						id="appOrientationWillChangeLabel"
+						data-width="FILL_AVAILABLE_SPACE"
+						data-fontSize="20"
+						data-text="">
+					</div>
+					<div widgetType="Label"
+						id="tabScreenOrientationDidChangeLabel"
+						data-width="FILL_AVAILABLE_SPACE"
+						data-fontSize="20"
+						data-text="">
+					</div>
+					<div widgetType="Label"
+						id="tabScreenOrientationWillChangeLabel"
+						data-width="FILL_AVAILABLE_SPACE"
+						data-fontSize="20"
+						data-text="">
+					</div>
+
+			</div> <!-- mainLayoutSecondScreen -->
+		</div> <!-- secondScreen -->
+	</div> <!-- tabScreen -->
+	</div>
+</body>
+</html>

@@ -58,10 +58,6 @@ namespace Wormhole
 	{
 	}
 
-	/**
-	 * @return The string value of a field in the JSON data.
-	 * Return empty string if the field does not exist.
-	 */
 	MAUtil::String JSONMessage::getArgsField(const MAUtil::String& fieldName)
 	{
 		YAJLDom::Value* argsNode = getParamNode("args");
@@ -76,14 +72,10 @@ namespace Wormhole
 		return "";
 	}
 
-	/**
-	 * @return The integer value of a field in the JSON data.
-	 * Return 0 if the field does not exist.
-	 */
 	int JSONMessage::getArgsFieldInt(const MAUtil::String& fieldName)
 	{
 		YAJLDom::Value* argsNode = getParamNode("args");
-		if (NULL != argsNode && YAJLDom::Value::NUL != argsNode->getType())
+		if (NULL != argsNode && YAJLDom::Value::MAP == argsNode->getType())
 		{
 			YAJLDom::Value* value = argsNode->getValueForKey(fieldName.c_str());
 			if (NULL != value && YAJLDom::Value::NUMBER == value->getType())
@@ -94,71 +86,32 @@ namespace Wormhole
 		return 0;
 	}
 
-	/**
-	 * Get the options parameters "create" and "exclusive"
-	 * from the JSON tree.
-	 * @return true on success, false on error.
-	 */
-	bool JSONMessage::getJSONParamsOptionsCreateExclusive(
-		bool& create,
-		bool& exclusive)
+	MAUtil::String JSONMessage::getArgsField(int index)
 	{
-		// Default values.
-		create = false;
-		exclusive = false;
-
-		// Get the root node for the message parameters.
 		YAJLDom::Value* argsNode = getParamNode("args");
-		if (NULL == argsNode || YAJLDom::Value::MAP != argsNode->getType())
+		if (NULL != argsNode && YAJLDom::Value::ARRAY == argsNode->getType())
 		{
-			return false;
-		}
-
-		YAJLDom::Value* optionsNode = argsNode->getValueForKey("options");
-		if (NULL != optionsNode && YAJLDom::Value::NUL != optionsNode->getType())
-		{
-			YAJLDom::Value* createNode = optionsNode->getValueForKey("create");
-			if (NULL != optionsNode && YAJLDom::Value::NUL != optionsNode->getType())
+			YAJLDom::Value* value = argsNode->getValueByIndex(index);
+			if (NULL != value && YAJLDom::Value::STRING == value->getType())
 			{
-				create = createNode->toBoolean();
+				return value->toString();
 			}
-			YAJLDom::Value* exclusiveNode = optionsNode->getValueForKey("exclusive");
-			if (NULL != exclusiveNode && YAJLDom::Value::NUL != exclusiveNode->getType())
-			{
-				exclusive = exclusiveNode->toBoolean();
-			}
-
-			return true;
 		}
-
-		return false;
+		return "";
 	}
 
-	/**
-	 * Get the parent fullPath of a directory entry from the JSON tree.
-	 * @return true on success, false on error.
-	 */
-	bool JSONMessage::getJSONParamParentFullPath(String& destinationPath)
+	int JSONMessage::getArgsFieldInt(int index)
 	{
-		// Get the root node for the message parameters.
 		YAJLDom::Value* argsNode = getParamNode("args");
-		if (NULL == argsNode || YAJLDom::Value::MAP != argsNode->getType())
+		if (NULL != argsNode && YAJLDom::Value::ARRAY == argsNode->getType())
 		{
-			return false;
-		}
-
-		// Get the node for the parent directory.
-		YAJLDom::Value* parentNode = argsNode->getValueForKey("parent");
-		if (NULL != parentNode && YAJLDom::Value::MAP == parentNode->getType())
-		{
-			YAJLDom::Value* pathNode = parentNode->getValueForKey("fullPath");
-			if (NULL != pathNode && YAJLDom::Value::NUL != pathNode->getType())
+			YAJLDom::Value* value = argsNode->getValueByIndex(index);
+			if (NULL != value && YAJLDom::Value::NUMBER == value->getType())
 			{
-				destinationPath = pathNode->toString();
-				return true;
+				return value->toInt();
 			}
 		}
-
-		return false;
+		return 0;
 	}
+
 } // namespace

@@ -43,15 +43,15 @@ namespace MoSync
         public class DatePicker : WidgetBaseWindowsPhone
         {
             // Some default values.
-            private const int _maxYear = 3000;
-            private const int _minYear = 1600;
+            private static int _maxYear = 3000;
+            private static int _minYear = 1600;
 
             // The native DatePiker object.
             protected Microsoft.Phone.Controls.DatePicker mDatePicker;
 
             // Max/Min Date values
-            protected DateTime mMaxDate;
-            protected DateTime mMinDate;
+            protected static DateTime mMaxDate;
+            protected static DateTime mMinDate;
 
             // The URI String for the CustomDatePickerPage.xaml containing the navigation parameters.
             private DatePickerPageCustomUriString mUriString;
@@ -91,6 +91,42 @@ namespace MoSync
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     });
             }
+
+            #region Getters for static members
+
+            public static int MinYear
+            {
+                get
+                {
+                    return _minYear;
+                }
+            }
+
+            public static int MaxYear
+            {
+                get
+                {
+                    return _maxYear;
+                }
+            }
+
+            public static DateTime MinDate
+            {
+                get
+                {
+                    return mMinDate;
+                }
+            }
+
+            public static DateTime MaxDate
+            {
+                get
+                {
+                    return mMaxDate;
+                }
+            }
+
+            #endregion
 
             /**
              * @author: Ciprian Filipas
@@ -375,13 +411,63 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("maxdateyear") || propertyName.Equals("maxdatemonth") || propertyName.Equals("maxdateday") ||
+                    propertyName.Equals("mindateyear") || propertyName.Equals("mindatemonth") || propertyName.Equals("mindateday"))
                 {
-                    return false;
+                    int value;
+                    if (!int.TryParse(propertyValue, out value))
+                    {
+                        isPropertyValid = false;
+                    }
+                    if (propertyName.Equals("maxdateyear"))
+                    {
+                        if (MinDate > MaxDate.AddYears(-1 * (MaxDate.Year - value)) || value > MaxYear) isPropertyValid = false;
+                    }
+                    else if (propertyName.Equals("maxdatemonth"))
+                    {
+                        if (value <= 12 && value >= 1)
+                        {
+                            if (MinDate > MaxDate.AddMonths(-1 * (MaxDate.Month - value))) isPropertyValid = false;
+                        }
+                        else
+                        {
+                            isPropertyValid = false;
+                        }
+                    }
+                    else if (propertyName.Equals("maxdateday"))
+                    {
+                        int month = MaxDate.Month;
+                        if (MinDate > MaxDate.AddDays(value - MaxDate.Day)) isPropertyValid = false;
+                        // If the month have changed it means that the day value was not valid.
+                        if (month != MaxDate.AddDays(value - MaxDate.Day).Month) isPropertyValid = false;
+                    }
+                    else if (propertyName.Equals("mindateyear"))
+                    {
+                        if (MinDate.AddYears(-1 * (MinDate.Year - value)) > MaxDate || value < MinYear) isPropertyValid = false;
+                    }
+                    else if (propertyName.Equals("mindatemonth"))
+                    {
+                        if (value <= 12 && value >= 1)
+                        {
+                            if (MinDate.AddMonths(-1 * (MinDate.Month - value)) > MaxDate) isPropertyValid = false;
+                        }
+                        else
+                        {
+                            isPropertyValid = false;
+                        }
+                    }
+                    else if (propertyName.Equals("mindateday"))
+                    {
+                        int month = MinDate.Month;
+                        if (MinDate.AddDays(value - MinDate.Day) > MaxDate) isPropertyValid = false;
+                        // IF the month have changed it means that the day value was not valid.
+                        if (month != MinDate.AddDays(value - MinDate.Day).Month) isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

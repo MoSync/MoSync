@@ -65,8 +65,8 @@ public class SpinnerWidget extends Layout implements OnItemSelectedListener
 	 * properties before the items are drawn on the screen, FILL_PARENT will be returned
 	 * instead of the actual values.
 	 */
-	int mItemHeight = AbsListView.LayoutParams.FILL_PARENT;
-	int mItemWidth = AbsListView.LayoutParams.FILL_PARENT;
+	int mItemHeight = AbsListView.LayoutParams.MATCH_PARENT;
+	int mItemWidth = AbsListView.LayoutParams.MATCH_PARENT;
 
 	/**
 	 * Constructor.

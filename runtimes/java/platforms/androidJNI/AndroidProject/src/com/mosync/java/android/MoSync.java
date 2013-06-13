@@ -147,9 +147,6 @@ public class MoSync extends Activity
 		// Initialize.
 		mMoSyncView = null;
 
-		// Default screen orientation is portrait mode.
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
 		try
 		{
 			// Create the thread.
@@ -178,22 +175,6 @@ public class MoSync extends Activity
 			SYSLOG("No GCM/C2DM message");
 		}
 
-		// Options Menu is enabled for devices prior to Honeycomb.
-		// ActionBar is disabled by default starting with Honeycomb, and can be
-		// enabled using maActionBarSetEnabled(true)
-		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
-		{
-			// Action bar will not be supported on pre-Honeycomb devices
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			NativeUI.mActionBarEnabled = false;
-		}
-		else
-		{
-			requestWindowFeature(Window.FEATURE_ACTION_BAR);
-			NativeUI.mActionBarEnabled = true;
-			getActionBar().hide();
-		}
-
 		// Create the view.
 		mMoSyncView = createMoSyncView();
 		if (null != mMoSyncView)
@@ -210,49 +191,6 @@ public class MoSync extends Activity
 
 		registerShutdownListener();
     }
-
-    public int setActionBarState(Boolean state)
-    {
-        if (checkActionBarCompatibility())
-        {
-			if ( state )
-			{
-				getActionBar().show();
-			}
-			else
-			{
-				getActionBar().hide();
-			}
-			return IX_WIDGET.MAW_RES_OK;
-        }
-
-        Log.e("@@MoSync", "maActionBarSetEnabled error: selected feature cannot be applied.");
-        return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-    }
-
-	public static Boolean checkActionBarCompatibility()
-	{
-		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
-		{
-			SYSLOG("@@MoSync ActionBar is not available on current platform");
-			return false;
-		}
-		return true;
-	}
-
-	public int setActionBarVisibility(Boolean visibility)
-	{
-        if (checkActionBarCompatibility())
-        {
-			if (visibility)
-				getActionBar().show();
-			else
-				getActionBar().hide();
-        }
-
-        Log.e("@@MoSync", "maActionBarSetEnabled error: selected feature cannot be applied.");
-        return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-	}
 
     public MoSyncThread getMoSyncThread()
     {
@@ -499,8 +437,6 @@ public class MoSync extends Activity
 			for (int i=0; i < items.size(); i++)
 			{
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
-				if (NativeUI.mActionBarEnabled)
-					item.setShowAsAction(items.get(i).getShowActionFlag());
 				if ( items.get(i).hasIconFromResources() )
 				{
 					item.setIcon( items.get(i).getIconResId() );
@@ -562,11 +498,6 @@ public class MoSync extends Activity
 			for (int i=0; i < items.size(); i++)
 			{
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
-				// When enabled, use ActionBar items.
-				if (NativeUI.mActionBarEnabled)
-				{
-					item.setShowAsAction(items.get(i).getShowActionFlag());
-				}
 
 				if ( items.get(i).hasIconFromResources() )
 				{
@@ -598,26 +529,9 @@ public class MoSync extends Activity
 		ScreenWidget currentScreen = mMoSyncThread.getCurrentScreen();
 		if ( currentScreen != null )
 		{
-			if ( NativeUI.mActionBarEnabled )
-			{
-				if (item.getItemId() == android.R.id.home)
-				{
-					EventQueue.getDefault().postActionBarHomeSelected(
-							currentScreen.getHandle());
-				}
-				else
-				{
-					EventQueue.getDefault().postActionBarItemSelected(
-							currentScreen.getHandle(),
-							item.getItemId());
-				}
-			}
-			else
-			{
-				EventQueue.getDefault().postOptionsMenuItemSelected(
-						currentScreen.getHandle(),
-						item.getItemId());
-			}
+			EventQueue.getDefault().postOptionsMenuItemSelected(
+				currentScreen.getHandle(),
+				item.getItemId());
 
 			return true;
 		}

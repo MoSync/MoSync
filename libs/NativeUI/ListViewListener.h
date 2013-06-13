@@ -125,7 +125,8 @@ namespace NativeUI
 		 * Platform: iOS
 		 * @param listView The list view object that generated the event.
 		 * @param listViewSection The ListViewSection object that contains the item.
-		 * @param listViewItem The item objet whose insert button was clicked.
+		 * Will be null if list view type is default.
+		 * @param listViewItem The item object whose insert button was clicked.
 		 */
 		virtual void segmentedListViewItemInsert(
 			ListView* listView,
@@ -138,7 +139,8 @@ namespace NativeUI
 		 * Platform: iOS
 		 * @param listView The list view object that generated the event.
 		 * @param listViewSection The ListViewSection object that contains the item.
-		 * @param listViewItem The item objet whose delete button was clicked.
+		 * Will be null if list view type is default.
+		 * @param listViewItem The item object whose delete button was clicked.
 		 */
 		virtual void segmentedListViewItemDelete(
 			ListView* listView,

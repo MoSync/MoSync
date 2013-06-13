@@ -35,6 +35,8 @@
 
 using namespace NativeUI;
 
+#define FOCUS_TOAST_STR "Tap to focus"
+
 #define BTN_RATIO 0.16 // Image button/container width ratio for normal buttons
 #define TAKE_PICTURE_BTN_RATIO 0.30 // Image button/container width ratio for the -take snapshot- button
 #define ZOOM_STEP_RATIO 0.1 // (Zoom step)/(maximum zoom) ratio
@@ -114,7 +116,7 @@ namespace MoSyncCamera
 	}
 
 
-	void CameraScreen::resetCameraPropeties()
+	void CameraScreen::resetCameraProperties()
 	{
 		if ( mCamera )
 		{
@@ -150,9 +152,7 @@ namespace MoSyncCamera
 		{
 			// If flash not supported disable the flash button.
 			mSetNextFlashModeButton->setEnabled(false);
-			mSetNextFlashModeButton->setBackgroundImage(kFlashModesImg[FLASH_OFF]);
-			// Pressed is not handled so no pressed image needed.
-			mSetNextFlashModeButton->setPressedImage(kFlashModesImg[FLASH_OFF]);
+			mSetNextFlashModeButton->setBackgroundImage(RES_FLASH_IMG_DISABLED);
 		}
 
 		// If we have only one camera we don't add the swap camera button.
@@ -175,11 +175,12 @@ namespace MoSyncCamera
 					this, RES_ZOOM_IN_IMG, RES_ZOOM_IN_IMG_PRESSED);
 			mMainLayout->addChild(mZoomInButton);
 
-			// camera zoom out button
+			// camera zoom out button. Disabled at startup.
 			mZoomOutButton = new NativeUI::ImageButton();
 			ScreenUtils::setupImageButton(mZoomOutButton,
-					this, RES_ZOOM_OUT_IMG, RES_ZOOM_OUT_IMG_PRESSED);
+					this, RES_ZOOM_OUT_IMG_DISABLED, RES_ZOOM_OUT_IMG_DISABLED);
 			mMainLayout->addChild(mZoomOutButton);
+			mZoomOutButton->setEnabled(false);
 		}
 	}
 
@@ -241,9 +242,7 @@ namespace MoSyncCamera
 	void CameraScreen::show()
 	{
 		Screen::show();
-
-		mCamera->startPreview();
-		resetCameraPropeties();
+		startCameraPreview();
 	}
 
 
@@ -252,12 +251,18 @@ namespace MoSyncCamera
 	{
 		int returnCode = Screen::showWithTransition(screenTransitionType,
 				screenTransitionDuration);
-		if ( returnCode >= 0 )
-		{
-			mCamera->startPreview();
-			resetCameraPropeties();
-		}
+
+		startCameraPreview();
 		return returnCode;
+	}
+
+
+	void CameraScreen::startCameraPreview()
+	{
+		mCamera->startPreview();
+		resetCameraProperties();
+
+		maToast(FOCUS_TOAST_STR, MA_TOAST_DURATION_SHORT);
 	}
 
 
@@ -285,7 +290,7 @@ namespace MoSyncCamera
 	void CameraScreen::showSnapshotInProgress()
 	{
 		toogleShowSnapshotButton(false);
-		mTakeSnapshotButton->setEnabled(false);
+		toogleTakeSnapshotButton(false);
 
 		mActivityIndicator->show();
 	}
@@ -294,11 +299,18 @@ namespace MoSyncCamera
 	void CameraScreen::hideSnapshotInProgress(bool snapshotIsValid)
 	{
 		toogleShowSnapshotButton(snapshotIsValid);
-		mTakeSnapshotButton->setEnabled(true);
+		toogleTakeSnapshotButton(true);
 
 		mActivityIndicator->hide();
 	}
 
+	void CameraScreen::triggerAutoFocus()
+	{
+		if ( mCamera->isCameraStarted() )
+		{
+			mCamera->setFocusMode(FOCUS_AUTO);
+		}
+	}
 
 	void CameraScreen::buttonClicked(NativeUI::Widget* button)
 	{
@@ -389,7 +401,19 @@ namespace MoSyncCamera
 		{
 			nextZoomLevel = maxZoomLevel;
 		}
-		mCamera->setZoomLevel(nextZoomLevel);
+		bool isZoomLevelSuported = mCamera->setZoomLevel(nextZoomLevel);
+
+		if ( isZoomLevelSuported && !mZoomOutButton->isEnabled() )
+		{
+			mZoomOutButton->setBackgroundImage(RES_ZOOM_OUT_IMG);
+			mZoomOutButton->setPressedImage(RES_ZOOM_OUT_IMG_PRESSED);
+			mZoomOutButton->setEnabled(true);
+		}
+		if ( nextZoomLevel == maxZoomLevel )
+		{
+			mZoomInButton->setBackgroundImage(RES_ZOOM_IN_IMG_DISABLED);
+			mZoomInButton->setEnabled(false);
+		}
 	}
 
 
@@ -404,7 +428,19 @@ namespace MoSyncCamera
 		{
 			nextZoomLevel = 0;
 		}
-		mCamera->setZoomLevel(nextZoomLevel);
+		bool isZoomLevelSuported = mCamera->setZoomLevel(nextZoomLevel);
+
+		if ( isZoomLevelSuported && !mZoomInButton->isEnabled() )
+		{
+			mZoomInButton->setBackgroundImage(RES_ZOOM_IN_IMG);
+			mZoomInButton->setPressedImage(RES_ZOOM_IN_IMG_PRESSED);
+			mZoomInButton->setEnabled(true);
+		}
+		if ( nextZoomLevel == 0 )
+		{
+			mZoomOutButton->setBackgroundImage(RES_ZOOM_OUT_IMG_DISABLED);
+			mZoomOutButton->setEnabled(false);
+		}
 	}
 
 	void CameraScreen::toogleShowSnapshotButton(bool enabled)
@@ -419,8 +455,24 @@ namespace MoSyncCamera
 		{
 			// Use disabled images
 			mShowSnapshotButton->setBackgroundImage(RES_SHOW_PICTURE_IMG_DISABLED);
-			mShowSnapshotButton->setPressedImage(RES_SHOW_PICTURE_IMG_DISABLED);
 		}
 		mShowSnapshotButton->setEnabled(enabled);
+	}
+
+
+	void CameraScreen::toogleTakeSnapshotButton(bool enabled)
+	{
+		if ( enabled )
+		{
+			// Use enabled images
+			mTakeSnapshotButton->setBackgroundImage(RES_TAKE_PICTURE_IMG);
+			mTakeSnapshotButton->setPressedImage(RES_TAKE_PICTURE_IMG_PRESSED);
+		}
+		else
+		{
+			// Use disabled images
+			mTakeSnapshotButton->setBackgroundImage(RES_TAKE_PICTURE_IMG_DISABLED);
+		}
+		mTakeSnapshotButton->setEnabled(enabled);
 	}
 } // MoSyncCamera

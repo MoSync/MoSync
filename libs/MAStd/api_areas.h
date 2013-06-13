@@ -304,7 +304,7 @@ MAUtil::DataHandler
 <td>
 <strong>Database API</strong>
 </td>
-<td>Functions for accessing SQLite databases. Note that maDBExecSQLParams() currently is available on iOS and MoRE (not on Android).<br>
+<td>Functions for accessing SQLite databases.<br>
 </td>
 <td>maDBOpen(),
 maDBClose(),

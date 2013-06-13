@@ -115,11 +115,14 @@ public class PIMUtil {
 				;
 			crtIndex--;
 			int len = crtIndex - buffIndex;
-			char[] tmp = new char[len];
-			System.arraycopy(buffer, buffIndex, tmp, 0, len);
-			val[i] = new String(tmp);
-			tmp = null;
-			buffIndex += val[i].length();
+			if (len > 0)
+			{
+				char[] tmp = new char[len];
+				System.arraycopy(buffer, buffIndex, tmp, 0, len);
+				val[i] = new String(tmp);
+				tmp = null;
+				buffIndex += val[i].length();
+			}
 			buffIndex++;
 		}
 

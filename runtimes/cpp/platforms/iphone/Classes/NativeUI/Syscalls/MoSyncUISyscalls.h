@@ -240,7 +240,7 @@ int maWidgetScreenInsertNavBarButton(int side, MAWidgetHandle screenWidgetHandle
  * - #MAW_RES_OK on success, or
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  */
-int maActionBarSetEnabled(int showActionBar);
+//int maActionBarSetEnabled(int showActionBar);
 
 /**
  * Add a menu item to the Action bar.
@@ -258,7 +258,7 @@ int maActionBarSetEnabled(int showActionBar);
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  */
-int maActionBarAddMenuItem(MAHandle screenHandle, const char* title, const MA_ACTION_BAR_ITEM_ICON* item, int displayFlag);
+//int maActionBarAddMenuItem(MAHandle screenHandle, const char* title, const MA_ACTION_BAR_ITEM_ICON* item, int displayFlag);
 
 /**
  * Remove a menu item from the Action bar.
@@ -270,7 +270,7 @@ int maActionBarAddMenuItem(MAHandle screenHandle, const char* title, const MA_AC
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled, or
  * - #MAW_RES_INVALID_HANDLE If the indicated screen has no item on specified handle.
  */
-int maActionBarRemoveMenuItem(MAHandle screenHandle,int itemHandle);
+//int maActionBarRemoveMenuItem(MAHandle screenHandle,int itemHandle);
 
 /**
  * Call this syscall after you finished adding/removing items to the action bar.
@@ -280,7 +280,7 @@ int maActionBarRemoveMenuItem(MAHandle screenHandle,int itemHandle);
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarRefresh();
+//int maActionBarRefresh();
 
 /**
  * Enable or disable the display of the action bar.
@@ -293,7 +293,7 @@ int maActionBarRefresh();
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarSetVisibility(int showState);
+//int maActionBarSetVisibility(int showState);
 
 /**
  * Get the current height of the action bar.
@@ -302,7 +302,7 @@ int maActionBarSetVisibility(int showState);
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarGetHeight();
+//int maActionBarGetHeight();
 
 /**
  * Check if the ActionBar is currently displayed.
@@ -311,7 +311,7 @@ int maActionBarGetHeight();
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarIsShowing();
+//int maActionBarIsShowing();
 
 /**
  * Set the action bar's title.
@@ -323,7 +323,7 @@ int maActionBarIsShowing();
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarSetTitle(const char* title);
+//int maActionBarSetTitle(const char* title);
 
 /**
  * Set the icon to display in the 'home' section of the action bar.
@@ -334,7 +334,7 @@ int maActionBarSetTitle(const char* title);
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarSetIcon(MAHandle iconHandle);
+//int maActionBarSetIcon(MAHandle iconHandle);
 
 /**
  * Set whether an activity title/subtitle should be displayed.
@@ -344,7 +344,7 @@ int maActionBarSetIcon(MAHandle iconHandle);
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarShowTitleEnabled(int enableTitle);
+//int maActionBarShowTitleEnabled(int enableTitle);
 
 /**
  * Set whether to display the activity logo rather than the activity icon.
@@ -355,7 +355,7 @@ int maActionBarShowTitleEnabled(int enableTitle);
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarShowLogoEnabled(int enableLogo);
+//int maActionBarShowLogoEnabled(int enableLogo);
 
 /**
  * Enable or disable the "home" button in the corner of the action bar.
@@ -370,7 +370,7 @@ int maActionBarShowLogoEnabled(int enableLogo);
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarSetHomeButtonEnabled(int state);
+//int maActionBarSetHomeButtonEnabled(int state);
 
 /**
  * Enable or disable the icon for up navigation (which displays the "up" indicator next to the
@@ -381,7 +381,7 @@ int maActionBarSetHomeButtonEnabled(int state);
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarSetDisplayHomeAsUpEnabled(int showHomeAsUp);
+//int maActionBarSetDisplayHomeAsUpEnabled(int showHomeAsUp);
 
 /**
  * Set the ActionBar's background. This will be used for the primary action bar.
@@ -391,6 +391,6 @@ int maActionBarSetDisplayHomeAsUpEnabled(int showHomeAsUp);
  * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
  * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitly disabled.
  */
-int maActionBarSetBackgroundImage(MAHandle imageHandle);
+//int maActionBarSetBackgroundImage(MAHandle imageHandle);
 
 #endif // _MOSYNC_UI_SYSCALLS_

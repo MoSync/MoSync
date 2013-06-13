@@ -186,9 +186,6 @@ int maGetSystemProperty(const char *key, char *buf, int size)
     } else if (strcmp(key, "mosync.device.name") == 0) {
         BOOL success = [[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
         res = (success)?strlen(buf) + 1: -1;
-    } else if (strcmp(key, "mosync.device.UUID")== 0) {
-        BOOL success = [[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
-        res = (success)?strlen(buf) + 1: -1;
     } else if (strcmp(key, "mosync.device.OS")== 0) {
         BOOL success = [[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSUTF8StringEncoding];
         res = (success)?strlen(buf) + 1: -1;
@@ -306,7 +303,11 @@ SYSCALL(int, maFileSetProperty(const char* path, int property, int value))
     switch (property) {
         case MA_FPROP_IS_BACKED_UP:
         {
-            if (&NSURLIsExcludedFromBackupKey == nil)
+            if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"5.0"))
+            {
+                returnValue = MA_FERR_GENERIC;
+            }
+            else if (&NSURLIsExcludedFromBackupKey == nil)
             {
                 // For iOS <= 5.0.1.
                 const char* filePath = [[url path] fileSystemRepresentation];

@@ -38,7 +38,7 @@ public class ScreenFactory implements AbstractViewFactory
 		FrameLayout layout = new FrameLayout( activity );
 
 		// Screen fills the whole screen.
-		LayoutParams layoutParams = new LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT );
+		LayoutParams layoutParams = new LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT );
 		layout.setLayoutParams( layoutParams );
 
 		return new ScreenWidget( handle, layout );

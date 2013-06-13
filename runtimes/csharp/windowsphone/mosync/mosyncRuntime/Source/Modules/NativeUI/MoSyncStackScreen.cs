@@ -114,7 +114,7 @@ namespace MoSync
              */
             public void Pop()
             {
-                postPopEvent();
+                PostPopEvent();
 
                 /**
                  * If the stack is not empty show the top element of the stack
@@ -145,7 +145,7 @@ namespace MoSync
              */
             public void PopFromBackButtonPressed()
             {
-                postPopEvent();
+                PostPopEvent();
 
                 /**
                  * If the stack is not empty show the top element of the stack
@@ -170,7 +170,7 @@ namespace MoSync
             /**
              * Pops the screen form the stack and posts the custom event
              */
-            private void postPopEvent()
+            private void PostPopEvent()
             {
                 /**
                  * If the stack has more than one item pop it and post the MAW_EVENT_STACK_SCREEN_POPPED event
@@ -203,7 +203,7 @@ namespace MoSync
              * MAW_STACK_SCREEN_BACK_BUTTON_ENABLED property implementation
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_STACK_SCREEN_BACK_BUTTON_ENABLED)]
-            public String backButtonEnabled
+            public String BackButtonEnabled
             {
                 set
                 {
@@ -334,22 +334,21 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = Screen.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false) return false;
+                bool isPropertyValid = Screen.ValidateProperty(propertyName, propertyValue);
 
                 if (propertyName.Equals("backButtonEnabled"))
                 {
                     bool val;
-                    if (!Boolean.TryParse(propertyValue, out val)) return false;
+                    if (!Boolean.TryParse(propertyValue, out val)) isPropertyValid = false;
                 }
                 else if (propertyName.Equals("pushTransitionType"))
                 {
                     int val;
-                    if (!Int32.TryParse(propertyValue, out val)) return false;
-                    if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(val)) return false;
+                    if (!Int32.TryParse(propertyValue, out val)) isPropertyValid = false;
+                    if (!NativeUI.MoSyncScreenTransitions.isTransitionAvailable(val)) isPropertyValid = false;
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

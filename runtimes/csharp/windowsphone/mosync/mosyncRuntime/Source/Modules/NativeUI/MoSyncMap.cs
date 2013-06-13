@@ -194,13 +194,17 @@ namespace MoSync
             {
                 set
                 {
-                    if (value.Equals("true"))
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
                     {
-                        mBingMap.IsHitTestVisible = true;
-                    }
-                    else if (value.Equals("false"))
-                    {
-                        mBingMap.IsHitTestVisible = false;
+                        if (val)
+                        {
+                            mBingMap.IsHitTestVisible = true;
+                        }
+                        else
+                        {
+                            mBingMap.IsHitTestVisible = false;
+                        }
                     }
                     else
                     {
@@ -305,13 +309,13 @@ namespace MoSync
             {
                 set
                 {
-                    if (value.Equals("true"))
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
                     {
-                        mBingMap.SetView(mBingMap.Center, mCenterZoomLevel);
-                    }
-                    else if (value.Equals("false"))
-                    {
-                        // do nothing
+                        if (val)
+                        {
+                            mBingMap.SetView(mBingMap.Center, mCenterZoomLevel);
+                        }
                     }
                     else
                     {
@@ -424,16 +428,16 @@ namespace MoSync
             {
                 set
                 {
-                    if (value.Equals("true"))
+                    bool val;
+                    if (Boolean.TryParse(value, out val))
                     {
-                        List<System.Device.Location.GeoCoordinate> points = new List<System.Device.Location.GeoCoordinate>();
-                        points.Add(mVisibleAreaUpperLeftCorner);
-                        points.Add(mVisibleAreaLowerRightCorner);
-                        mBingMap.SetView(LocationRect.CreateLocationRect(points));
-                    }
-                    else if (value.Equals("false"))
-                    {
-                        // do nothing
+                        if (val)
+                        {
+                            List<System.Device.Location.GeoCoordinate> points = new List<System.Device.Location.GeoCoordinate>();
+                            points.Add(mVisibleAreaUpperLeftCorner);
+                            points.Add(mVisibleAreaLowerRightCorner);
+                            mBingMap.SetView(LocationRect.CreateLocationRect(points));
+                        }
                     }
                     else
                     {
@@ -452,13 +456,49 @@ namespace MoSync
              */
             public new static bool ValidateProperty(string propertyName, string propertyValue)
             {
-                bool isBasePropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
-                if (isBasePropertyValid == false)
+                bool isPropertyValid = WidgetBaseWindowsPhone.ValidateProperty(propertyName, propertyValue);
+
+                if (propertyName.Equals("type"))
                 {
-                    return false;
+                    if (!(propertyValue.Equals(MoSync.Constants.MAW_MAP_TYPE_ROAD) ||
+                        propertyValue.Equals(MoSync.Constants.MAW_MAP_TYPE_SATELLITE)))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("center_latitude") ||
+                    propertyName.Equals("center_longitude") ||
+                    propertyName.Equals("visible_area_upper_left_corner_latitude") ||
+                    propertyName.Equals("visible_area_upper_left_corner_longitude") ||
+                    propertyName.Equals("visible_area_lower_right_corner_latitude") ||
+                    propertyName.Equals("visible_area_lower_right_corner_longitude"))
+                {
+                    double latitude;
+                    if (!Double.TryParse(propertyValue, out latitude))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("center_zoom_level"))
+                {
+                    int zoomLevel;
+                    if (!Int32.TryParse(propertyValue, out zoomLevel))
+                    {
+                        isPropertyValid = false;
+                    }
+                }
+                else if (propertyName.Equals("interraction_enabled") ||
+                    propertyName.Equals("centered") ||
+                    propertyName.Equals("centered_on_visible_area"))
+                {
+                    bool val;
+                    if (!Boolean.TryParse(propertyValue, out val))
+                    {
+                        isPropertyValid = false;
+                    }
                 }
 
-                return true;
+                return isPropertyValid;
             }
 
             #endregion

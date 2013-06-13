@@ -75,15 +75,15 @@ namespace NativeUI
 		return Widget::addChild(widget);
 	}
 
-    /**
-     * Enforces the focus on the list.
-     * Generally needed when for some reason the list looses it's focus.
-     * Platform: Android.
-     */
-    void ListView::requestFocus()
-    {
+	/**
+	 * Enforces the focus on the list.
+	 * Generally needed when for some reason the list looses it's focus.
+	 * Platform: Android.
+	 */
+	void ListView::requestFocus()
+	{
 		setProperty(MAW_LIST_VIEW_REQUEST_FOCUS,"");
-    }
+	}
 
 	 /**
 	  * Get the list view type.
@@ -430,11 +430,18 @@ namespace NativeUI
 		MAWidgetEventData* widgetEventData)
 	{
 		int sectionClickedIndex = widgetEventData->sectionIndex;
-		int itemIndexWithinSection = widgetEventData->sectionItemIndex;
-		ListViewSection* listViewSection = (ListViewSection*)
-			this->getChild(sectionClickedIndex);
-		ListViewItem* listViewItem = (ListViewItem*)
-			listViewSection->getChild(itemIndexWithinSection);
+		int itemIndex = widgetEventData->sectionItemIndex;
+		ListViewSection* listViewSection = NULL;
+		ListViewItem* listViewItem = NULL;
+		if (getType() != LIST_VIEW_TYPE_DEFAULT)
+		{
+			listViewSection = (ListViewSection*) getChild(sectionClickedIndex);
+			listViewItem = (ListViewItem*) listViewSection->getChild(itemIndex);
+		}
+		else
+		{
+			listViewItem = (ListViewItem*) getChild(itemIndex);
+		}
 
         // List view is not in section mode, try regular childs instead
         if (listViewItem == NULL)
@@ -459,11 +466,18 @@ namespace NativeUI
 		MAWidgetEventData* widgetEventData)
 	{
 		int sectionClickedIndex = widgetEventData->sectionIndex;
-		int itemIndexWithinSection = widgetEventData->sectionItemIndex;
-		ListViewSection* listViewSection = (ListViewSection*)
-			this->getChild(sectionClickedIndex);
-		ListViewItem* listViewItem = (ListViewItem*)
-			listViewSection->getChild(itemIndexWithinSection);
+		int itemIndex = widgetEventData->sectionItemIndex;
+		ListViewSection* listViewSection = NULL;
+		ListViewItem* listViewItem = NULL;
+		if (getType() != LIST_VIEW_TYPE_DEFAULT)
+		{
+			listViewSection = (ListViewSection*) getChild(sectionClickedIndex);
+			listViewItem = (ListViewItem*) listViewSection->getChild(itemIndex);
+		}
+		else
+		{
+			listViewItem = (ListViewItem*) getChild(itemIndex);
+		}
 
         // List view is not in section mode, try regular childs instead
         if (listViewItem == NULL)
