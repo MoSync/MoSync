@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--
+* @file index.html
+*
+* Template application that shows examples of how to access
+* device services from JavaScript using the Wormhole library.
+-->
+<html>
+	<head>
+		<meta name="viewport" content="width=320, user-scalable=no">
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Wormhole Template App</title>
+		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script type="text/javascript" charset="utf-8" src="js/wormhole.js"></script>
+		<script type="text/javascript">
+			var cameraDestinationType;
+			var cameraSourceType;
+
+			/**
+			 * Called on 'deviceReady', this function sets the default camera settings.
+			 */
+			function setDefaultValues()
+			{
+				cameraDestinationType = Camera.DestinationType.DATA_URL;
+				cameraSourceType = Camera.PictureSourceType.PHOTOLIBRARY;
+			}
+
+			/**
+			 * Get a picture.
+			 */
+			function getPicture()
+			{
+				var cameraOptions = { quality : 75,
+						  destinationType : cameraDestinationType,
+						  sourceType : cameraSourceType,
+						  targetWidth: 100,
+						  targetHeight: 100,
+						  encodingType: Camera.EncodingType.JPEG,
+						  mediaType: Camera.MediaType.PICTURE,
+						  allowEdit : true,
+						  correctOrientation: true,
+						  saveToPhotoAlbum: false,
+						  popoverOptions: CameraPopoverOptions};
+
+				navigator.camera.getPicture(function(picture)
+						{
+							document.getElementById("cameraResult").innerHTML = picture;
+						},
+						function(message)
+						{
+							document.getElementById("cameraResult").innerHTML = message;
+						},
+						cameraOptions);
+			}
+
+			/**
+			 * Changes the destination type of the camera module.
+			 */
+			function changeDestinationType()
+			{
+				if (cameraDestinationType == Camera.DestinationType.DATA_URL)
+				{
+					cameraDestinationType = Camera.DestinationType.FILE_URI;
+					document.getElementById("destinationType").innerHTML = "Destination: file uri";
+				}
+				else
+				{
+					cameraDestinationType = Camera.DestinationType.DATA_URL;
+					document.getElementById("destinationType").innerHTML = "Destination: data url";
+				}
+			}
+
+			/**
+			 * Changes the source type of the camera module.
+			 */
+			function changeSourceType()
+			{
+				if (cameraSourceType == Camera.PictureSourceType.PHOTOLIBRARY)
+				{
+					cameraSourceType = Camera.PictureSourceType.CAMERA;
+					document.getElementById("sourceType").innerHTML = "Source: camera";
+				}
+				else if (cameraSourceType == Camera.PictureSourceType.CAMERA)
+				{
+					cameraSourceType = Camera.PictureSourceType.SAVEDPHOTOALBUM;
+					document.getElementById("sourceType").innerHTML = "Source: saved photo album";
+				}
+				else
+				{
+					cameraSourceType = Camera.PictureSourceType.PHOTOLIBRARY;
+					document.getElementById("sourceType").innerHTML = "Source: photo library";
+				}
+			}
+
+			// Register event listeners.
+
+			// The "deviceready" event is sent when the system
+			// has finished loading.
+			document.addEventListener(
+				"deviceready",
+				setDefaultValues,
+				true);
+
+			// Close the application when the back key is pressed.
+			document.addEventListener(
+				"backbutton",
+				function() { mosync.app.exit(); },
+				true);
+		</script>
+	</head>
+	<body>
+		<div id="screen">
+			<div class="pane" id="heading">PhoneGap Camera Test</div>
+			<div class="pane button" id="destinationType" onclick="changeDestinationType()">Destination: data url</div>
+			<div class="pane button" id="sourceType" onclick="changeSourceType()">Source: photo library</div>
+			<div class="pane" id="settingsInfo">
+				<div class="infoItemCenter">Press above to change camera settings</div>
+			</div>
+			<div class="pane button" onclick="getPicture()">Get picture</div>
+			<div class="pane" id="info">
+				<div class="infoItem">Camera Result: <span id="cameraResult">&nbsp;</span></div>
+			</div>
+		</div>
+	</body>
+</html>
