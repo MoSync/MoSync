@@ -1934,105 +1934,105 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetStackScreenPop");
 			return _maWidgetStackScreenPop(a, mJNIEnv, mJThis);
 
-		// ********** Action Bar API **********
-		case maIOCtl_maActionBarSetEnabled:
-		{
-			SYSLOG("maIOCtl_maActionBarSetEnabled");
-			return _maActionBarSetEnabled(a, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarAddMenuItem:
-		{
-			SYSLOG("maIOCtl_maActionBarAddMenuItem");
-			//int displayFlag = ARG_NO_4;
-			//return _maActionBarAddMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), c, displayFlag, mJNIEnv, mJThis);
-			int _handle = a;
-			const char *_title = SYSCALL_THIS->GetValidatedStr(b);
-			int _flag = ARG_NO_4;
-
-			MA_ACTION_BAR_ITEM_ICON* args = (MA_ACTION_BAR_ITEM_ICON*) SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MA_ACTION_BAR_ITEM_ICON));
-			return _maActionBarAddMenuItem(
-				_handle,
-				_title,
-				args->iconPredefinedId,
-				args->iconHandle,
-				_flag,
-				mJNIEnv,
-				mJThis);
-		}
-
-		case maIOCtl_maActionBarRemoveMenuItem:
-		{
-			SYSLOG("maIOCtl_maActionBarRemoveItem");
-			return _maActionBarRemoveMenuItem(a, b, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarSetVisibility:
-		{
-			SYSLOG("maIOCtl_maActionBarSetVisibility");
-			return _maActionBarSetVisibility(a, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarGetHeight:
-		{
-			SYSLOG("maIOCtl_maActionBarGetHeight");
-			return _maActionBarGetHeight(mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarIsShowing:
-		{
-			SYSLOG("maIOCtl_maActionBarIsShowing");
-			return _maActionBarIsShowing(mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarSetTitle:
-		{
-			SYSLOG("maIOCtl_maActionBarSetTitle");
-			const char *_title = SYSCALL_THIS->GetValidatedStr(a);
-			return _maActionBarSetTitle(_title, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarSetIcon:
-		{
-			SYSLOG("maIOCtl_maActionBarSetIcon");
-			return _maActionBarSetIcon(a, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarSetDisplayHomeAsUpEnabled:
-		{
-			SYSLOG("maIOCtl_maActionBarSetDisplayHomeAsUpEnabled");
-			return _maActionBarSetDisplayHomeAsUpEnabled(a, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarShowTitleEnabled:
-		{
-			SYSLOG("maIOCtl_maActionBarShowTitleEnabled");
-			return _maActionBarShowTitleEnabled(a, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarShowLogoEnabled:
-		{
-			SYSLOG("maIOCtl_maActionBarShowLogoEnabled");
-			return _maActionBarShowLogoEnabled(a, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarSetHomeButtonEnabled:
-		{
-			SYSLOG("maIOCtl_maActionBarSetHomeButtonEnabled");
-			return _maActionBarSetHomeButtonEnabled(a, mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarRefresh:
-		{
-			SYSLOG("maIOCtl_maActionBarRefresh");
-			return _maActionBarRefresh(mJNIEnv, mJThis);
-		}
-
-		case maIOCtl_maActionBarSetBackgroundImage:
-		{
-			SYSLOG("maIOCtl_maActionBarSetBackgroundImage");
-			return _maActionBarSetBackgroundImage(a, mJNIEnv, mJThis);
-		}
+//		// ********** Action Bar API **********
+//		case maIOCtl_maActionBarSetEnabled:
+//		{
+//			SYSLOG("maIOCtl_maActionBarSetEnabled");
+//			return _maActionBarSetEnabled(a, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarAddMenuItem:
+//		{
+//			SYSLOG("maIOCtl_maActionBarAddMenuItem");
+//			//int displayFlag = ARG_NO_4;
+//			//return _maActionBarAddMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), c, displayFlag, mJNIEnv, mJThis);
+//			int _handle = a;
+//			const char *_title = SYSCALL_THIS->GetValidatedStr(b);
+//			int _flag = ARG_NO_4;
+//
+//			MA_ACTION_BAR_ITEM_ICON* args = (MA_ACTION_BAR_ITEM_ICON*) SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MA_ACTION_BAR_ITEM_ICON));
+//			return _maActionBarAddMenuItem(
+//				_handle,
+//				_title,
+//				args->iconPredefinedId,
+//				args->iconHandle,
+//				_flag,
+//				mJNIEnv,
+//				mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarRemoveMenuItem:
+//		{
+//			SYSLOG("maIOCtl_maActionBarRemoveItem");
+//			return _maActionBarRemoveMenuItem(a, b, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarSetVisibility:
+//		{
+//			SYSLOG("maIOCtl_maActionBarSetVisibility");
+//			return _maActionBarSetVisibility(a, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarGetHeight:
+//		{
+//			SYSLOG("maIOCtl_maActionBarGetHeight");
+//			return _maActionBarGetHeight(mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarIsShowing:
+//		{
+//			SYSLOG("maIOCtl_maActionBarIsShowing");
+//			return _maActionBarIsShowing(mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarSetTitle:
+//		{
+//			SYSLOG("maIOCtl_maActionBarSetTitle");
+//			const char *_title = SYSCALL_THIS->GetValidatedStr(a);
+//			return _maActionBarSetTitle(_title, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarSetIcon:
+//		{
+//			SYSLOG("maIOCtl_maActionBarSetIcon");
+//			return _maActionBarSetIcon(a, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarSetDisplayHomeAsUpEnabled:
+//		{
+//			SYSLOG("maIOCtl_maActionBarSetDisplayHomeAsUpEnabled");
+//			return _maActionBarSetDisplayHomeAsUpEnabled(a, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarShowTitleEnabled:
+//		{
+//			SYSLOG("maIOCtl_maActionBarShowTitleEnabled");
+//			return _maActionBarShowTitleEnabled(a, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarShowLogoEnabled:
+//		{
+//			SYSLOG("maIOCtl_maActionBarShowLogoEnabled");
+//			return _maActionBarShowLogoEnabled(a, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarSetHomeButtonEnabled:
+//		{
+//			SYSLOG("maIOCtl_maActionBarSetHomeButtonEnabled");
+//			return _maActionBarSetHomeButtonEnabled(a, mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarRefresh:
+//		{
+//			SYSLOG("maIOCtl_maActionBarRefresh");
+//			return _maActionBarRefresh(mJNIEnv, mJThis);
+//		}
+//
+//		case maIOCtl_maActionBarSetBackgroundImage:
+//		{
+//			SYSLOG("maIOCtl_maActionBarSetBackgroundImage");
+//			return _maActionBarSetBackgroundImage(a, mJNIEnv, mJThis);
+//		}
 
 		// ********** Notification API **********
 

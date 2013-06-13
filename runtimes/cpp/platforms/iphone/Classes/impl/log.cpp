@@ -25,10 +25,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define CONFIG_H
 #define LOGGING_ENABLED
 
+#define PTHREAD_ATTR_INIT_ERROR_STR  "pthread_mutexattr_init failed"
+#define PTHREAD_ATTR_SET_ERROR_STR   "pthread_mutexattr_settype failed"
+#define PTHREAD_MUTEX_INIT_ERROR_STR "pthread_mutex_init failed"
+
+#define PTHREAD_ERROR(errorMessage, errorCode) { \
+	char buffer[256]; \
+	sprintf(buffer, "Critical section failed with message \"%s\" and error code: %d", errorMessage, errorCode); \
+	logWithNSLog(buffer, strlen(buffer)); \
+	pthread_exit(NULL); \
+};
+
 #include <helpers/log.h>
 #include <helpers/helpers.h>
 #include <helpers/CriticalSection.h>
 #include "iphone_helpers.h"
+
 using namespace MoSyncError;
 
 #if !defined(_android)
@@ -37,6 +49,7 @@ static const char* sFilename = "log.txt";
 timeval sStartTime;
 
 CRITICAL_SECTION gLogCS;
+
 
 void InitLog(const char* filenameOverride) {
 	static bool done = false;
@@ -104,11 +117,24 @@ void LogTime(const char* fmt, ...) {
 
 void InitializeCriticalSection(CRITICAL_SECTION* cs) {
 	pthread_mutexattr_t mutexattr;
+	int returnCode;
+
+	// Init mutex attribute
+	returnCode = pthread_mutexattr_init(&mutexattr);
+	if ( returnCode )
+		PTHREAD_ERROR(PTHREAD_ATTR_INIT_ERROR_STR, returnCode);
+
 	// Set the mutex as a recursive mutex
-	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
-	// create the mutex with the attributes set
-	pthread_mutex_init(cs, &mutexattr);
-	//After initializing the mutex, the thread attribute can be destroyed
+	returnCode = pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+	if ( returnCode )
+		PTHREAD_ERROR(PTHREAD_ATTR_SET_ERROR_STR, returnCode);
+
+	// Create the mutex with the attributes set
+	returnCode = pthread_mutex_init(cs, &mutexattr);
+	if ( returnCode )
+		PTHREAD_ERROR(PTHREAD_MUTEX_INIT_ERROR_STR, returnCode);
+
+	// After initializing the mutex, the thread attribute can be destroyed
 	pthread_mutexattr_destroy(&mutexattr);
 }
 

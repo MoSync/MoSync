@@ -359,14 +359,14 @@ namespace NativeUI
 	 * - #MAW_RES_ACTION_BAR_DISABLED If the action bar is not enabled, or
 	 * -
 	 */
-	MAHandle Screen::addActionBarMenuItem(const MAUtil::String itemTitle, const int iconPredefinedId,
-			const MAHandle iconHandle, const ActionBarMenuItemDisplayFlag flag)
-	{
-		MA_ACTION_BAR_ITEM_ICON iconArgs;
-		iconArgs.iconPredefinedId = iconPredefinedId;
-		iconArgs.iconHandle = iconHandle;
-		return maActionBarAddMenuItem(getWidgetHandle(), itemTitle.c_str(), &iconArgs, flag);
-	}
+	// MAHandle Screen::addActionBarMenuItem(const MAUtil::String itemTitle, const int iconPredefinedId,
+	// 		const MAHandle iconHandle, const ActionBarMenuItemDisplayFlag flag)
+	// {
+	// 	MA_ACTION_BAR_ITEM_ICON iconArgs;
+	// 	iconArgs.iconPredefinedId = iconPredefinedId;
+	// 	iconArgs.iconHandle = iconHandle;
+	// 	return maActionBarAddMenuItem(getWidgetHandle(), itemTitle.c_str(), &iconArgs, flag);
+	// }
 
 	/**
 	 * Remove a menu item from the Action bar.
@@ -381,10 +381,10 @@ namespace NativeUI
 	 * - #MAW_RES_ACTION_BAR_DISABLED If the action bar is not enabled, or
 	 * - #MAW_RES_INVALID_HANDLE If the indicated screen has no item on specified handle.
 	 */
-	int Screen::removeActionBarMenuItem(MAHandle itemHandle)
-	{
-		return maActionBarRemoveMenuItem(getWidgetHandle(), itemHandle);
-	}
+	// int Screen::removeActionBarMenuItem(MAHandle itemHandle)
+	// {
+	// 	return maActionBarRemoveMenuItem(getWidgetHandle(), itemHandle);
+	// }
 
 	/**
 	 * Remove all Action bar menu items from the current screen.
@@ -399,15 +399,15 @@ namespace NativeUI
 	 * - #MAW_RES_ACTION_BAR_DISABLED If the Action bar is not enabled, or
 	 * - #MAW_RES_INVALID_HANDLE If the indicated screen has no menu item on specified handle.
 	 */
-	int Screen::removeActionBarItems()
-	{
-		int result = MAW_RES_OK;
-		for (int i=0 ; i<mActionBarItems.size(); i++)
-		{
-			result = maActionBarRemoveMenuItem(getWidgetHandle(), mActionBarItems[i]);
-		}
-		return result;
-	}
+	// int Screen::removeActionBarItems()
+	// {
+	// 	int result = MAW_RES_OK;
+	// 	for (int i=0 ; i<mActionBarItems.size(); i++)
+	// 	{
+	// 		result = maActionBarRemoveMenuItem(getWidgetHandle(), mActionBarItems[i]);
+	// 	}
+	// 	return result;
+	// }
 
 	/**
 	 * Check if a screen is shown.

@@ -37,6 +37,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Controls.Maps;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace MoSync
 {
@@ -94,12 +95,13 @@ namespace MoSync
             {
                 set
                 {
-                    double latitude;
-                    if (Double.TryParse(value, out latitude))
+                    IFormatProvider provider = CultureInfo.InvariantCulture;
+                    try
                     {
+                        double latitude = double.Parse(value, provider);
                         mPushpin.Location.Latitude = latitude;
                     }
-                    else
+                    catch
                     {
                         throw new InvalidPropertyValueException();
                     }
@@ -114,14 +116,15 @@ namespace MoSync
             {
                 set
                 {
-                    double longitude;
-                    if (Double.TryParse(value, out longitude))
+                    IFormatProvider provider = CultureInfo.InvariantCulture;
+                    try
                     {
+                        double longitude = double.Parse(value, provider);
                         mPushpin.Location.Longitude = longitude;
                     }
-                    else
+                    catch
                     {
-                        throw new InvalidPropertyValueException();
+                         throw new InvalidPropertyValueException();
                     }
                 }
             }
@@ -157,8 +160,12 @@ namespace MoSync
                 if (propertyName.Equals("latitude") ||
                     propertyName.Equals("longitude"))
                 {
-                    double val;
-                    if (!Double.TryParse(propertyValue, out val))
+                    IFormatProvider provider = CultureInfo.InvariantCulture;
+                    try
+                    {
+                        double val = double.Parse(propertyValue, provider);
+                    }
+                    catch
                     {
                         isPropertyValid = false;
                     }

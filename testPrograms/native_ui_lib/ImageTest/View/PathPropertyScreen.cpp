@@ -61,6 +61,8 @@ namespace ImageTest
 		mSelectImageFromHandleButton->addButtonListener(this);
 		mSelectImageFromPathButton->addButtonListener(this);
 		mGetImagePathButton->addButtonListener(this);
+
+		mGetImagePathButton->setEnabled(false);
 	}
 
 	/**
@@ -181,11 +183,13 @@ namespace ImageTest
 		if (button == mSelectImageFromHandleButton)
 		{
 			mListener.selectImageFromHandle();
+			mGetImagePathButton->setEnabled(false);
 		}
 		else if (button == mSelectImageFromPathButton)
 		{
 			MAUtil::String path = mPathEditBox->getText();
 			mListener.selectImageFromPath(path);
+			mGetImagePathButton->setEnabled(true);
 		}
 		else if (button == mGetImagePathButton)
 		{

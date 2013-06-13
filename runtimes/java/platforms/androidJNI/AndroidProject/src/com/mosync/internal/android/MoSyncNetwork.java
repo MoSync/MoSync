@@ -643,12 +643,8 @@ public class MoSyncNetwork
 	 */
 	void copyIntToMemory(int address, int value)
 	{
-		ByteBuffer buffer = mMoSyncThread.getMemorySlice(address, 4).order(null);
-		//ByteOrder oldOrder = getMemDataSection().order();
-		//getMemDataSection().order(ByteOrder.LITTLE_ENDIAN);
-		//getMemDataSection().asIntBuffer().put(value);
+		ByteBuffer buffer = mMoSyncThread.getMemorySlice(address, 4);
 		buffer.putInt(value);
-		//getMemDataSection().order(oldOrder);
 	}
 
 	/**
@@ -656,10 +652,7 @@ public class MoSyncNetwork
 	 */
 	int readIntFromMemory(int address)
 	{
-		//ByteOrder oldOrder = mMemDataSection.order();
-		//mMemDataSection.order(ByteOrder.LITTLE_ENDIAN);
-		int value = mMoSyncThread.getMemorySlice(address, 4).order(null).getInt();
-		//mMemDataSection.order(oldOrder);
+		int value = mMoSyncThread.getMemorySlice(address, 4).getInt();
 
 		return value;
 	}
@@ -1769,12 +1762,9 @@ public class MoSyncNetwork
 			int port;
 			if (splitUrl.length == 2)
 			{
-				int end =
-					(splitUrl[0].length() + realUrl.length())
-					- (splitUrl[0].length() + splitUrl[1].length());
-				port = Integer.valueOf(
-					realUrl.substring(
-						splitUrl[0].length() + 1, end)).intValue();
+				int end =(splitUrl[0].length() + realUrl.length()) - (splitUrl[0].length() + splitUrl[1].length());
+
+				port = Integer.valueOf(realUrl.substring(splitUrl[0].length() + 1, end));
 				newUrl += splitUrl[1];
 			}
 			else if(splitUrl.length == 1 && splitUrl[0].length() > 0)

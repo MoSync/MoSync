@@ -55,7 +55,6 @@ public class MoSyncAds
 	 */
 	public int maAdsBannerCreate(final int bannerSize, final String publisherID)
 	{
-		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
 			getActivity().runOnUiThread(new Runnable()
@@ -68,10 +67,6 @@ public class MoSyncAds
 			});
 			return waiter.getResult();
 		}
-		catch(InterruptedException ie)
-		{
-			return -1;
-		}
 	}
 
 	/**
@@ -80,7 +75,6 @@ public class MoSyncAds
 	 */
 	public int maAdsAddBannerToLayout(final int bannerHandle, final int layoutHandle, final Widget layoutWidget)
 	{
-		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
 			getActivity().runOnUiThread(new Runnable()
@@ -93,10 +87,6 @@ public class MoSyncAds
 			});
 			return waiter.getResult();
 		}
-		catch(InterruptedException ie)
-		{
-			return -1;
-		}
 	}
 
 	/**
@@ -105,7 +95,6 @@ public class MoSyncAds
 	 */
 	public int maAdsRemoveBannerFromLayout(final int bannerHandle, final int layoutHandle, final Widget layoutWidget)
 	{
-		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
 			getActivity().runOnUiThread(new Runnable()
@@ -118,10 +107,6 @@ public class MoSyncAds
 			});
 			return waiter.getResult();
 		}
-		catch(InterruptedException ie)
-		{
-			return -1;
-		}
 	}
 
 	/**
@@ -130,7 +115,6 @@ public class MoSyncAds
 	 */
 	public int maAdsBannerDestroy(final int bannerHandle)
 	{
-		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
 			getActivity().runOnUiThread(new Runnable()
@@ -142,10 +126,6 @@ public class MoSyncAds
 				}
 			});
 			return waiter.getResult();
-		}
-		catch(InterruptedException ie)
-		{
-			return -1;
 		}
 	}
 
@@ -159,7 +139,6 @@ public class MoSyncAds
 		final String value)
 	{
 		// TODO check if this really should be called from the ui thread
-		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
 			getActivity().runOnUiThread(new Runnable()
@@ -173,10 +152,6 @@ public class MoSyncAds
 			});
 			return waiter.getResult();
 		}
-		catch(InterruptedException ie)
-		{
-			return -1;
-		}
 	}
 
 	/**
@@ -189,7 +164,6 @@ public class MoSyncAds
 		final int memBuffer,
 		final int memBufferSize)
 	{
-		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
 			getActivity().runOnUiThread(new Runnable() {
@@ -200,10 +174,6 @@ public class MoSyncAds
 				}
 			});
 			return waiter.getResult();
-		}
-		catch(InterruptedException ie)
-		{
-			return -1;
 		}
 	}
 	/************************ Class members ************************/

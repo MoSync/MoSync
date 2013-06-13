@@ -962,7 +962,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		final byte[] data,
 		final BitmapFactory.Options options)
 	{
-		try
 		{
 			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
 			getActivity().runOnUiThread(new Runnable()
@@ -990,11 +989,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 				}
 			});
 			return waiter.getResult();
-		}
-		catch(InterruptedException ie)
-		{
-			//Log.i("MoSync", "Couldn't decode image data.");
-			return null;
 		}
 	}
 
@@ -1032,7 +1026,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	//synchronized
 	Bitmap createBitmap(final int width, final int height)
 	{
-		try
 		{
 			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
 			getActivity().runOnUiThread(new Runnable()
@@ -1062,11 +1055,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			});
 			return waiter.getResult();
 		}
-		catch(InterruptedException ie)
-		{
-			Log.i("MoSync", "Couldn't create empty bitmap.");
-		}
-		return null;
 	}
 
 	/*
@@ -1087,7 +1075,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		final int height,
 		final int[] pixels)
 	{
-		try
 		{
 			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
 			getActivity().runOnUiThread(new Runnable()
@@ -1116,11 +1103,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 				}
 			});
 			return waiter.getResult();
-		}
-		catch(InterruptedException ie)
-		{
-			//Log.i("MoSync", "Couldn't create bitmap from pixel data.");
-			return null;
 		}
 	}
 
@@ -1731,7 +1713,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	{
 		SYSLOG("maDrawImage");
 
-		ImageCache imageResource = mImageResources.get(new Integer(image));
+		ImageCache imageResource = mImageResources.get(image);
 		if (imageResource == null)
 		{
 			return;
@@ -1907,7 +1889,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	int maGetImageSize(int image)
 	{
 		SYSLOG("maGetImageSize");
-		ImageCache imageResource = mImageResources.get(new Integer(image));
+		ImageCache imageResource = mImageResources.get(image);
 		if (imageResource == null)
 		{
 			logError("maGetImageSize : no such resource");
@@ -2017,7 +1999,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	 * @param srcHeight
 	 * @param scanLength
 	 */
-	@SuppressWarnings("unused")
 	private void _maGetImageDataFast(
 		int image,
 		ImageCache imageResource,
@@ -2168,7 +2149,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		}
 		else
 		{
-			ImageCache imageResource = mImageResources.get(new Integer(image));
+			ImageCache imageResource = mImageResources.get(image);
 			if (null == imageResource)
 			{
 				return -1;
@@ -2437,7 +2418,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			}
 
 			mMaxStoreId++;
-			mStores.put(new Integer(mMaxStoreId), filePath);
+			mStores.put(mMaxStoreId, filePath);
 			return mMaxStoreId;
 		}
 		catch(Exception e)
@@ -2455,8 +2436,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		SYSLOG("maWriteStore");
 		try
 		{
-			File f = mContext.getFileStreamPath(
-				mStores.get(new Integer(store)));
+			File f = mContext.getFileStreamPath(mStores.get(store));
 			if (f.isFile())
 			{
 				ByteBuffer bb = mBinaryResources.get(data);
@@ -2516,8 +2496,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 
 		try
 		{
-			File file = mContext.getFileStreamPath(
-				mStores.get(new Integer(store)));
+			File file = mContext.getFileStreamPath(mStores.get(store));
 			byte[] buffer;
 			int length = 0;
 			if (file.isFile())
@@ -2567,14 +2546,14 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	{
 		SYSLOG("maCloseStore");
 
-		String filePath = mStores.get(new Integer(store));
+		String filePath = mStores.get(store);
 		if (remove != 0)
 		{
 			File f = mContext.getFileStreamPath(filePath);
 			f.delete();
 		}
 
-		if (!(mStores.remove(new Integer(store)) == filePath))
+		if (!(mStores.remove(store) == filePath))
 		{
 			maPanic(1, "maCloseStore failed!");
 		}
@@ -3259,12 +3238,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	void destroyResource(int resourceIndex)
 	{
 		SYSLOG("destroyResource :" + resourceIndex);
-		/*
-		if(null != mBinaryResources.get(resourceIndex))
-		{
-			mBinaryResources.remove(resourceIndex);
-		}
-		*/
+
 		if(null != mUBinaryResources.get(resourceIndex))
 		{
 			mUBinaryResources.remove(resourceIndex);
@@ -3274,16 +3248,18 @@ public class MoSyncThread extends Thread implements MoSyncContext
 			ImageCache img = mImageResources.get(resourceIndex);
 			if(null != img)
 			{
-				img.mBitmap.recycle();
+				// recycle only if possible
+				if(img.mBitmap != null && !img.mBitmap.isRecycled())
+				{
+				    Log.e("MoSyncThread", "recycle the bitmap" + img.mBitmap);
+				    img.mBitmap.recycle();
+				}
+
+				img.mBitmap = null;
 				mImageResources.remove(resourceIndex);
 			}
 		}
-		//else
-		//{
-		//	Log.e("MoSyncThread", "destroyResource bad handle: " + resourceIndex);
-		//}
 
-		//Log.i("MoSyncThread", "Resource deleted, force GC");
 		System.gc();
 	}
 
@@ -4648,109 +4624,6 @@ public class MoSyncThread extends Thread implements MoSyncContext
 				widgetHandle, title, iconHandle, iconPredefined);
 	}
 
-	/**
-	* The ActionBar is unique per application, therefore all syscalls that
-	* relate to the Action Bar will be handled on that unique instance.
-	* Available only on Android.
-	* @param handle The screen handle.
-	* @param title The menu item title.
-	* @param iconPredefinedId Optional icon for the action bar item.
-	* @param iconHandle ptional icon for the action bar item.
-	* @param displayFlag Where and how to display the menu item.
-	* \returns The the item handle on success, or any of the following result codes:
-	* - #MAW_RES_ERROR
-	* - #MAW_RES_ACTION_BAR_INVALID_ICON
-	* - #MAW_RES_ACTION_BAR_INVALID_FLAG
-	* - #MAW_RES_INVALID_HANDLE If the screenHandle points to an invalid screen.
-	* - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled.
-	* - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform.
-	*/
-	public int maActionBarAddMenuItem(final int handle, final String title,
-			final int iconPredefinedId, final int iconHandle, final int displayFlag)
-	{
-		return mMoSyncNativeUI.maActionBarAddMenuItem(
-				handle, title,
-				iconPredefinedId, iconHandle, displayFlag);
-	}
-
-	/**
-	 * Remove an item from the Action bar.
-	 * @param screenHandle The screen handle.
-	 * @param itemHandle The handle of the menu item to be removed.
-	 * \returns #MAW_RES_OK on success, or any of the following result codes:
-	 * - #MAW_RES_ACTION_BAR_NOT_AVAILABLE If the action bar is not available on the current platform,
-	 * - #MAW_RES_ACTION_BAR_DISABLED If the action bar was explicitely disabled, or
-	 * - #MAW_RES_INVALID_HANDLE If the indicated screen has no item on specified handle.
-	 */
-	public int maActionBarRemoveMenuItem(final int screenHandle, final int itemHandle)
-	{
-		return mMoSyncNativeUI.maActionBarRemoveMenuItem(screenHandle, itemHandle);
-	}
-
-	public int maActionBarSetEnabled(int state)
-	{
-		return mMoSyncNativeUI.maActionBarSetEnabled(state == 1 ? true : false);
-	}
-
-	public int maActionBarSetVisibility(int visibility)
-	{
-		return mMoSyncNativeUI.maActionBarSetVisibility(visibility == 1 ? true : false);
-	}
-
-	public int maActionBarGetHeight()
-	{
-		return mMoSyncNativeUI.maActionBarGetHeight();
-	}
-
-	public int maActionBarIsShowing()
-	{
-		return mMoSyncNativeUI.maActionBarIsShowing();
-	}
-
-	public int maActionBarSetTitle(final String title)
-	{
-		return mMoSyncNativeUI.maActionBarSetTitle(title);
-	}
-
-	public int maActionBarSetIcon(int iconHandle)
-	{
-		return mMoSyncNativeUI.maActionBarSetIcon(iconHandle);
-	}
-
-	public int maActionBarSetDisplayHomeAsUpEnabled(int enableUp)
-	{
-		return mMoSyncNativeUI.maActionBarSetDisplayHomeAsUpEnabled(enableUp == 1 ? true : false);
-	}
-
-	public int maActionBarShowTitleEnabled(int enable)
-	{
-		return mMoSyncNativeUI.maActionBarShowTitleEnabled(enable == 1 ? true : false);
-	}
-
-	public int maActionBarShowLogoEnabled(int enable)
-	{
-		if (enable == 1)
-			getActivity().getActionBar().setDisplayUseLogoEnabled(true);
-		else
-			getActivity().getActionBar().setDisplayUseLogoEnabled(true);
-		return 0;
-	}
-
-	public int maActionBarSetHomeButtonEnabled(int state)
-	{
-		return mMoSyncNativeUI.maActionBarSetHomeButtonEnabled(state == 1 ? true : false);
-	}
-
-	public int maActionBarRefresh()
-	{
-		return mMoSyncNativeUI.maActionBarRefresh();
-	}
-
-	public int maActionBarSetBackgroundImage(final int imageHandle)
-	{
-		return mMoSyncNativeUI.maActionBarSetBackgroundImage(imageHandle);
-	}
-
 	public void invalidateOptionsMenu(Activity activity) {
 		Class<?> activityClass = null;
 		Method activity_invalidateOptionMenu = null;
@@ -4764,15 +4637,11 @@ public class MoSyncThread extends Thread implements MoSyncContext
 		try {
 			activity_invalidateOptionMenu = activityClass
 					.getMethod("invalidateOptionsMenu");
+			activity_invalidateOptionMenu.invoke(activity);
 			/* success, this is a newer device */
-		} catch (NoSuchMethodException nsme) {
+		} catch (Exception e) {
 			/* failure, must be older device */
 			Log.i("MoSync", "invalidateOptionsMenu failed");
-		}
-		try {
-			activity_invalidateOptionMenu.invoke(activity);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 
