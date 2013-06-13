@@ -66,9 +66,9 @@ static ScreenOrientation *sharedInstance = nil;
 	self = [super init];
 	if (self)
 	{
-		mAllowedScreenOrientations = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
-		mCurrentScreenOrientation = UIInterfaceOrientationPortrait;
-		mSupportedOrientations = UIInterfaceOrientationMaskPortrait;
+		mAllowedScreenOrientations = MA_SCREEN_ORIENTATION_PORTRAIT_UP | MA_SCREEN_ORIENTATION_LANDSCAPE;
+		mCurrentScreenOrientation = [UIApplication sharedApplication].statusBarOrientation;
+		mSupportedOrientations = UIInterfaceOrientationMaskAllButUpsideDown;
 	}
     return self;
 }
