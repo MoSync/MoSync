@@ -404,13 +404,13 @@ string getStlportDir(Arguments* params, bool useMakeParam) {
 
 string getNdkRoot(Arguments* params) {
 	string ndkDir = require(params, "--android-ndk-location");
-	toDir(ndkDir);
 	toSlashes(ndkDir);
 	string ndkOSDir = ndkDir;
 	toOSSlashes(ndkOSDir);
-	if (!existsDir(ndkOSDir.c_str())) {
+	if (!existsDir(ndkDir.c_str())) {
 		error("Could not find android NDK! Set --android-ndk-location to a proper directory.\n", 2);
 	}
+	toDir(ndkDir);
 	return ndkDir;
 }
 
