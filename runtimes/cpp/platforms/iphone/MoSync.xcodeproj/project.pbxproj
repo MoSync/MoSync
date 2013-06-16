@@ -318,6 +318,7 @@
 		43F3706715B476940095B3C6 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43F3706415B476910095B3C6 /* TouchHelper.mm */; };
 		43F9CBBB14C4198400DE2285 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		74126EFB1725BEB400FA5697 /* NavBarButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 74126EFA1725BEB400FA5697 /* NavBarButtonWidget.mm */; };
+		74C96EA2176B038A00B6BA07 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74C96EA1176B038A00B6BA07 /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		74DBC3501727E368000D7533 /* NavBarButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 74126EFA1725BEB400FA5697 /* NavBarButtonWidget.mm */; };
 		8509432A1185AF87004A3B2D /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
 		850943891185B35D004A3B2D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -693,6 +694,7 @@
 		43F9CBB914C4197400DE2285 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		74126EF91725BEB400FA5697 /* NavBarButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavBarButtonWidget.h; path = NativeUI/Widgets/NavBarButtonWidget.h; sourceTree = "<group>"; };
 		74126EFA1725BEB400FA5697 /* NavBarButtonWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NavBarButtonWidget.mm; path = NativeUI/Widgets/NavBarButtonWidget.mm; sourceTree = "<group>"; };
+		74C96EA1176B038A00B6BA07 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -833,6 +835,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74C96EA2176B038A00B6BA07 /* Social.framework in Frameworks */,
 				43C4836116417AF6008F9A39 /* MapKit.framework in Frameworks */,
 				43277C49163ED76100DE2CF5 /* CoreVideo.framework in Frameworks */,
 				E438DF511535D368008B5005 /* CoreMedia.framework in Frameworks */,
@@ -987,6 +990,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				74C96EA1176B038A00B6BA07 /* Social.framework */,
 				43C4835F16417ACE008F9A39 /* MapKit.framework */,
 				43277C48163ED76100DE2CF5 /* CoreVideo.framework */,
 				4300E3E6152C60FA00B40FA2 /* StoreKit.framework */,
@@ -2211,7 +2215,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = "MoSync-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-D__MS_XCODE__",
@@ -2235,7 +2239,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = "MoSync-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-D__MS_XCODE__",
@@ -2328,7 +2332,7 @@
 					../../../../intlibs,
 					../../../../libs,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 2.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DDARWIN";
 				PREBINDING = NO;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B06E2757-3CC3-41D7-9607-2B0F939ED9DB";
@@ -2354,7 +2358,7 @@
 					../../../../intlibs,
 					../../../../libs,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 2.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";

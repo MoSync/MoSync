@@ -231,6 +231,22 @@ int maWidgetScreenAddOptionsMenuItem(MAWidgetHandle widget, const char * title, 
 int maWidgetScreenInsertNavBarButton(int side, MAWidgetHandle screenWidgetHandle, MAWidgetHandle navBarButtonWidgetHandle, int index);
 
 /**
+ * Checks if social functions are available.
+ * @return 1 if social functions are available, 0 otherwise.
+ */
+int maSocialCanShare();
+
+/**
+ * Shows a share pane where the user can pick where to share the specified information.
+ * @param initialText Default text to write in the tweet/facebook field
+ * @param imageToShare Image handle to attach to the post
+ * @param urlToShare Url to attach to the post
+ * - MAW_RES_OK if everything went fine.
+ * - MAW_RES_ERROR if social functions were disabled.
+ */
+int maSocialShareInfo(const char* initialText, int imageToShare, const char* urlToShare);
+
+/**
  * Enable or disable the Action bar.
  * By default, the Action bar is disabled.
  * Note that the Action bar is only available starting from Android API level 11.

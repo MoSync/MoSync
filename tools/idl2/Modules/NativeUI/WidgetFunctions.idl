@@ -267,3 +267,30 @@ group WidgetAPIFunctions "Widget functions" {
     */
     int maWidgetScreenInsertNavBarButton(in MAWNavigationBarButtonSide side, in MAWidgetHandle screenWidget, in MAWidgetHandle navBarButtonWidget, in int index);
 } // end of group WidgetAPIFunctions
+
+group SocialAPI "Social API" {
+	group SocialFunctions "Social Functions" {
+
+		/**
+		* \brief Checks if social functions are available
+		* Available on iOS only.
+		*
+		* \returns 1 if social functions are available, 0 otherwise.
+		*/
+		int maSocialCanShare();
+
+		/**
+		* \brief Shows a share pane where the user can pick where to share the specified information.
+		* Available on iOS only.
+		*
+		* \param initialText Default text to write in the tweet/facebook field
+		* \param imageToShare Image handle to attach to the post, use 0 to not post any image
+		* \param urlToShare Url to attach to the post, if empty, no url will be attached
+		*
+		* \returns One of the following constants:
+		*  - #MAW_RES_OK if no error occurred.
+		*  - #MAW_RES_ERROR if social functions were disabled.
+		*/
+		int maSocialShareInfo(in MAString initialText, in int imageToShare, in MAString urlToShare);
+    } // End of Social Functions
+} // End of Social API

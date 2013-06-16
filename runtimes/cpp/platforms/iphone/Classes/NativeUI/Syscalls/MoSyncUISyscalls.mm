@@ -566,6 +566,112 @@ int maWidgetScreenInsertNavBarButton(int side, MAWidgetHandle screenWidgetHandle
     return MAW_RES_OK;
 }
 
+int maSocialCanShare()
+{
+    if (NSClassFromString(@"UIActivityViewController"))
+        return 1;
+
+    return 0;
+}
+
+int maSocialShareInfo(const char* initialText, int imageHandleToShare, const char* urlToShare)
+{
+    if (!maSocialCanShare())
+        return MAW_RES_ERROR;
+
+    UIImage* imageToShare = nil;
+    if (imageHandleToShare > 0)
+    {
+        Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandleToShare);
+        UIImageOrientation orientation = UIImageOrientationUp;
+        switch (imageResource->orientation)
+        {
+            case 1:
+                orientation = UIImageOrientationUp;
+                break;
+            case 2:
+                orientation = UIImageOrientationUpMirrored;
+                break;
+            case 3:
+                orientation = UIImageOrientationDown;
+                break;
+            case 4:
+                orientation = UIImageOrientationDownMirrored;
+                break;
+            case 5:
+                orientation = UIImageOrientationLeftMirrored;
+                break;
+            case 6:
+                orientation = UIImageOrientationRight;
+                break;
+            case 7:
+                orientation = UIImageOrientationRightMirrored;
+                break;
+            case 8:
+                orientation = UIImageOrientationLeft;
+                break;
+            default:
+                break;
+        }
+
+        imageToShare = [UIImage imageWithCGImage:imageResource->image scale:getScreenScale() orientation:orientation];
+    }
+
+    NSMutableArray* excludedItemTypes = [[NSMutableArray alloc] initWithCapacity:2];
+    NSMutableArray* itemsToShare = [[NSMutableArray alloc] initWithCapacity:3];
+
+    NSString *textToShare = [[NSString alloc] initWithUTF8String:initialText];
+    [itemsToShare addObject:textToShare];
+
+    if (imageToShare != nil)
+    {
+        [itemsToShare addObject:imageToShare];
+    }
+    else
+    {
+        [excludedItemTypes addObject:UIActivityTypeSaveToCameraRoll];
+        [excludedItemTypes addObject:UIActivityTypeAssignToContact];
+    }
+
+    NSString* urlString = [[NSString alloc] initWithUTF8String:urlToShare];
+    NSURL *url = nil;
+    if ([urlString length] > 0)
+    {
+        url = [NSURL URLWithString:urlString];
+        [itemsToShare addObject:url];
+    }
+
+    UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:itemsToShare applicationActivities:nil];
+    activityVC.excludedActivityTypes = excludedItemTypes;
+
+    ScreenWidget* currentScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
+    UIViewController* controller = [currentScreen getController];
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+    if (mainQueue == dispatch_get_current_queue())
+    {
+        [controller presentViewController:activityVC animated:YES completion:nil];
+    }
+    else
+    {
+        dispatch_sync(mainQueue, ^
+                      {
+                          [controller presentViewController:activityVC animated:YES completion:nil];
+                      });
+    }
+
+    [excludedItemTypes release];
+    [itemsToShare release];
+    [textToShare release];
+
+    if (imageToShare != nil)
+        [imageToShare release];
+
+    if (url != nil)
+        [url release];
+
+    return MAW_RES_OK;
+}
+
 /**
  * Enable or disable the Action bar.
  * By default, the Action bar is disabled.
