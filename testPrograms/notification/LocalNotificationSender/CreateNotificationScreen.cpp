@@ -92,13 +92,15 @@ CreateNotificationScreen::CreateNotificationScreen():
 	mFlashOnLength(NULL),
 	mFlashOffLength(NULL),
 	mTime(NULL),
-	mCreateNotificationButton(NULL)
+	mCreateNotificationButton(NULL),
+	mUnscheduleNotificationButton(NULL)
 {
 	this->createMainLayout();
 
 	mContentBody->addEditBoxListener(this);
 	mTime->addEditBoxListener(this);
 	mCreateNotificationButton->addButtonListener(this);
+	mUnscheduleNotificationButton->addButtonListener(this);
 	NotificationManager::getInstance()->addLocalNotificationListener(this);
 //	this->resetView();
 }
@@ -111,6 +113,7 @@ CreateNotificationScreen::~CreateNotificationScreen()
 	mContentBody->removeEditBoxListener(this);
 	mTime->removeEditBoxListener(this);
 	mCreateNotificationButton->removeButtonListener(this);
+	mUnscheduleNotificationButton->removeButtonListener(this);
 
 	if (isIOS())
 	{
@@ -246,11 +249,15 @@ void CreateNotificationScreen::createMainLayout()
 	listItem->addChild(hLayout);
 	listView->addChild(listItem);
 	mCreateNotificationButton = new ImageButton();
-	mCreateNotificationButton->setImage(RES_IMAGE);
+	mCreateNotificationButton->setImage(RES_IMAGE_SEND);
+
+	mUnscheduleNotificationButton = new ImageButton();
+	mUnscheduleNotificationButton->setImage(RES_IMAGE_UNSCHEDULE);
 
 	space = this->createSpacer();
 	hLayout->addChild(space);
 	hLayout->addChild(mCreateNotificationButton);
+	hLayout->addChild(mUnscheduleNotificationButton);
 
 	// Align the image button at the center of the layout.
 	// Only after adding the image button widget to layout the widget's width
@@ -402,6 +409,18 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 		NotificationManager::getInstance()->scheduleLocalNotification(notification);
 		printf("notification created with handle = %d ", notification->getHandle());
 		this->resetView();
+	}
+	else if (button == mUnscheduleNotificationButton)
+	{
+		int index = mLocalNotificationVector.size() - 1;
+		if (index >= 0)
+		{
+			LocalNotification* notification = mLocalNotificationVector[index];
+			maAlert("unscheduledLocalNotification", MAUtil::integerToString(notification->getHandle()).c_str() ,NULL,"OK", NULL);
+			NotificationManager::getInstance()->unscheduleLocalNotification(notification);
+			mLocalNotificationVector.remove(index);
+			delete notification;
+		}
 	}
 }
 
