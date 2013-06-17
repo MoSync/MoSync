@@ -93,7 +93,10 @@ void ListScreen::back()
 	FacebookDemoScreen::back();
 }
 
-void ListScreen::listViewItemClicked(NativeUI::ListView* listView, NativeUI::ListViewItem* listViewItem)
+void ListScreen::listViewItemClicked(
+	NativeUI::ListView *listView,
+	NativeUI::ListViewSection *listViewSection,
+	NativeUI::ListViewItem *listViewItem)
 {
 	ListItem *item = (ListItem*)listViewItem;
 	item->doClick();
