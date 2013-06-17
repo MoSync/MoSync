@@ -39,7 +39,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_F
  * @author emma tresanszki
  *
  */
-public class AlarmReceiver  extends BroadcastReceiver{
+public class AlarmReceiver extends BroadcastReceiver{
 
 	@Override
 	public void onReceive(Context appContext, Intent intent) {

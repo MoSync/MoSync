@@ -60,12 +60,35 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_CAN
 public class LocalNotificationsManager
 {
 	/**
+	 * The MoSync thread object.
+	 */
+	private static MoSyncThread mMoSyncThread;
+
+	/**
+	 * A table that contains a mapping between a handle and a notification.
+	 */
+	private HandleTable<LocalNotificationObject> m_NotificationTable =
+		new HandleTable<LocalNotificationObject>();
+
+	/**
+	 * A table that contains mapping between a notification handle and a  pending intent assigned to it.
+	 *
+	 * The pending intent represents a task to run at a specified time in the schedule method.
+	 * The key is the handle of the notification.
+	 */
+	private Hashtable<Integer,Intent> m_Intents =
+		new Hashtable<Integer,Intent>();
+
+	public static LocalNotificationsManager sLocalNotificationsManager = null;
+
+	/**
 	 * Constructor.
 	 * @param thread The MoSync thread object.
 	 */
 	public LocalNotificationsManager(MoSyncThread thread)
 	{
 		mMoSyncThread = thread;
+		sLocalNotificationsManager = this;
 	}
 
 	/**
@@ -220,7 +243,7 @@ public class LocalNotificationsManager
 			AlarmManager alarmManager  = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
 
 			// Prepare the intent that will be launched at scheduled time.
-			Intent intent = new Intent(appContext, com.mosync.internal.android.notifications.AlarmReceiver.class);
+			Intent intent = new Intent(appContext, AlarmReceiver.class);
 			intent.setAction("MoSync " + notification.getId());
 
 			intent.putExtra(
@@ -349,31 +372,17 @@ public class LocalNotificationsManager
 		mMoSyncThread.postEvent(event);
 	}
 
-	/************************ Class members ************************/
 	/**
-	 * The MoSync thread object.
+	 * Sets the active flag to true.
+	 * @param handle The handle of the notification
+	 * to set the flag for.
 	 */
-	private static MoSyncThread mMoSyncThread;
-
-	/**
-	 * A table that contains a mapping between a handle and a notification.
-	 */
-	private HandleTable<LocalNotificationObject> m_NotificationTable =
-		new HandleTable<LocalNotificationObject>();
-
-	/**
-	 * A table that contains mapping between a notification handle and a  pending intent assigned to it.
-	 *
-	 * The pending intent represents a task to run at a specified time in the schedule method.
-	 * The key is the handle of the notification.
-	 */
-	private Hashtable<Integer,Intent> m_Intents =
-		new Hashtable<Integer,Intent>();
-
-	/**
-	 * The MoSync application's focus state.
-	 * If true the app is in foreground.
-	 * If false the app is in background.
-	 */
-	private static Boolean mFocusState = true;
+	void setActive(int handle)
+	{
+		LocalNotificationObject obj = m_NotificationTable.get(handle);
+		if (obj != null)
+		{
+			obj.setActive(true);
+		}
+	}
 }

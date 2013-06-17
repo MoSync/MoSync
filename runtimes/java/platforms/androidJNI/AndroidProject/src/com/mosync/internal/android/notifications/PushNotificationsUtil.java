@@ -135,7 +135,8 @@ public class PushNotificationsUtil
      * @return The preferred display flag, or
      * 0 if it was not defined.
      */
-    public static int getPushNotificationDisplayFlag(Context context)
+    @SuppressWarnings("deprecation")
+	public static int getPushNotificationDisplayFlag(Context context)
     {
         final SharedPreferences prefs = context.getSharedPreferences(
                 PREFERENCE,
