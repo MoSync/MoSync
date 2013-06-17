@@ -91,6 +91,17 @@ public class LocalNotificationObject {
 
 	/**
 	 * Set the internal state of the notification.
+	 * So we later know that we
+	 * need to start/stop the service if there're
+	 * no pending notifications.
+	 */
+	public void setActive(boolean active)
+	{
+		mIsActive = active;
+	}
+
+	/**
+	 * Set the internal state of the notification.
 	 * To inactive, so we later know that we
 	 * don't need to stop the service if there're
 	 * no pending notifications.
@@ -152,6 +163,7 @@ public class LocalNotificationObject {
 	 * @param value The property value.
 	 * @return result code.
 	 */
+	@SuppressWarnings("deprecation")
 	public int setProperty(String name, String value)
 		throws PropertyConversionException, InvalidPropertyValueException
 	{
@@ -201,15 +213,21 @@ public class LocalNotificationObject {
 			switch (flag)
 			{
 				case MA_NOTIFICATION_FLAG_AUTO_CANCEL:
+					mNotification.flags |= Notification.FLAG_AUTO_CANCEL;
+					break;
 				case MA_NOTIFICATION_FLAG_HIGH_PRIORITY:
+					mNotification.flags |= Notification.FLAG_HIGH_PRIORITY;
+					break;
 				case MA_NOTIFICATION_FLAG_INSISTENT:
+					mNotification.flags |= Notification.FLAG_INSISTENT;
+					break;
 				case MA_NOTIFICATION_FLAG_NO_CLEAR:
-					mNotification.defaults |= flag;
-					mFlag = flag;
+					mNotification.flags |= Notification.FLAG_NO_CLEAR;
 					break;
 				default:
 					throw new InvalidPropertyValueException(name, value);
 			}
+			mFlag = flag;
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_DISPLAY_FLAG) )
 		{
