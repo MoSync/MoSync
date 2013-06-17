@@ -52,7 +52,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.ForEach(System.Windows.Media.Imaging.WriteableBitmap,System.Func{System.Int32,System.Int32,System.Windows.Media.Color})">
             <summary>
-            Applies the given function to all the pixels of the bitmap in 
+            Applies the given function to all the pixels of the bitmap in
             order to set their color.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -60,7 +60,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.ForEach(System.Windows.Media.Imaging.WriteableBitmap,System.Func{System.Int32,System.Int32,System.Windows.Media.Color,System.Windows.Media.Color})">
             <summary>
-            Applies the given function to all the pixels of the bitmap in 
+            Applies the given function to all the pixels of the bitmap in
             order to set their color.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -68,7 +68,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.GetPixeli(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32)">
             <summary>
-            Gets the color of the pixel at the x, y coordinate as integer.  
+            Gets the color of the pixel at the x, y coordinate as integer.
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -78,7 +78,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.GetPixel(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32)">
             <summary>
-            Gets the color of the pixel at the x, y coordinate as a Color struct.  
+            Gets the color of the pixel at the x, y coordinate as a Color struct.
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -97,7 +97,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixeli(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Byte,System.Byte,System.Byte)">
             <summary>
-            Sets the color of the pixel using a precalculated index (faster). 
+            Sets the color of the pixel using a precalculated index (faster).
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -108,7 +108,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixel(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Byte,System.Byte,System.Byte)">
             <summary>
-            Sets the color of the pixel. 
+            Sets the color of the pixel.
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -120,7 +120,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixeli(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Byte,System.Byte,System.Byte,System.Byte)">
             <summary>
-            Sets the color of the pixel including the alpha value and using a precalculated index (faster). 
+            Sets the color of the pixel including the alpha value and using a precalculated index (faster).
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -132,7 +132,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixel(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Byte,System.Byte,System.Byte,System.Byte)">
             <summary>
-            Sets the color of the pixel including the alpha value. 
+            Sets the color of the pixel including the alpha value.
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -145,7 +145,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixeli(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Windows.Media.Color)">
             <summary>
-            Sets the color of the pixel using a precalculated index (faster). 
+            Sets the color of the pixel using a precalculated index (faster).
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -154,7 +154,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixel(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Windows.Media.Color)">
             <summary>
-            Sets the color of the pixel. 
+            Sets the color of the pixel.
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -164,7 +164,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixeli(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Byte,System.Windows.Media.Color)">
             <summary>
-            Sets the color of the pixel using an extra alpha value and a precalculated index (faster). 
+            Sets the color of the pixel using an extra alpha value and a precalculated index (faster).
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -174,7 +174,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixel(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Byte,System.Windows.Media.Color)">
             <summary>
-            Sets the color of the pixel using an extra alpha value. 
+            Sets the color of the pixel using an extra alpha value.
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -185,7 +185,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixeli(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32)">
             <summary>
-            Sets the color of the pixel using a precalculated index (faster).  
+            Sets the color of the pixel using a precalculated index (faster).
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -194,7 +194,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.SetPixel(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Int32)">
             <summary>
-            Sets the color of the pixel. 
+            Sets the color of the pixel.
             For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -234,8 +234,8 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawBeziers(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Windows.Media.Color)">
             <summary>
-            Draws a series of cubic Beziér splines each defined by start, end and two control points. 
-            The ending point of the previous curve is used as starting point for the next. 
+            Draws a series of cubic Beziér splines each defined by start, end and two control points.
+            The ending point of the previous curve is used as starting point for the next.
             Therfore the inital curve needs four points and the subsequent 3 (2 control and 1 end point).
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -244,8 +244,8 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawBeziers(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Int32)">
             <summary>
-            Draws a series of cubic Beziér splines each defined by start, end and two control points. 
-            The ending point of the previous curve is used as starting point for the next. 
+            Draws a series of cubic Beziér splines each defined by start, end and two control points.
+            The ending point of the previous curve is used as starting point for the next.
             Therfore the inital curve needs four points and the subsequent 3 (2 control and 1 end point).
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -268,11 +268,11 @@
             <param name="color">The color.</param>
             <param name="pixels">The pixels array.</param>
             <param name="w">The width of the bitmap.</param>
-            <param name="h">The height of the bitmap.</param> 
+            <param name="h">The height of the bitmap.</param>
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawCurve(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Single,System.Windows.Media.Color)">
             <summary>
-            Draws a Cardinal spline (cubic) defined by a point collection. 
+            Draws a Cardinal spline (cubic) defined by a point collection.
             The cardinal spline passes through each point in the collection.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -282,7 +282,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawCurve(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Single,System.Int32)">
             <summary>
-            Draws a Cardinal spline (cubic) defined by a point collection. 
+            Draws a Cardinal spline (cubic) defined by a point collection.
             The cardinal spline passes through each point in the collection.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -292,7 +292,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawCurveClosed(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Single,System.Windows.Media.Color)">
             <summary>
-            Draws a closed Cardinal spline (cubic) defined by a point collection. 
+            Draws a closed Cardinal spline (cubic) defined by a point collection.
             The cardinal spline passes through each point in the collection.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -302,7 +302,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawCurveClosed(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Single,System.Int32)">
             <summary>
-            Draws a closed Cardinal spline (cubic) defined by a point collection. 
+            Draws a closed Cardinal spline (cubic) defined by a point collection.
             The cardinal spline passes through each point in the collection.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -452,7 +452,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawLine(System.Int32[],System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
-            Draws a colored line by connecting two points using an optimized DDA. 
+            Draws a colored line by connecting two points using an optimized DDA.
             Uses the pixels array and the width directly for best performance.
             </summary>
             <param name="pixels">An array containing the pixels as int RGBA value.</param>
@@ -562,7 +562,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawEllipse(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Int32,System.Int32,System.Windows.Media.Color)">
             <summary>
-            A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+            A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
             x2 has to be greater than x1 and y2 has to be greater than y1.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -574,7 +574,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawEllipse(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
-            A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+            A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
             x2 has to be greater than x1 and y2 has to be greater than y1.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -598,7 +598,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.DrawEllipseCentered(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
-            A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+            A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
             Uses a different parameter representation than DrawEllipse().
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -679,7 +679,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillEllipse(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Int32,System.Int32,System.Windows.Media.Color)">
             <summary>
-            A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+            A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
             x2 has to be greater than x1 and y2 has to be greater than y1.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -691,7 +691,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillEllipse(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
-            A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+            A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
             x2 has to be greater than x1 and y2 has to be greater than y1.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -703,7 +703,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillEllipseCentered(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Int32,System.Int32,System.Windows.Media.Color)">
             <summary>
-            A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+            A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
             Uses a different parameter representation than DrawEllipse().
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -715,7 +715,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillEllipseCentered(System.Windows.Media.Imaging.WriteableBitmap,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
-            A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+            A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
             Uses a different parameter representation than DrawEllipse().
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -812,12 +812,12 @@
             <param name="color">The color.</param>
             <param name="pixels">The pixels array.</param>
             <param name="w">The width of the bitmap.</param>
-            <param name="h">The height of the bitmap.</param> 
+            <param name="h">The height of the bitmap.</param>
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillBeziers(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Windows.Media.Color)">
             <summary>
-            Draws a series of filled, cubic Beziér splines each defined by start, end and two control points. 
-            The ending point of the previous curve is used as starting point for the next. 
+            Draws a series of filled, cubic Beziér splines each defined by start, end and two control points.
+            The ending point of the previous curve is used as starting point for the next.
             Therfore the inital curve needs four points and the subsequent 3 (2 control and 1 end point).
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -826,8 +826,8 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillBeziers(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Int32)">
             <summary>
-            Draws a series of filled, cubic Beziér splines each defined by start, end and two control points. 
-            The ending point of the previous curve is used as starting point for the next. 
+            Draws a series of filled, cubic Beziér splines each defined by start, end and two control points.
+            The ending point of the previous curve is used as starting point for the next.
             Therfore the inital curve needs four points and the subsequent 3 (2 control and 1 end point).
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -850,11 +850,11 @@
             <param name="color">The color.</param>
             <param name="pixels">The pixels array.</param>
             <param name="w">The width of the bitmap.</param>
-            <param name="h">The height of the bitmap.</param> 
+            <param name="h">The height of the bitmap.</param>
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillCurve(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Single,System.Windows.Media.Color)">
             <summary>
-            Draws a filled Cardinal spline (cubic) defined by a point collection. 
+            Draws a filled Cardinal spline (cubic) defined by a point collection.
             The cardinal spline passes through each point in the collection.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -864,7 +864,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillCurve(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Single,System.Int32)">
             <summary>
-            Draws a filled Cardinal spline (cubic) defined by a point collection. 
+            Draws a filled Cardinal spline (cubic) defined by a point collection.
             The cardinal spline passes through each point in the collection.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -874,7 +874,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillCurveClosed(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Single,System.Windows.Media.Color)">
             <summary>
-            Draws a filled, closed Cardinal spline (cubic) defined by a point collection. 
+            Draws a filled, closed Cardinal spline (cubic) defined by a point collection.
             The cardinal spline passes through each point in the collection.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -884,7 +884,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.FillCurveClosed(System.Windows.Media.Imaging.WriteableBitmap,System.Int32[],System.Single,System.Int32)">
             <summary>
-            Draws a filled, closed Cardinal spline (cubic) defined by a point collection. 
+            Draws a filled, closed Cardinal spline (cubic) defined by a point collection.
             The cardinal spline passes through each point in the collection.
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -945,7 +945,7 @@
         </member>
         <member name="M:System.Windows.Media.Imaging.WriteableBitmapExtensions.WriteTga(System.Windows.Media.Imaging.WriteableBitmap,System.IO.Stream)">
             <summary>
-            Writes the WriteableBitmap as a TGA image to a stream. 
+            Writes the WriteableBitmap as a TGA image to a stream.
             Used with permission from Nokola: http://nokola.com/blog/post/2010/01/21/Quick-and-Dirty-Output-of-WriteableBitmap-as-TGA-Image.aspx
             </summary>
             <param name="bmp">The WriteableBitmap.</param>
@@ -966,7 +966,7 @@
         </member>
         <member name="F:System.Windows.Media.Imaging.WriteableBitmapExtensions.BlendMode.Alpha">
             <summary>
-            Alpha blendiing uses the alpha channel to combine the source and destination. 
+            Alpha blendiing uses the alpha channel to combine the source and destination.
             </summary>
         </member>
         <member name="F:System.Windows.Media.Imaging.WriteableBitmapExtensions.BlendMode.Additive">

@@ -25,12 +25,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 #include "YAJLDom.h"
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <MAUtil/util.h>
 #include <MAUtil/Stack.h>
-#include "src/api/yajl_parse.h"
-#include "src/api/yajl_gen.h"
 #include <conprint.h>
 #include <MAP/MemoryMgr.h>
+#else
+#include "../MAUtil/util.h"
+#include "../MAUtil/Stack.h"
+#include "../MAStd/conprint.h"
+#include "../MAP/MemoryMgr.h"
+#endif
+
+#include "src/api/yajl_parse.h"
+#include "src/api/yajl_gen.h"
 
 using namespace MAPUtil;
 

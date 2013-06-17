@@ -44,6 +44,10 @@
 #include "PimSyscall.h"
 #include "helpers/cpp_ix_pim.h"
 
+#define VSV_ARGPTR_NAME argptr
+#define VSV_ARGPTR_DECL , va_list VSV_ARGPTR_NAME
+#define VSV_ARGPTR_USE , VSV_ARGPTR_NAME
+
 namespace Core {
 	class VMCore;
 }

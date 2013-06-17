@@ -66,7 +66,7 @@ public:
 	 * Constructor.
 	 * @deprecated
 	 */
-	MessageStream::MessageStream(
+	MessageStream(
 		NativeUI::WebView* webView,
 		MAHandle dataHandle);
 
@@ -119,7 +119,7 @@ protected:
 	/**
 	 * Read data and initialise the stream.
 	 */
-	void MessageStream::initialize(MAHandle dataHandle);
+	void initialize(MAHandle dataHandle);
 
 	/**
 	 * TODO: Add error handling.

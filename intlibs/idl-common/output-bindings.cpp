@@ -114,7 +114,8 @@ void lua_outputHeaderFile(
 		// We want to include NativeUI and OpenGL.
 		string s = ixs[i];
 		if (s == "IX_WIDGET" ||
-			s == "IX_OPENGL_ES")
+			s == "IX_OPENGL_ES" ||
+			s == "IX_OPENGL_ES_MA")
 		{
 			lua_streamHeaderFile(luaHeaderFile, maapi, i);
 		}

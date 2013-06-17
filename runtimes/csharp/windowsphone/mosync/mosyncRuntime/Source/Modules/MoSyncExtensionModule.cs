@@ -14,7 +14,11 @@ namespace MoSync
         void Init(Core core, Runtime runtime);
         String GetName();
 		uint GetHash();
+#if !LIB
 		long Invoke(MoSync.Core core, int index, int a, int b, int c);
+#else
+		long Invoke(MoSync.Core core, int index, int a, int b, int c, int args);
+#endif
     }
 
     public class ExtensionModule : ISyscallModule, IIoctlModule
@@ -66,19 +70,26 @@ namespace MoSync
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
-            syscalls.maExtensionFunctionInvoke = delegate(int extensionId, int a, int b, int c)
-            {
+#if !LIB
+			syscalls.maExtensionFunctionInvoke = delegate(int extensionId, int a, int b, int c)
+#else
+			syscalls.maExtensionFunctionInvoke = delegate(int extensionId, int a, int b, int c, int args)
+#endif
+			{
 				int _module = extensionId >> 8;
 				if (_module >= 0 && _module < mModules.Count)
 				{
 					IExtensionModule module = mModules[_module];
 					int function = extensionId & 0xff;
+#if !LIB
 					return module.Invoke(core, function, a, b, c);
+#else
+					return module.Invoke(core, function, a, b, c, args);
+#endif
 				}
-
 				return MoSync.Constants.MA_EXTENSION_FUNCTION_UNAVAILABLE;
-            };
-        }
+			};
+		}
 
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
 		{

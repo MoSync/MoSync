@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Comunication">
+      <UniqueIdentifier>{df36bd7a-6409-4a5a-acae-4df12801930b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Environment">
+      <UniqueIdentifier>{5330d3ed-c808-4e76-9c0f-5d94bbf631b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types">
+      <UniqueIdentifier>{ebaa11f4-701c-46eb-a3bb-ac23dfa26886}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types\kazlib">
+      <UniqueIdentifier>{10d810dc-4c7d-4064-946b-82710b01be60}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\BluetoothConnection.cpp">
+      <Filter>Comunication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BluetoothDiscovery.cpp">
+      <Filter>Comunication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BuffDownloader.cpp">
+      <Filter>Comunication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Connection.cpp">
+      <Filter>Comunication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Downloader.cpp">
+      <Filter>Comunication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server.cpp">
+      <Filter>Comunication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Environment.cpp">
+      <Filter>Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Moblet.cpp">
+      <Filter>Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Geometry.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HashMap.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RefCounted.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\String.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kazlib\dict.c">
+      <Filter>Types\kazlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kazlib\hash.c">
+      <Filter>Types\kazlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CharInput.cpp" />
+    <ClCompile Include="..\CharInputC.c" />
+    <ClCompile Include="..\FileLister.cpp" />
+    <ClCompile Include="..\FrameBuffer.c" />
+    <ClCompile Include="..\Graphics.c" />
+    <ClCompile Include="..\GraphicsOpenGL.c" />
+    <ClCompile Include="..\GraphicsSoftware.c" />
+    <ClCompile Include="..\PlaceholderPool.cpp" />
+    <ClCompile Include="..\util.cpp" />
+    <ClCompile Include="..\GLMoblet.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\BluetoothConnection.h">
+      <Filter>Comunication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\BluetoothDiscovery.h">
+      <Filter>Comunication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\BuffDownloader.h">
+      <Filter>Comunication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Connection.h">
+      <Filter>Comunication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Downloader.h">
+      <Filter>Comunication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mauuid.h">
+      <Filter>Comunication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server.h">
+      <Filter>Comunication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Environment.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ListenerSet.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Moblet.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\collection_common.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dictionary.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dictionary_impl.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Geometry.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\HashMap.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\HashMap_impl.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\List.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Map.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RefCounted.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Set.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\String.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Vector.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\kazlib\dict.h">
+      <Filter>Types\kazlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\kazlib\hash.h">
+      <Filter>Types\kazlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CharInput.h" />
+    <ClInclude Include="..\DataHandler.h" />
+    <ClInclude Include="..\FileLister.h" />
+    <ClInclude Include="..\FrameBuffer.h" />
+    <ClInclude Include="..\Graphics.h" />
+    <ClInclude Include="..\GraphicsOpenGL.h" />
+    <ClInclude Include="..\GraphicsSoftware.h" />
+    <ClInclude Include="..\PlaceholderPool.h" />
+    <ClInclude Include="..\util.h" />
+    <ClInclude Include="..\ErrorListenable.h" />
+    <ClInclude Include="..\GLMoblet.h" />
+    <ClInclude Include="..\HashDict.h" />
+    <ClInclude Include="..\HashDict_impl.h" />
+    <ClInclude Include="..\HashSet.h" />
+    <ClInclude Include="..\Stack.h" />
+    <ClInclude Include="..\Tokenizer.h" />
+  </ItemGroup>
+</Project>

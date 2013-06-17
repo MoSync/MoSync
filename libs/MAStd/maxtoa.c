@@ -31,7 +31,11 @@
 // SUCH DAMAGE.
 // 
 
+#ifndef __IOS__
 #include "maxtoa.h"
+#else
+#include <maxtoa.h>
+#endif
 
 void xtoa(unsigned long val, char *buf, unsigned radix, int negative)
 {
@@ -101,3 +105,53 @@ char *ultoa(unsigned long val, char *buf, int radix)
   return buf;
 }
 #endif	//_MSC_VER
+
+void xxtoa(unsigned long long val, char *buf, unsigned radix, int negative)
+{
+  char *p;
+  char *firstdig;
+  char temp;
+  unsigned digval;
+
+  p = buf;
+
+  if (negative)
+  {
+    // Negative, so output '-' and negate
+    *p++ = '-';
+    val = (unsigned long)(-(long) val);
+  }
+
+  // Save pointer to first digit
+  firstdig = p;
+
+  do
+  {
+    digval = (unsigned) (val % radix);
+    val /= radix;
+
+    // Convert to ascii and store
+    if (digval > 9)
+      *p++ = (char) (digval - 10 + 'a');
+    else
+      *p++ = (char) (digval + '0');
+  } while (val > 0);
+
+  // We now have the digit of the number in the buffer, but in reverse
+  // order.  Thus we reverse them now.
+
+  *p-- = '\0';
+  do
+  {
+    temp = *p;
+    *p = *firstdig;
+    *firstdig = temp;
+    p--;
+    firstdig++;
+  } while (firstdig < p);
+}
+
+char *lltoa(long long val, char *buf, int radix) {
+  xxtoa(val, buf, radix, (radix == 10 && val < 0));
+  return buf;
+}

@@ -19,7 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sstream>
 //#include <direct.h>
 #include <iomanip>
-#include <string.h>
 
 #include <filelist/filelist.h>
 #include <helpers/types.h>
@@ -252,7 +251,7 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 
 		if(!syscall && f.returnType != "noreturn")
 			stream <<
-				"#if defined(__arm__) && !defined(MAPIP)\n"
+				"#if defined(__arm__) && !defined(MAPIP) && !defined(MOSYNC_NATIVE)\n"
 				"inline\n"
 				"#endif\n";
 		if(syscall)
@@ -533,7 +532,12 @@ static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int
 		"typedef wchar wchar_t;\n"
 		"#endif	//__cplusplus\n"
 		"#else	//MAPIP\n"
+		"#if defined(MOSYNC_NATIVE)\n"
+		"#include <stddef.h>\n"
+		"typedef wchar_t wchar;\n"
+		"#else\n"
 		"typedef unsigned short wchar;\n"
+		"#endif // MOSYNC_NATIVE\n"
 		"#endif	//MAPIP\n"
 		"#endif	//_WCHAR_DEFINED\n"
 		"\n"
@@ -589,14 +593,12 @@ static void streamIoctlInputParam(ostream& stream, int k, bool java) {
 	if(k < 3) {
 		stream << (char)('a'+k);
 	} else {
-		if(java)
+		if (!java) {
+			stream << "ARG_NO_" << (k + 1);
+		} else {
 			stream << "mCore.";
-		else
-			stream << "SYSCALL_THIS->";
-		stream << "GetValidatedStackValue(" << ((k-3)<<2);
-		if(!java)
-			stream << " VSV_ARGPTR_USE";
-		stream << ")";
+			stream << "GetValidatedStackValue(" << ((k-3)<<2) << ")";
+		}
 	}
 }
 
@@ -754,6 +756,12 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 		streamCaselist(stream, ioctl, headerName, ix, false);
 		streamCaselist(stream, ioctl, headerName, ix, true);
 
+		for (int k = 3; !java && k < 10; k++) {
+			int argNo = k + 1;
+			stream << "#undef ARG_NO_" << argNo << "\n";
+			stream << "#define ARG_NO_" << argNo << " ";
+			stream << "SYSCALL_THIS->GetValidatedStackValue(" << ((k-3)<<2) << " VSV_ARGPTR_USE)\n";
+		}
 		for(size_t j=0; j<ioctl.functions.size(); j++) {
 			const IoctlFunction& f(ioctl.functions[j]);
 			if(f.ix != ix)
@@ -1078,11 +1086,27 @@ void outputCSharpSyscallNativeArg(ostream& maapiFile, int i, const string& coreO
 	}
 }
 
+void outputCSharpSyscallNativeArgWP8(ostream& maapiFile, int i, const string& coreObject) {
+	if(i < 4) {
+		maapiFile << "i" << i;
+	} else {
+		maapiFile << coreObject << "ExtractArgs( args, " << ((i-4)<<2) << ")";
+	}
+}
+
 void outputCSharpIoctlArg(ostream& maapiFile, int i, const std::string& coreObject) {
 	if(i < 3) {
 		maapiFile << (char)('a'+i);
 	} else {
 		maapiFile << coreObject << "GetStackValue(" << ((i-3)<<2) << ")";
+	}
+}
+
+void outputCSharpIoctlArgWP8(ostream& maapiFile, int i, const std::string& coreObject) {
+	if(i < 3) {
+		maapiFile << (char)('a'+i);
+	} else {
+		maapiFile << coreObject << "ExtractArgs( args, " << ((i-3)<<2) << ")";
 	}
 }
 
@@ -1130,6 +1154,30 @@ void outputCSharpIoctlArgTyped(ostream& maapiFile, int& argindex, const Argument
 		maapiFile << ")";
 	} else {
 		outputCSharpIoctlArg(maapiFile, argindex, coreObject);
+		argindex++;
+	}
+}
+
+void outputCSharpIoctlArgTypedWP8(ostream& maapiFile, int& argindex, const Argument& a,
+	const Interface& maapi, const std::string& coreObject)
+{
+	std::string argType = getCSharpType(maapi, a.type, a.in);
+	if(argType == "double") {
+		maapiFile << "MoSync.Util.ConvertToDouble(";
+		outputCSharpIoctlArgWP8(maapiFile, argindex, coreObject);
+		maapiFile << ", ";
+		argindex++;
+		outputCSharpIoctlArgWP8(maapiFile, argindex, coreObject);
+		argindex++;
+		maapiFile << ")";
+	}
+	else if(argType == "float") {
+		maapiFile << "MoSync.Util.ConvertToFloat(";
+		outputCSharpIoctlArgWP8(maapiFile, argindex, coreObject);
+		argindex++;
+		maapiFile << ")";
+	} else {
+		outputCSharpIoctlArgWP8(maapiFile, argindex, coreObject);
 		argindex++;
 	}
 }
@@ -1321,8 +1369,224 @@ void streamCSharpFunctionDelegates(ostream& maapiFile, const Interface& maapi)
 			std::string argType = getCSharpType(maapi, a.type, a.in);
 			maapiFile << argType << " _" << a.name;
 		}
+
 		maapiFile << ");\n";
 		maapiFile << "\tpublic Delegate_" << f.name << " " << f.name << " = null;\n";
+	}
+}
+
+void streamCSharpFunctionDelegatesWP8(ostream& maapiFile, const Interface& maapi)
+{
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		//maapiFile << "\t\tcase " << f.number << ":\n";
+
+		maapiFile << "\tpublic MosyncLibrary.Delegate_" << f.name << " " << f.name << " = null;\n";
+	}
+}
+
+void streamManagedCppDelegatesWP8(ostream& gluecodeFile, const Interface& maapi)
+{
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		//gluecodeFile << "\t\tcase " << f.number << ":\n";
+
+		std::string returnType;
+
+		if(f.returnType.compare("longlong") == 0)
+		{
+			returnType.assign("longlong");
+		}
+		else
+			returnType = getCSharpType(maapi, f.returnType, true);
+
+
+		gluecodeFile << "\tpublic delegate " << returnType << " Delegate_" << f.name << "(";
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			if(k != 0)
+				gluecodeFile << ", ";
+
+			std::string argType = getCSharpType(maapi, a.type, a.in);
+			gluecodeFile << argType << " _" << a.name;
+		}
+
+		if(f.name.compare("maIOCtl") == 0 || f.name.compare("maExtensionFunctionInvoke")  == 0)
+		{
+			gluecodeFile << ", int _args";
+		}
+
+		gluecodeFile  << ");\n";
+	}
+}
+
+void streamManagedCppDelegateInstancesWP8(ostream& gluecodeFile, const Interface& maapi)
+{
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		gluecodeFile << "\tstatic Delegate_" << f.name << "^ _" << f.name << " = nullptr;\n";
+	}
+}
+
+void streamManagedCppDelegatesSettersWP8(ostream& gluecodeFile, const Interface& maapi)
+{
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		gluecodeFile << "\t\tstatic void Set_" << f.name << "(" << "Delegate_" << f.name << "^ del);\n";
+	}
+}
+
+void streamManagedCppDelegatesSettersImplWP8(ostream& gluecodeFile, const Interface& maapi)
+{
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		gluecodeFile << "void WindowsPhoneRuntimeComponent::Set_" << f.name << "(" << "Delegate_" << f.name << "^ del)";
+		gluecodeFile << "\n{\n" << "\tMosyncLibrary::_" << f.name << " = del;\n}\n\n";
+	}
+}
+
+void streamManagedCppSyscallImplWP8(ostream& gluecodeFile, const Interface& maapi)
+{
+	bool noReturn, maIoctlEllipsis;
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		noReturn = false;
+		maIoctlEllipsis = false;
+
+		std::string returnType = cType(maapi, f.returnType);
+
+		//gluecodeFile << "\t\tcase " << f.number << ":\n";
+
+		gluecodeFile << returnType << " " << f.name << "(";
+
+		if(returnType.compare("void") == 0)
+		{
+			noReturn = true;
+		}
+
+		for(size_t k=0; k < f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			if(k != 0)
+				gluecodeFile << ", ";
+
+			//std::string argType = getCSharpType(maapi, a.type, a.in);
+			if(a.in && isPointerType(maapi, a.type))
+			{
+				gluecodeFile << "const ";
+			}
+
+			gluecodeFile << cType(maapi, a.type);
+			gluecodeFile << " _" << a.name;
+		}
+
+		//For maIOCtl and maExtensionFunctionInvoke we have additional arguments
+		//If  new syscalls like these ones are added this code needs to be update
+		if(f.name.compare("maIOCtl") == 0 || f.name.compare("maExtensionFunctionInvoke") == 0)
+		{
+			gluecodeFile  << " MA_IOCTL_ELLIPSIS)\n";
+			maIoctlEllipsis = true;
+		}
+		else gluecodeFile  << ")\n";
+
+		//function body
+		gluecodeFile << "{\n";
+
+		if(noReturn)
+		{
+			gluecodeFile << "\tif(nullptr != MosyncLibrary::_" << f.name << ")\n";
+			gluecodeFile << "\t{\n";
+
+			if(maIoctlEllipsis)
+			{
+				gluecodeFile << "\t\tva_list args;\n";
+				const Argument& a(f.args[f.args.size() - 1]);
+				gluecodeFile << "\t\tva_start(args, _" << a.name << ");\n";
+			}
+
+			gluecodeFile << "\t\t MosyncLibrary::_" << f.name << "(";
+
+			for(size_t k = 0; k < f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			if(k != 0)
+				gluecodeFile << ", ";
+
+				//std::string argType = getCSharpType(maapi, a.type, a.in);
+				if(a.type.compare("int") != 0)
+					gluecodeFile << "(int)_" << a.name;
+				else gluecodeFile << "_" << a.name;
+			}
+
+			gluecodeFile << ");\n";
+
+			if(maIoctlEllipsis)
+			{
+				gluecodeFile << "\t\tva_end(args);\n";
+			}
+			gluecodeFile << "\t}\n";
+		}
+		else
+		{
+			gluecodeFile << "\tif(nullptr != MosyncLibrary::_" << f.name << ")\n";
+			gluecodeFile << "\t{\n";
+
+			if(maIoctlEllipsis)
+			{
+				gluecodeFile << "\t\tva_list args;\n";
+				gluecodeFile << "\t\tint returnVal = 0;\n";
+				const Argument& a(f.args[f.args.size() - 1]);
+				gluecodeFile << "\t\tva_start(args, _" << a.name << ");\n";
+			}
+
+			if(returnType.find("*") != std::string::npos)
+				gluecodeFile << "\t\treturn (" << returnType << ") MosyncLibrary::_" << f.name << "(";
+			else
+				gluecodeFile << "\t\treturn MosyncLibrary::_" << f.name << "(";
+
+			for(size_t k = 0; k < f.args.size(); k++)
+			{
+				const Argument& a(f.args[k]);
+				if(k != 0)
+					gluecodeFile << ", ";
+
+					//std::string argType = getCSharpType(maapi, a.type, a.in);
+					if(cType(maapi, a.type).compare("int") != 0 &&
+					   cType(maapi, a.type).compare("float") != 0 &&
+					   cType(maapi, a.type).compare("double") != 0)
+						gluecodeFile << "(int)_" << a.name;
+					else gluecodeFile << "_" << a.name;
+			}
+
+			if(maIoctlEllipsis)
+			{
+				gluecodeFile << ", (int)args);\n";
+				gluecodeFile << "\t\tva_end(args);\n\n";
+				gluecodeFile << "\t\treturn returnVal;\n";
+			}
+			else gluecodeFile << ");\n";
+
+			gluecodeFile << "\t}\n";
+			if(returnType.find("*") != std::string::npos)
+				gluecodeFile << "\telse return NULL;\n";
+			else gluecodeFile << "\telse return IOCTL_UNAVAILABLE;\n";
+		}
+
+		gluecodeFile << "}\n\n";
+	}
+}
+
+void streamCSharpMachinePartialCodeWP8(ostream& gluecodeFile, const Interface& maapi)
+{
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		gluecodeFile << "\t\t\tMosyncLibrary.WindowsPhoneRuntimeComponent.Set_" << f.name << "(";
+		gluecodeFile << "mosyncMachine.GetRuntime().GetSyscalls()." << f.name << ");\n";
 	}
 }
 

@@ -434,7 +434,7 @@ SYSCALL(MAExtensionFunction, maExtensionFunctionLoad(MAHandle module, int index)
     return MA_EXTENSION_FUNCTION_UNAVAILABLE;
 }
 
-SYSCALL(longlong, maExtensionFunctionInvoke(int, int, int, int))
+SYSCALL(longlong, maExtensionFunctionInvoke(int, int, int, int MA_IOCTL_ELLIPSIS))
 {
     BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }

@@ -16,34 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "IOCtl.h"
-
 #include <helpers/cpp_defs.h>
-
-/**
- * Custom Wide Char String length calculation function.
- * Exists because the android NDK does not support wchars.
- *
- * @param s		input multi-byte string
- *
- * @return		length of the input string
- *
- * TODO: Use a build in function instead if this one.
- * This function is written in a non-readable way,
- * improved it a little bit by changing a variable name.
- */
-inline size_t wideCharStringLength(const wchar * s)
-{
-	const wchar *current;
-	if (s == 0)
-	{
-		return 0;
-	}
-	for (current = s; *current; ++current);
-	return current - s;
-}
 
 namespace Base
 {
+
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info)
 	{
 		int size = maGetScrSize();
@@ -479,8 +456,8 @@ namespace Base
 	{
 
 		// Initialization.
-		jstring jstrTITLE = jNIEnv->NewString((jchar*)title, wideCharStringLength(title));
-		jstring jstrINTEXT = jNIEnv->NewString((jchar*)inText, wideCharStringLength(inText));
+		jstring jstrTITLE = WCHAR_TO_JCHAR(jNIEnv, title);
+		jstring jstrINTEXT = WCHAR_TO_JCHAR(jNIEnv, inText);
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
@@ -615,9 +592,9 @@ namespace Base
 	{
 		Base::gSyscall->VM_Yield();
 
-		jstring jstrTitle = jNIEnv->NewString((jchar*)title, wideCharStringLength(title));
-		jstring jstrText = jNIEnv->NewString((jchar*)destructiveText, wideCharStringLength(destructiveText));
-		jstring jstrCancelText = jNIEnv->NewString((jchar*)cancelText, wideCharStringLength(cancelText));
+		jstring jstrTitle = WCHAR_TO_JCHAR(jNIEnv, title);
+		jstring jstrText = WCHAR_TO_JCHAR(jNIEnv, destructiveText);
+		jstring jstrCancelText = WCHAR_TO_JCHAR(jNIEnv, cancelText);
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
@@ -2753,6 +2730,41 @@ namespace Base
 		return (int)result;
 	}
 
+	MAExtensionModule _maExtensionModuleLoad(JNIEnv* jNIEnv, jobject jThis, const char* name, int hash)
+	{
+		jstring jname = jNIEnv->NewStringUTF(name);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maExtensionModuleLoad", "(Ljava/lang/String;I)I");
+		if (methodID == 0) return 0;
+		int retVal = jNIEnv->CallIntMethod(jThis, methodID, jname, hash);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jname);
+
+		return retVal;
+	}
+
+	MAExtensionFunction _maExtensionFunctionLoad(JNIEnv* jNIEnv, jobject jThis, MAHandle module, int index)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maExtensionFunctionLoad", "(II)I");
+		if (methodID == 0) return 0;
+		int retVal = jNIEnv->CallIntMethod(jThis, methodID, module, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return retVal;
+	}
+
+	int _maExtensionFunctionInvoke2(JNIEnv* jNIEnv, jobject jThis, MAExtensionFunction fn, int numargs, int ptrs, int memStart) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maExtensionFunctionInvoke", "(III)I");
+		if (methodID == 0) return 0;
+		jint retVal = jNIEnv->CallIntMethod(jThis, methodID, fn, ptrs, memStart);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return retVal;
+	}
 
 	int _maNFCStart(JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);

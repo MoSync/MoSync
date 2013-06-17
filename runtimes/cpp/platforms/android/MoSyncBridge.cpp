@@ -25,12 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <unistd.h>
 
-#include <android/log.h>
-
-// Comment/comment out to turn on/off logging.
-// TODO: Move this to a header file to support common logging for all files.
-//#define SYSLOG(m) __android_log_write(ANDROID_LOG_INFO, "MoSync JNI", m)
-#define SYSLOG(...)
+#include "syslog.h"
 
 /*
 // This is how you trap exeptions from the Java side.
@@ -83,7 +78,8 @@ static jboolean nativeLoad(
 	jobject program,
 	jlong programOffset,
 	jobject resource,
-	jlong resourceOffset)
+	jlong resourceOffset,
+	jboolean isNative)
 {
 	SYSLOG("load program and resource");
 
@@ -166,11 +162,15 @@ static jboolean nativeLoad(
 
 	gCore->mJniEnv = env;
 	gCore->mJThis = jthis;
-	Base::gSyscall->setJNIEnvironment(env, jthis);
+	// Updated, ICS made changes in how local and global references are handled.
+	// This global is not deleted since it's used for the entire life cycle of the app.
+	// Note: never deleted, create nativeInit and nativeDispose. Plus create MoSyncNativeBridge
+	jobject gloablRefJThis = env->NewGlobalRef(jthis);
+	Base::gSyscall->setJNIEnvironment(env, gloablRefJThis);
 
 	SYSLOG("MoSyncBridge.cpp: nativeLoad: Calling Core::LoadVMApp");
 
-	return Core::LoadVMApp(gCore, prgFd, resFd);
+	return Core::LoadVMApp(gCore, prgFd, resFd, (bool) isNative);
 }
 
 /**
@@ -249,6 +249,27 @@ static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 	// do the thing
 
 	return gCore->mem_ds_jobject;
+}
+
+#include <dlfcn.h>
+
+typedef void (*MainFunction) ();
+
+static void nativeRun2(JNIEnv* env, jobject jthis, jstring jLibpath, jstring jMainFn) {
+	const char* libpath = env->GetStringUTFChars(jLibpath, NULL);
+	const char* mainFn = env->GetStringUTFChars(jMainFn, NULL);
+	MainFunction my_function;
+    void* handle = dlopen(libpath, RTLD_LAZY);
+    *(void**)(&my_function) = dlsym(handle, mainFn);
+    SYSLOG("Invoking %s for library %s", mainFn, libpath);
+    env->ReleaseStringUTFChars(jLibpath, libpath);
+    env->ReleaseStringUTFChars(jMainFn, mainFn);
+    if (my_function) {
+        // Execute!
+        (void) my_function();
+    } else {
+        maPanic(1, "Missing entry function!");
+    }
 }
 
 /**
@@ -704,6 +725,11 @@ static void nativeExit( JNIEnv* env, jobject jthis )
 	return;
 }
 
+static jobject nativeGetMemorySlice(JNIEnv* env, jobject jthis, int addr, int size) {
+	jobject buffer = (jobject)env->NewDirectByteBuffer((void*) addr, (jlong) size);
+	return buffer;
+}
+
 /**
 * @brief jniRegisterNativeMethods
 */
@@ -737,16 +763,18 @@ int jniRegisterNativeMethods(
 
 // NOTE: Remember to update sNumJavaMethods when adding/removing
 // native methods!
-static jint sNumJavaMethods = 10;
+static jint sNumJavaMethods = 12;
 static JNINativeMethod sMethods[] =
 {
 	// name, signature, funcPtr
 	{ "nativeInitRuntime", "()Z", (void*)nativeInitRuntime },
-	{ "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;J)Z", (void*)nativeLoad },
+	{ "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;JZ)Z", (void*)nativeLoad },
 	{ "nativeLoadResource", "(Ljava/io/FileDescriptor;JII)Z", (void*)nativeLoadResource },
 	//{ "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource },
 	{ "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined },
 	{ "nativeRun", "()V", (void*)nativeRun },
+	{ "nativeGetMemorySlice", "(II)Ljava/nio/ByteBuffer;", (void*)nativeGetMemorySlice },
+	{ "nativeRun2", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)nativeRun2 },
 	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },
 	{ "nativeGetEventQueueSize", "()I", (void*)nativeGetEventQueueSize },
 	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource },

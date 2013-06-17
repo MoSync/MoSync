@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 #include <mavsprintf.h>
 #include "RenderText.h"
-#include "graph.h"
+#include "Graph.h"
 #include "GFont.h"
 #include <GLES2/gl2.h>
 #include <glm/glm.hpp>

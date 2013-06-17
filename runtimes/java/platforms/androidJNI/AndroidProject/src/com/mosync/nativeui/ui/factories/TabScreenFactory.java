@@ -77,7 +77,7 @@ public class TabScreenFactory implements AbstractViewFactory
         tabRootView.setOrientation( LinearLayout.VERTICAL );
         tabRootView.setLayoutParams(
         		new ViewGroup.LayoutParams(
-        				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT ) );
+						LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT ) );
 
 		tabRootView.addView( createTabWidget( activity ) );
 		tabRootView.addView( createTabContent( activity ) );
@@ -117,7 +117,7 @@ public class TabScreenFactory implements AbstractViewFactory
         tabWidget.setId( android.R.id.tabs );
         LinearLayout.LayoutParams tabWidgetParams =
 			new LinearLayout.LayoutParams(
-        				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT );
+					LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT );
         tabWidgetParams.weight = 0;
         tabWidget.setLayoutParams( tabWidgetParams );
 

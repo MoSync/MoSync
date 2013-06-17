@@ -37,9 +37,9 @@ MA 02110-1301, USA.
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
-#include <hash_map>
 #include <GLES2/gl2.h>
 #include "IFont.h"
+#include "Utils.h"
 
 class ParseBMFont;
 struct BMChar;

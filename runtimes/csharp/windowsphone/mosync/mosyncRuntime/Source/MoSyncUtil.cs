@@ -146,8 +146,8 @@ namespace MoSync
 				if (eol > pos)
 				{
 					len = eol - pos;
-					if (eol + 1 < text.Length && Char.IsControl(text[eol]))
-						len -= 1;
+                    if (eol + 1 < text.Length && Char.IsControl(text[eol]))
+                        len -= 1;
 				}
 				else
 				{

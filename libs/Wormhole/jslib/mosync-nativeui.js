@@ -280,7 +280,6 @@ mosync.nativeui.maWidgetModalDialogHide = function(dialogID, successCallback,
 /**
  * Pushes a screen to the given screen stack, hides the current screen and shows
  * the pushed screen. Pushing it to the stack will make it automatically go
- 
  * back to the previous screen when popped.
  *
  * @param stackScreenID

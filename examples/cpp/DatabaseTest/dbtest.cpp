@@ -344,5 +344,3 @@ void DBTest::shouldhold(bool condition, MAUtil::String errorMessage, MAUtil::Str
 	}
 	//else printf(succesMessage.c_str());
 }
-
-

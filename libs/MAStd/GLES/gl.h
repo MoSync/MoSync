@@ -5,6 +5,11 @@
 
 #include <ma.h>
 #include <maapi_defs.h>
+#include <IX_OPENGL_ES_MA.h>
+#ifdef NATIVE_GLES
+#undef __gl_h_
+#include <GLES/gl_native.h>
+#else
 #include <IX_OPENGL_ES.h>
 #include <IX_GL1.h>
 #define GL_API
@@ -777,6 +782,8 @@ GL_API void GL_APIENTRY glPointSizePointerOES (GLenum type, GLsizei stride, cons
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif /* __gl_h_ */

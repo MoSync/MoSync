@@ -1,12 +1,6 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_EMPTY;
@@ -15,11 +9,16 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_BIRTHDAY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_DATE;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 
-public class PIMFieldBirthday extends PIMField {
+public class PIMFieldBirthday extends PIMIntegerField {
 
 	/**
 	 * Constructor
@@ -128,33 +127,6 @@ public class PIMFieldBirthday extends PIMField {
 	 */
 	boolean hasCustomLabel(int index) {
 		return false;
-	}
-
-	char[] getData(int index) {
-		String val = getSpecificData(index);
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeInt(Integer.parseInt(val), buffer, 0);
-		return buffer;
-	}
-
-	String getSpecificData(int index) {
-		String[] val = mValues.get(index);
-		return val[1];
-	}
-
-	int getDataSize(String val) {
-		return (Integer.SIZE / 8);
-	}
-
-	void setData(int index, char[] buffer) {
-		String val = Integer.toString(PIMUtil.readInt(buffer, 0));
-		setSpecificData(val, index);
-	}
-
-	void setSpecificData(String data, int index) {
-		String[] val = mValues.get(index);
-		val[1] = data;
-		mValues.set(index, val);
 	}
 
 	void postProcessData() {

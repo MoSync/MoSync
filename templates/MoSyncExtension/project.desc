@@ -1,0 +1,9 @@
+id = extension
+type = ext
+name = Extension
+description = A template for multiplatform extensions for MoSync
+
+[Files]
+extension.idl -> %project-name%.idl
+
+[Settings]
