@@ -379,6 +379,10 @@ public class LocalNotificationsManager
 	 */
 	void setActive(int handle)
 	{
-		m_NotificationTable.get(handle).setActive(true);
+		LocalNotificationObject obj = m_NotificationTable.get(handle);
+		if (obj != null)
+		{
+			obj.setActive(true);
+		}
 	}
 }
