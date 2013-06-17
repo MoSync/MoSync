@@ -44,7 +44,10 @@ void MainScreen::keyPressEvent(int keyCode, int nativeCode)
 	}
 }
 
-void MainScreen::listViewItemClicked(NativeUI::ListView* listView, NativeUI::ListViewItem* listViewItem)
+void MainScreen::listViewItemClicked(
+	NativeUI::ListView *listView,
+	NativeUI::ListViewSection *listViewSection,
+	NativeUI::ListViewItem *listViewItem)
 {
 	ListItem *item = (ListItem*)listViewItem;
 	item->doClick();

@@ -28,6 +28,11 @@
  */
 #define DEFAULT_DELETE_BUTTON_TITLE "Delete";
 
+/**
+ * For default list views MAW_RES_INVALID_INDEX should be set to listSectionIndex event member.
+ */
+#define SECTION_INDEX(section) (self.type == ListViewTypeDefault) ? MAW_RES_INVALID_INDEX : section;
+
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
@@ -434,35 +439,54 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	MAEvent event;
-	event.type = EVENT_TYPE_WIDGET;
-	MAWidgetEventData *eventData = new MAWidgetEventData;
+	// Used only for Segmented list views.
+    int widgetEventTypeSegmented;
+	// Used for all list views.
+	int widgetEventTypeDefault;
 
-
-    int widgetEventType = MAW_RES_ERROR;
     switch (editingStyle)
     {
         case UITableViewCellEditingStyleInsert:
-            widgetEventType = MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN;
+            widgetEventTypeSegmented = MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN;
+			widgetEventTypeDefault = MAW_EVENT_LIST_ITEM_INSERT_BTN;
             break;
         case UITableViewCellEditingStyleDelete:
-            widgetEventType = MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN;
+            widgetEventTypeSegmented = MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN;
+			widgetEventTypeDefault = MAW_EVENT_LIST_ITEM_DELETE_BTN;
             break;
         default:
-            widgetEventType = MAW_RES_ERROR;
+            widgetEventTypeSegmented = MAW_RES_ERROR;
+			widgetEventTypeDefault = MAW_RES_ERROR;
             break;
     }
 
-    if (widgetEventType != MAW_RES_ERROR)
+	// deprecated in MoSync 3.3
+    if (widgetEventTypeSegmented != MAW_RES_ERROR)
     {
-        eventData->eventType = widgetEventType;
-        eventData->sectionIndex = indexPath.section;
+		MAEvent event;
+		event.type = EVENT_TYPE_WIDGET;
+		MAWidgetEventData *eventData = new MAWidgetEventData;
+        eventData->eventType = widgetEventTypeSegmented;
         eventData->sectionItemIndex = indexPath.row;
-
+        eventData->sectionIndex = indexPath.section;
         eventData->widgetHandle = self.handle;
         event.data = (int)eventData;
         Base::gEventQueue.put(event);
     }
+
+	// new event
+	if (widgetEventTypeDefault != MAW_RES_ERROR)
+	{
+		MAEvent event;
+		event.type = EVENT_TYPE_WIDGET;
+		MAWidgetEventData *eventData = new MAWidgetEventData;
+        eventData->eventType = widgetEventTypeDefault;
+        eventData->listItemIndex = indexPath.row;
+        eventData->listSectionIndex = SECTION_INDEX(indexPath.section);
+        eventData->widgetHandle = self.handle;
+        event.data = (int)eventData;
+        Base::gEventQueue.put(event);
+	}
 }
 
 #pragma mark UITableViewDelegate
@@ -497,10 +521,10 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_ITEM_WILL_SELECT;
 	eventData->widgetHandle = self.handle;
-	eventData->listItemIndex = [indexPath row];
+	eventData->listItemIndex = indexPath.row;
+	eventData->listSectionIndex = SECTION_INDEX(indexPath.section);
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
-
     return indexPath;
 }
 
@@ -511,22 +535,27 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
  */
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	MAEvent event;
-	event.type = EVENT_TYPE_WIDGET;
-	MAWidgetEventData *eventData = new MAWidgetEventData;
-
-    if (_type == ListViewTypeDefault)
+	// deprecated in MoSync 3.3
+    if (self.type != ListViewTypeDefault)
     {
-        eventData->eventType = MAW_EVENT_ITEM_CLICKED;
-        eventData->listItemIndex = [indexPath row];
-    }
-    else
-    {
+		MAEvent event;
+		event.type = EVENT_TYPE_WIDGET;
+		MAWidgetEventData *eventData = new MAWidgetEventData;
         eventData->eventType = MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED;
         eventData->sectionIndex = indexPath.section;
         eventData->sectionItemIndex = indexPath.row;
+		eventData->widgetHandle = self.handle;
+		event.data = (int)eventData;
+		Base::gEventQueue.put(event);
     }
 
+	// this event should be used instead
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_ITEM_CLICKED;
+	eventData->listItemIndex = indexPath.row;
+	eventData->listSectionIndex = SECTION_INDEX(indexPath.section);
 	eventData->widgetHandle = self.handle;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);

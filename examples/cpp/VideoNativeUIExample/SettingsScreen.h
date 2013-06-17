@@ -80,14 +80,17 @@ private:
 	 */
 	void createMainLayout();
 
-    /** from ListViewListener
-     * This method is called when a list view item is clicked.
-     * @param listView The list view object that generated the event.
-     * @param listViewItem The ListViewItem object that was clicked.
-     */
-    virtual void listViewItemClicked(
-        ListView* listView,
-        ListViewItem* listViewItem);
+	/**
+	 * This method is called when a list view item is clicked.
+	 * @param listView The list view object that generated the event.
+	 * @param listViewSection The section object that contains the selected item.
+	 * Will be null for default type list views.
+	 * @param listViewItem The item object that was clicked.
+	 */
+	virtual void listViewItemClicked(
+		ListView *listView,
+		ListViewSection *listViewSection,
+		ListViewItem *listViewItem);
 
     /** from CheckBoxListener
      * This method is called when the state of the check box was changed

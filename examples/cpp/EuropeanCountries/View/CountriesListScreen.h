@@ -65,26 +65,16 @@ namespace EuropeanCountries
 		virtual ~CountriesListScreen();
 
 		/**
-		 * This method is called when an alphabetical list view item is clicked.
-		 * From ListViewListener.
-		 * @param listView The list view object that generated the event.
-		 * @param listViewSection The ListViewSection object that contains the selected item.
-		 * @param listViewItem The ListViewItem objet clicked.
-		 */
-		virtual void segmentedListViewItemClicked(
-			NativeUI::ListView* listView,
-			NativeUI::ListViewSection* listViewSection,
-			NativeUI::ListViewItem* listViewItem);
-
-		/**
 		 * This method is called when a list view item is clicked.
-		 * From ListViewListener.
 		 * @param listView The list view object that generated the event.
-		 * @param listViewItem The ListViewItem object that was clicked.
+		 * @param listViewSection The section object that contains the selected item.
+		 * Will be null for default type list views.
+		 * @param listViewItem The item object that was clicked.
 		 */
 		virtual void listViewItemClicked(
-			NativeUI::ListView* listView,
-			NativeUI::ListViewItem* listViewItem) {};
+			NativeUI::ListView *listView,
+			NativeUI::ListViewSection *listViewSection,
+			NativeUI::ListViewItem *listViewItem);
 
 		/**
 		 * Show a screen. Only one screen at a time is visible.
