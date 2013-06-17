@@ -41,7 +41,10 @@ public:
 	 */
 	virtual void keyPressEvent(int keyCode, int nativeCode);
 
-	virtual void listViewItemClicked(NativeUI::ListView* listView, NativeUI::ListViewItem* listViewItem);
+	virtual void listViewItemClicked(
+		NativeUI::ListView *listView,
+		NativeUI::ListViewSection *listViewSection,
+		NativeUI::ListViewItem *listViewItem);
 
 	virtual void buttonClicked(Widget* button);
 

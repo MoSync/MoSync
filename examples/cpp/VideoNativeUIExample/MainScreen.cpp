@@ -65,10 +65,14 @@ MainScreen::~MainScreen()
 /**
  * This method is called when a list view item is clicked.
  * @param listView The list view object that generated the event.
- * @param listViewItem The ListViewItem object that was clicked.
+ * @param listViewSection The section object that contains the selected item.
+ * Will be null for default type list views.
+ * @param listViewItem The item object that was clicked.
  */
 void MainScreen::listViewItemClicked(
-	ListView* listView, ListViewItem* listViewItem)
+	ListView *listView,
+	ListViewSection *listViewSection,
+	ListViewItem *listViewItem)
 {
 	if ( listView == mSettingsScreen->getSettingsListView()
 		&&

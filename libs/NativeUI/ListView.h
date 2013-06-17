@@ -257,16 +257,29 @@ namespace NativeUI
 		ListViewStyle getListViewStyleEnum(int listStyle);
 
 		/**
+		 * Notify listeners when receiving #MAW_EVENT_ITEM_CLICKED.
+		 * @param widgetEventData Event's data.
+		 */
+		void notifyListenersItemClicked(const MAWidgetEventData& widgetEventData);
+
+		/**
+		 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED.
+		 * @deprecated
+		 * @param widgetEventData Event's data.
+		 */
+		void notifyListenersSectionItemClicked(const MAWidgetEventData& widgetEventData);
+
+		/**
 		 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_INSERT_BTN.
 		 * @param widgetEventData Event's data.
 		 */
-		void notifyListenersClickedInsertButton(MAWidgetEventData* widgetEventData);
+		void notifyListenersInsertButtonClicked(const MAWidgetEventData& widgetEventData);
 
 		/**
 		 * Notify listeners when receiving #MAW_EVENT_SEGMENTED_LIST_ITEM_DELETE_BTN.
 		 * @param widgetEventData Event's data.
 		 */
-		void notifyListenersClickedDeleteButton(MAWidgetEventData* widgetEventData);
+		void notifyListenersDeleteButtonClicked(const MAWidgetEventData& widgetEventData);
 
 	private:
 		/**
