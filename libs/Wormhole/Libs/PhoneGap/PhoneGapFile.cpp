@@ -424,6 +424,14 @@ namespace Wormhole
 				}
 			}
 		}
+		else
+		{
+			if (!FileExists(fullFilePath))
+			{
+				callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+				return;
+			}
+		}
 
 		// Send back FileEntry data.
 		String fileEntry = emitFileEntry(
