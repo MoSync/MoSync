@@ -58,7 +58,7 @@ namespace NativeUI
         MAUtil::Vector<Listener*>& vector,
         Listener* listener)
 	{
-		if (listener == NULL)
+		if (!listener)
 		{
 			return;
 		}
@@ -85,7 +85,7 @@ namespace NativeUI
         MAUtil::Vector<Listener*>& vector,
         Listener* listener)
     {
-		if (listener == NULL)
+		if (!listener)
 		{
 			return;
 		}
