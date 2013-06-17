@@ -227,6 +227,7 @@ public class LocalNotificationObject {
 				default:
 					throw new InvalidPropertyValueException(name, value);
 			}
+			mFlag = flag;
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_DISPLAY_FLAG) )
 		{
