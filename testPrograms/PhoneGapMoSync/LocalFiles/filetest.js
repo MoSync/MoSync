@@ -114,59 +114,28 @@ var FileSys = function()
 			};
 		}
 
-		fileSys.fileExists = function(path, fun)
+		fileSys.writeText = function(path, data, fun)
 		{
 			fileSys.root.getFile(
 				path,
-				{ create: false, exclusive: false },
-				function(fileEntry)
+				{ create: true, exclusive: false },
+				function(file)
 				{
-					FileMgr.prototype.testFileExists(
-						fileEntry.fullPath,
-						function(exists)
+					file.createWriter(
+						function(writer)
 						{
-							fun(true, exists);
+							writer.truncate(0);
+							writer.onwriteend = function(evt) {
+								fileSys.writeTextAtPosition(path, data, 0, fun);
+							}
 						},
 						error(fun));
 				},
-				error(fun));
-		};
-
-		fileSys.writeText = function(path, data, fun)
-		{
-			fileSys.fileExists(
-				path,
-				function(success, exists)
+				function (error)
 				{
-					if (success)
-					{
-						if (exists)
-						{
-							fileSys.truncate(
-								path,
-								0,
-								function(success)
-								{
-									if (success)
-									{
-										fileSys.writeTextAtPosition(path, data, 0, fun);
-									}
-									else
-									{
-										error(fun)();
-									}
-								});
-						}
-						else
-						{
-							fileSys.writeTextAtPosition(path, data, 0, fun);
-						}
-					}
-					else
-					{
-						error(fun)();
-					}
-				});
+					fun((error.code === FileError.NOT_FOUND_ERR), false);
+				}
+			);
 		};
 
 		/**
@@ -195,7 +164,10 @@ var FileSys = function()
 						},
 						error(fun));
 				},
-				error(fun));
+				function (error)
+				{
+					fun((error.code === FileError.NOT_FOUND_ERR), false);
+				});
 		};
 
 		fileSys.readText = function(path, fun)
@@ -221,7 +193,10 @@ var FileSys = function()
 						},
 						error(fun));
 				},
-				error(fun));
+				function (error)
+				{
+					fun((error.code === FileError.NOT_FOUND_ERR), false);
+				});
 		};
 
 		fileSys.readAsDataURL = function(path, fun)

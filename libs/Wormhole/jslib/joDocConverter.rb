@@ -5,7 +5,7 @@ js_files = {
   "nativeui.md" => "mosync-nativeui.js",
   "bridge.md" => "mosync-bridge.js",
  # "sensormanager.md" => "mosync-sensormanager.js",
-  "pushnotifications.md" => "mosync-pushnotifications.js",
+ # "pushnotifications.md" => "mosync-pushnotifications.js",
   "resource.md" =>"mosync-resource.js"
   }
 
