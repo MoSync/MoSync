@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\kazlib\dict.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\kazlib\hash.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\BluetoothConnection.cpp" />
+    <ClCompile Include="..\BluetoothDiscovery.cpp" />
+    <ClCompile Include="..\BuffDownloader.cpp" />
+    <ClCompile Include="..\CharInput.cpp" />
+    <ClCompile Include="..\CharInputC.c" />
+    <ClCompile Include="..\Connection.cpp" />
+    <ClCompile Include="..\Downloader.cpp" />
+    <ClCompile Include="..\Environment.cpp" />
+    <ClCompile Include="..\FileLister.cpp" />
+    <ClCompile Include="..\FrameBuffer.c" />
+    <ClCompile Include="..\Geometry.cpp" />
+    <ClCompile Include="..\GLMoblet.cpp" />
+    <ClCompile Include="..\Graphics.c" />
+    <ClCompile Include="..\GraphicsOpenGL.c" />
+    <ClCompile Include="..\GraphicsSoftware.c" />
+    <ClCompile Include="..\HashMap.cpp" />
+    <ClCompile Include="..\Moblet.cpp" />
+    <ClCompile Include="..\PlaceholderPool.cpp" />
+    <ClCompile Include="..\RefCounted.cpp" />
+    <ClCompile Include="..\Server.cpp" />
+    <ClCompile Include="..\String.cpp" />
+    <ClCompile Include="..\util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\kazlib\dict.h" />
+    <ClInclude Include="..\..\kazlib\hash.h" />
+    <ClInclude Include="..\BluetoothConnection.h" />
+    <ClInclude Include="..\BluetoothDiscovery.h" />
+    <ClInclude Include="..\BuffDownloader.h" />
+    <ClInclude Include="..\CharInput.h" />
+    <ClInclude Include="..\collection_common.h" />
+    <ClInclude Include="..\Connection.h" />
+    <ClInclude Include="..\DataHandler.h" />
+    <ClInclude Include="..\Dictionary.h" />
+    <ClInclude Include="..\Dictionary_impl.h" />
+    <ClInclude Include="..\Downloader.h" />
+    <ClInclude Include="..\Environment.h" />
+    <ClInclude Include="..\ErrorListenable.h" />
+    <ClInclude Include="..\FileLister.h" />
+    <ClInclude Include="..\FrameBuffer.h" />
+    <ClInclude Include="..\Geometry.h" />
+    <ClInclude Include="..\GLMoblet.h" />
+    <ClInclude Include="..\Graphics.h" />
+    <ClInclude Include="..\GraphicsOpenGL.h" />
+    <ClInclude Include="..\GraphicsSoftware.h" />
+    <ClInclude Include="..\HashDict.h" />
+    <ClInclude Include="..\HashDict_impl.h" />
+    <ClInclude Include="..\HashMap.h" />
+    <ClInclude Include="..\HashMap_impl.h" />
+    <ClInclude Include="..\HashSet.h" />
+    <ClInclude Include="..\List.h" />
+    <ClInclude Include="..\ListenerSet.h" />
+    <ClInclude Include="..\Map.h" />
+    <ClInclude Include="..\mauuid.h" />
+    <ClInclude Include="..\Moblet.h" />
+    <ClInclude Include="..\PlaceholderPool.h" />
+    <ClInclude Include="..\RefCounted.h" />
+    <ClInclude Include="..\Server.h" />
+    <ClInclude Include="..\Set.h" />
+    <ClInclude Include="..\Stack.h" />
+    <ClInclude Include="..\String.h" />
+    <ClInclude Include="..\Tokenizer.h" />
+    <ClInclude Include="..\util.h" />
+    <ClInclude Include="..\Vector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MAStd\WP8\MAStd_WP8.vcxproj">
+      <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>MAUtil_WP8</ProjectName>
+    <RootNamespace>MAUtil</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug\</OutDir>
+    <TargetName>MAUtil</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release\</OutDir>
+    <TargetName>MAUtil</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>WIN32;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

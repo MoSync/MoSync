@@ -75,6 +75,8 @@ import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
+import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
+import com.mosync.internal.android.billing.Consts;
 import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
@@ -473,17 +475,7 @@ public class MoSync extends Activity
 	{
 		Log.e("@@MoSync", "MoSync onPrepareOptionsMenu");
 
-//    	MenuItem item1 = menu.add(0, 1, 0, "btn");
-//    	item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//    	item1.setIcon(17301555);
-//
-//    	MenuItem item2 = menu.add(1,0,0,"t");
-//    	item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//    	item2.setIcon(17301583);
-
-//		return super.onPrepareOptionsMenu(menu);
-
-//		// Remove all the items from the menu.
+		// Remove all the items from the menu.
 		menu.clear();
 
 		// Get the focused screen widget.
@@ -919,8 +911,10 @@ public class MoSync extends Activity
      */
     private void sendCloseEvent()
     {
-    	if (!mEventTypeCloseHasBeenSent)
-    	{
+		if (!mEventTypeCloseHasBeenSent)
+		{
+			MoSyncExtensionLoader.getDefault().unloadExtensions();
+
 			// Send EVENT_TYPE_CLOSE
 			int[] event = new int[1];
 			event[0] = EVENT_TYPE_CLOSE;

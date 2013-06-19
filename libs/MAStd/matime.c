@@ -7,9 +7,15 @@
 *                Adapted for MoSync - 21/02/07, Fredrik Eldh <fredrik.eldh@mobilesorcery.com>
 */
 
+#ifndef __IOS__
 #include "matime.h"
 #include "mavsprintf.h"
 #include "mastdlib.h"
+#else
+#include <matime.h>
+#include <mavsprintf.h>
+#include <mastdlib.h>
+#endif
 
 #define SECSPERMIN	60
 #define MINSPERHOUR	60
@@ -115,10 +121,10 @@ struct tm* split_time(time_t timer, struct tm* res)
 
 char* sprint_tm(const struct tm *tim_p, char* buf)
 {
-	static const char day_name[7][3] = {
+	static const char day_name[7][4] = {
 		"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 	};
-	static const char mon_name[12][3] = {
+	static const char mon_name[12][4] = {
 		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 	};
@@ -224,6 +230,7 @@ static void validate_structure(struct tm *tim_p)
 	}
 }
 
+#ifndef MOSYNC_NATIVE
 time_t mktime(struct tm *tim_p)
 {
 	time_t tim = 0;
@@ -274,3 +281,4 @@ time_t mktime(struct tm *tim_p)
 
 	return tim;
 }
+#endif

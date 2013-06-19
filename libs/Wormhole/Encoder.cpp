@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 #include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
 #include <mastdlib.h>		// C string conversion functions
+#include <MAUtil/String.h>
 
 #include "Encoder.h"
 

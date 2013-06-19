@@ -30,6 +30,22 @@ void MoSync_DidReceiveLocalNotification(UILocalNotification* localNotification);
 void MoSync_DidReceivePushNotification(NSDictionary* pushNotification);
 void MoSync_ApplicationRegistration(NSInteger errorCode, NSString* text);
 
+
+#ifdef MOSYNC_NATIVE
+#define max_data 6572
+
+extern "C" int resource_selector();
+extern "C" unsigned char* InitCustomEventPointer(int mallocSize);
+extern "C" int MAMain();
+
+void cpp_main()
+{
+    InitCustomEventPointer(4194304);
+    resource_selector();
+    MAMain();
+}
+#endif
+
 @implementation MoSyncAppDelegate
 
 //@synthesize window;

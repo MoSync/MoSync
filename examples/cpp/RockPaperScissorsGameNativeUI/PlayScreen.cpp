@@ -403,7 +403,11 @@ int PlayScreen::setWidgetProperty(
 	// Buffer for property values.
 	char buf[10];
 
+#ifdef WINDOWS_PHONE_8
+	_itoa( aValue, buf, base);
+#else
 	itoa( aValue, buf, base);
+#endif
 	// Apply the property to the widget.
 	return maWidgetSetProperty(aWidget, aProperty, buf);
 }

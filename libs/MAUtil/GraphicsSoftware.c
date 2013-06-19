@@ -164,7 +164,7 @@ static void soft_drawText(int left, int top, const char* text) {
 }
 
 static void soft_drawTextW(int left, int top, const wchar_t* text) {
-	maDrawTextW(sCurrentOffset.x + left, sCurrentOffset.y + top, text);
+	maDrawTextW(sCurrentOffset.x + left, sCurrentOffset.y + top, (wchar*)text);
 }
 
 static void soft_drawImage(MAHandle image, int left, int top) {

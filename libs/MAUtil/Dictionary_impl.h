@@ -19,6 +19,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * \brief Dictionary implementation
 */
 
+#ifdef MOSYNC_NATIVE
+#include <string.h>
+#endif
+
 #ifndef _SE_MSAB_MAUTIL_DICTIONARY_H_
 #error Do not include this file directly.
 #endif

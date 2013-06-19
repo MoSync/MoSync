@@ -24,6 +24,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Platform.h"
 #include "MosyncView.h"
 
+// true for native library approach
+extern bool gNativeMode;
+
 void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 
 void MoSync_UpdateView(CGImageRef ref);

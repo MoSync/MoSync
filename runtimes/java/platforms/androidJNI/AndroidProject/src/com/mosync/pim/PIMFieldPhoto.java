@@ -19,7 +19,7 @@ import android.database.Cursor;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.Data;
 
-public class PIMFieldPhoto extends PIMField {
+public class PIMFieldPhoto extends PIMIntegerField {
 
 	/**
 	 * Constructor
@@ -142,33 +142,6 @@ public class PIMFieldPhoto extends PIMField {
 	 */
 	boolean hasCustomLabel(int index) {
 		return false;
-	}
-
-	char[] getData(int index) {
-		String val = getSpecificData(index);
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeInt(Integer.parseInt(val), buffer, 0);
-		return buffer;
-	}
-
-	String getSpecificData(int index) {
-		String[] val = mValues.get(index);
-		return val[1];
-	}
-
-	int getDataSize(String val) {
-		return (Integer.SIZE / 8);
-	}
-
-	void setData(int index, char[] buffer) {
-		String val = Integer.toString(PIMUtil.readInt(buffer, 0));
-		setSpecificData(val, index);
-	}
-
-	void setSpecificData(String data, int index) {
-		String[] val = mValues.get(index);
-		val[1] = data;
-		mValues.set(index, val);
 	}
 
 	void addToDisk(ArrayList<ContentProviderOperation> ops,

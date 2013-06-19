@@ -37,6 +37,7 @@ MA 02110-1301, USA.
 #include "Libs/PhoneGap/PhoneGapMessageHandler.h"
 #include "Libs/JSNativeUI/NativeUIMessageHandler.h"
 #include "Libs/JSNativeUI/ResourceMessageHandler.h"
+#include "Libs/Extensions/ExtensionMessageHandler.h"
 #include "Libs/Orientation/OrientationMessageHandler.h"
 #include "Encoder.h"
 #include "FunTable.h"
@@ -222,6 +223,12 @@ protected:
 	 * Handler for resource messages used for NativeUI.
 	 */
 	Wormhole::ResourceMessageHandler* mResourceMessageHandler;
+
+	/**
+	 * Handler for extension messages used for JS extensions.
+	 * This handler cannot be replaced.
+	 */
+	Wormhole::ExtensionMessageHandler* mExtensionMessageHandler;
 
 	/**
 	 * Dictionary with pointers to message handler functions.

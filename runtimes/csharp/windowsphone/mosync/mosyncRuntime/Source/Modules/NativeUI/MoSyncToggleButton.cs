@@ -44,7 +44,8 @@ namespace MoSync
             /**
              * The native ToggleButton widget.
              */
-            protected Microsoft.Phone.Controls.ToggleSwitch mToggleButton;
+
+			protected Microsoft.Phone.Controls.ToggleSwitch mToggleButton;
 
             /**
              * Constructor
@@ -57,8 +58,8 @@ namespace MoSync
                 /**
                  * implementation of the Click event
                  */
-                mToggleButton.Click += new EventHandler<RoutedEventArgs>(
-                   delegate(Object from, RoutedEventArgs evt)
+				mToggleButton.Click += new EventHandler<RoutedEventArgs>(
+					delegate(Object from, RoutedEventArgs evt)
                    {
                        //click event needs a memory chunk of 8 bytes
                        Memory eventData = new Memory(12);

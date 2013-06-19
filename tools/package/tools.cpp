@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "tools.h"
 #include "package.h"
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <ostream>
 
@@ -33,6 +34,12 @@ void injectIcon(const char* platform, const char* size, const char* srcIcon, con
 		file(srcIcon) << " -size " << size << " -dst " << file(dst);
 
 	sh(iconInjectCmd.str().c_str(), silent);
+}
+
+void getExtensions(const char* extensionList, vector<string>& extensions) {
+	if (extensionList && strlen(extensionList) > 0) {
+		split(extensions, extensionList, ",");
+	}
 }
 
 string getBinary(const char* binaryName) {

@@ -28,11 +28,13 @@ struct SETTINGS {
 	const char* cppOutputDir;
 	const char* csOutputDir;
 	const char* model;
+	const char* mosyncProjectPath;
 	const char* dst;
 	const char* name;
 	const char* vendor;
 	const char* version;
 	const char* permissions;
+	const char* extensions;
 	const char* outputType;
 	const char* s60v3uid;
 	const char* s60v2uid;
@@ -60,6 +62,8 @@ struct SETTINGS {
 	bool WPgenerateOnly;
 	const char* WPguid;
 	const char* WPvsBuildPath;
+	const char* WPIncludePaths;
+	char* WPMacroDefines;
 
 	// Android specific settings
     const char* androidPackage;
@@ -70,6 +74,8 @@ struct SETTINGS {
     const char* androidKeyPass;
     const char* androidInstallLocation;
     const char* androidManifestTemplate;
+    const char* androidHeap;
+    const char* androidSdkLocation;
 
     // BlackBerry specific settings
     const char* blackberryJde;
@@ -92,6 +98,7 @@ void testProfileType(const SETTINGS&);
 void testName(const SETTINGS&);
 void testVendor(const SETTINGS&);
 void testVersion(const SETTINGS&);
+void testExtensions(const SETTINGS&);
 void testOutputType(const SETTINGS& s);
 void testS60v3Uid(const SETTINGS&);
 void testS60v2Uid(const SETTINGS&);
@@ -109,6 +116,7 @@ void testVsBuildPath(const SETTINGS& s);
 void testAndroidPackage(const SETTINGS&);
 void testAndroidVersionCode(const SETTINGS&);
 void testAndroidInstallLocation(const SETTINGS&);
+void testAndroidHeap(const SETTINGS& s);
 
 void testBlackberryJde(const SETTINGS&);
 

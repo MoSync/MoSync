@@ -20,7 +20,7 @@ namespace MoSync
 	{
 		delegate void ResultHandler(int handle, int connOp, int result);
 
-		static void WriteIPv4(Memory m, int addr, IPEndPoint ie)
+		static void WriteIPv4(IMemory m, int addr, IPEndPoint ie)
 		{
 			m.WriteInt32(addr + MoSync.Struct.MAConnAddr.family, MoSync.Constants.CONN_FAMILY_INET4);
 			m.WriteBytes(addr + MoSync.Struct.MAConnAddr.inet4.addr, ie.Address.GetAddressBytes(), 4);
@@ -39,7 +39,7 @@ namespace MoSync
 
 			// immediate
 			public abstract void close();
-			public abstract int getAddr(Memory m, int _addr);
+			public abstract int getAddr(IMemory m, int _addr);
 		}
 
 		class SocketConnection : Connection
@@ -123,7 +123,7 @@ namespace MoSync
 			{
 				mSocket.Close();
 			}
-			public override int getAddr(Memory m, int _addr)
+			public override int getAddr(IMemory m, int _addr)
 			{
 				EndPoint endPoint = mSocket.RemoteEndPoint;
 				switch (endPoint.AddressFamily)
@@ -287,7 +287,7 @@ namespace MoSync
 				if (mRequest != null)
 					mRequest.Abort();
 			}
-			public override int getAddr(Memory m, int _addr)
+			public override int getAddr(IMemory m, int _addr)
 			{
 				// not available for WebRequests on WindowsPhone.
 				return -1;
@@ -380,13 +380,22 @@ namespace MoSync
 				if (_conn == MoSync.Constants.HANDLE_LOCAL) // unavailable
 					return -1;
 				Connection c = mConnections[_conn];
-				return c.getAddr(core.GetDataMemory(), _addr);
+                return c.getAddr(core.GetDataMemory(), _addr);
 			};
 
 			syscalls.maConnRead = delegate(int _conn, int _dst, int _size)
 			{
-				Connection c = mConnections[_conn];
-				c.recv(core.GetDataMemory().GetData(), _dst, _size, mResultHandler);
+                Connection c = mConnections[_conn];
+#if !LIB
+                c.recv(core.GetDataMemory().GetData(), _dst, _size, mResultHandler);
+#else
+				//Create an empty byte array of size _size and give it as a buffer to the recv function.
+				Byte[] bytes = new Byte[_size];
+				c.recv(bytes, 0, _size, mResultHandler);
+
+				//write the buffer into memory at the _dst address
+				core.GetDataMemory().WriteBytes(_dst, bytes, _size);
+#endif
 			};
 
 			DataDelegate dataDelegate = delegate(int _conn, int _data,
@@ -426,7 +435,13 @@ namespace MoSync
 			syscalls.maConnWrite = delegate(int _conn, int _src, int _size)
 			{
 				Connection c = mConnections[_conn];
+#if !LIB
 				c.write(core.GetDataMemory().GetData(), _src, _size, mResultHandler);
+#else
+				Byte[] bytes = new Byte[_size];
+				core.GetDataMemory().ReadBytes(bytes, _src, _size);
+				c.write(bytes, 0, _size, mResultHandler);
+#endif
 			};
 
 			syscalls.maConnWriteFromData = delegate(int _conn, int _data, int _offset, int _size)

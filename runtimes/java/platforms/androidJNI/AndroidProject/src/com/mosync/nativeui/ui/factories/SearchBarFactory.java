@@ -96,14 +96,14 @@ public class SearchBarFactory implements AbstractViewFactory
         final EditText editBox = new EditText(activity);
         editBox.setMaxLines(1);
         layoutParams = new LinearLayout.LayoutParams(
-    		LinearLayout.LayoutParams.MATCH_PARENT,
-    		LinearLayout.LayoutParams.WRAP_CONTENT,
-    		1);
+			LinearLayout.LayoutParams.MATCH_PARENT,
+			LinearLayout.LayoutParams.WRAP_CONTENT,
+			1);
         layoutParams.setMargins(
-    		horizontalMargin,
-    		verticalMargin,
-    		horizontalMargin,
-    		verticalMargin);
+			horizontalMargin,
+			verticalMargin,
+			horizontalMargin,
+			verticalMargin);
         editBox.setLayoutParams(layoutParams);
         searchBarLayout.addView(editBox);
 
@@ -112,14 +112,14 @@ public class SearchBarFactory implements AbstractViewFactory
         button.setImageResource(android.R.drawable.ic_menu_search);
         button.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         layoutParams = new LinearLayout.LayoutParams(
-    		LinearLayout.LayoutParams.WRAP_CONTENT,
-    		LinearLayout.LayoutParams.WRAP_CONTENT,
-    		0);
+			LinearLayout.LayoutParams.WRAP_CONTENT,
+			LinearLayout.LayoutParams.WRAP_CONTENT,
+			0);
         layoutParams.setMargins(
-        	0,
-        	verticalMargin,
-        	horizontalMargin,
-        	verticalMargin);
+			0,
+			verticalMargin,
+			horizontalMargin,
+			verticalMargin);
         button.setLayoutParams(layoutParams);
         button.setAdjustViewBounds(true);
         button.setMaxWidth(searchButtonPixelSize);
@@ -135,7 +135,7 @@ public class SearchBarFactory implements AbstractViewFactory
     			if (null != manager && null != windowToken)
     			{
     				manager.hideSoftInputFromWindow(
-    					editBox.getWindowToken(),
+						editBox.getWindowToken(),
     					0);
     			}
 

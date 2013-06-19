@@ -68,8 +68,8 @@ int BluetoothConnection::connect(const char* url) {
 	MAUUID uuid;
 
 	// Check that the url is a valid.
-	if (53 != strlen(url) ||
-		url != strstr(url, "btspp://") ||
+	if (53 != (int)strlen(url) ||
+		strcmp(url, strstr(url, "btspp://")) != 0 ||
 		':' != url[20])
 	{
 		return CONNERR_URL;

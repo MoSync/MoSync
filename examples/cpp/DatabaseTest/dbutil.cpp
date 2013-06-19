@@ -97,4 +97,3 @@ int DBUtil::getColumnDataAsString(MAHandle cursor, int column, String& text)
 	// Return result.
 	return result;
 }
-

@@ -1,19 +1,18 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
-
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_EMPTY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_INDEX_INVALID;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_NAME;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING_ARRAY;
-
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 
-public class PIMFieldName extends PIMField {
+import com.mosync.api.Pointer;
+
+public class PIMFieldName extends PIMStringArrayField {
 
 	/**
 	 * Constructor
@@ -31,7 +30,8 @@ public class PIMFieldName extends PIMField {
 				StructuredName.PHONETIC_FAMILY_NAME,
 				StructuredName.PHONETIC_GIVEN_NAME,
 				StructuredName.PHONETIC_MIDDLE_NAME,
-				StructuredName.DISPLAY_NAME, StructuredName.IS_PRIMARY };
+				StructuredName.DISPLAY_NAME, StructuredName.IS_PRIMARY, DUMMY,
+				DUMMY };
 	}
 
 	void createMaps() {
@@ -86,46 +86,6 @@ public class PIMFieldName extends PIMField {
 	 */
 	boolean hasCustomLabel(int index) {
 		return false;
-	}
-
-	char[] getData(int index) {
-		String[] val = getSpecificData(index);
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeStringArray(val, buffer);
-		return buffer;
-	}
-
-	String[] getSpecificData(int index) {
-		String[] val = mValues.get(index);
-		String[] ret = new String[val.length - 2];
-		for (int i = 0; i < val.length - 2; i++) {
-			ret[i] = val[i + 1];
-		}
-		return ret;
-	}
-
-	int getDataSize(String[] val) {
-		int size = 4;
-		for (int i = 0; i < val.length; i++) {
-			if (val[i] != null) {
-				size += val[i].length();
-			}
-			size += 1;
-		}
-		return size;
-	}
-
-	void setData(int index, char[] buffer) {
-		String[] val = PIMUtil.readStringArray(buffer);
-		setSpecificData(val, index);
-	}
-
-	void setSpecificData(String[] data, int index) {
-		String[] val = mValues.get(index);
-		for (int i = 0; i < data.length; i++) {
-			val[i + 1] = data[i];
-		}
-		mValues.set(index, val);
 	}
 
 	int setAttribute(int index, int attribute) {

@@ -22,10 +22,34 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _CONSOLE_H_
 #define _CONSOLE_H_
 
+#if defined(MOSYNC_NATIVE) && !defined(__WINDOWS_PHONE_8__)
+#include <stdio.h>
+#endif
+
 #include "ma.h"
 #include "maarg.h"
 #include "mastring.h"
 #include "mavsprintf.h"
+
+#if defined(MOSYNC_NATIVE) && !defined(__WINDOWS_PHONE_8__)
+#define CON(ret, fn) ret con_##fn
+#undef printf
+#define printf con_printf
+#undef puts
+#define puts con_puts
+#undef wputs
+#define wputs con_wputs
+#undef vprintf
+#define vprintf con_vprintf
+#undef wprintf
+#define wprintf con_wprintf
+#undef wvprintf
+#define wvprintf con_wvprintf
+#undef putchar
+#define putchar con_putchar
+#else
+#define CON(ret, fn) ret fn
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,8 +75,9 @@ void DisplayConsole(void);
 */
 
 void PrintConsole(const wchar * str);
-int puts(const char* str);
-int wputs(const wchar* str);
+
+CON(int, puts(const char* str));
+CON(int, wputs(const wchar* str));
 
 /** \brief Prints a formatted string to the console.
 * \param fmt A C string that may contain formatting
@@ -64,17 +89,15 @@ int wputs(const wchar* str);
 * \see InitConsole PrintConsole
 */
 
-int printf(const char *fmt, ...);
+CON(int, printf(const char *fmt, ...));
 
-int vprintf(const char *fmt, va_list args);
+CON(int, vprintf(const char *fmt, va_list args));
 
-#define _WSTDIO_DEFINED
+CON(int, wprintf(const wchar_t *fmt, ...));
 
-int wprintf(const wchar_t *fmt, ...);
+CON(int, wvprintf(const wchar_t *fmt, va_list args));
 
-int wvprintf(const wchar_t *fmt, va_list args);
-
-int putchar(int character);
+CON(int, putchar(int character));
 
 /** \brief The console text color.
 *

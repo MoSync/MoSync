@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.egl;
 
 import com.mosync.internal.generated.IX_OPENGL_ES;
+import com.mosync.internal.generated.IX_OPENGL_ES_MA;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -83,7 +84,7 @@ public class EGLConfigFactory
 
             super(null);
 
-            if(glApi == IX_OPENGL_ES.MA_GL_API_GL1) {
+            if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL1) {
 				glApi = 0;
 				mConfigSpec = new int[] {
 					EGL10.EGL_RED_SIZE, redSize,
@@ -93,7 +94,7 @@ public class EGLConfigFactory
 					EGL10.EGL_DEPTH_SIZE, depthSize,
 					EGL10.EGL_STENCIL_SIZE, stencilSize,
 					EGL10.EGL_NONE};
-            } else if(glApi == IX_OPENGL_ES.MA_GL_API_GL2) {
+            } else if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL2) {
 				int EGL_OPENGL_ES2_BIT = 4;
 				glApi = 4;
 				mConfigSpec = new int[] {

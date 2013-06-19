@@ -281,9 +281,11 @@ cd $SOURCEDIR/runtimes/cpp/platforms/iphone
 cp Classes/impl/config_platform.h.example Classes/impl/config_platform.h 
 /opt/local/bin/ruby buildLibraries.rb || error_exit "Could not build runtimes."
 
-
-
-
+echo "----------------------------------------------------"
+echo "Building Android native runtimes"
+echo "----------------------------------------------------"
+cd $SOURCEDIR/runtimes/java/platforms/androidJNI
+/opt/local/bin/ruby buildLibs.rb @ || error_exit "Could not build Android native runtimes."
 
 # Wait until Eclipse is built
 # Then copy the result

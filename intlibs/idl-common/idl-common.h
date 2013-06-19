@@ -170,7 +170,17 @@ void outputCSharpIoctlArgTyped(ostream& maapiFile, int& argindex, const Argument
 size_t streamCSharpOffsets(ostream& stream, const Interface& inf, const Struct& s, size_t offset, int indent);
 void streamCSharpConstants(ostream& maapiFile, const Interface& maapi);
 void streamCSharpFunctionDelegates(ostream& maapiFile, const Interface& maapi);
+void outputCSharpIoctlArgTypedWP8(ostream& maapiFile, int& i, const Argument& a, const Interface& maapi, const string& coreObject);
+void outputCSharpIoctlArgWP8(ostream& maapiFile, int i, const string& coreobject);
+void outputCSharpSyscallNativeArgWP8(ostream& maapiFile, int i, const string& coreObject);
+void streamCSharpFunctionDelegatesWP8(ostream& maapiFile, const Interface& maapi);
 void streamIoctlFunctionInvokeCSharp(ostream& maapiFile, const Function& f, const Interface& maapi, const std::string& object="mIoctls.",  const std::string& coreObject="mCore.");
+void streamManagedCppDelegatesWP8(ostream& gluecodeFile, const Interface& maapi);
+void streamManagedCppDelegatesSettersWP8(ostream& gluecodeFile, const Interface& maapi);
+void streamManagedCppDelegateInstancesWP8(ostream& gluecodeFile, const Interface& maapi);
+void streamManagedCppSyscallImplWP8(ostream& gluecodeFile, const Interface& maapi);
+void streamManagedCppDelegatesSettersImplWP8(ostream& gluecodeFile, const Interface& maapi);
+void streamCSharpMachinePartialCodeWP8(ostream& gluecodeFile, const Interface& maapi);
 
 //implemented by the user
 void streamInvokePrefix(ostream&, const Function&);

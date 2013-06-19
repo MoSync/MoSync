@@ -22,9 +22,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _SE_MSAB_MAUTIL_DICTIONARY_H_
 #define _SE_MSAB_MAUTIL_DICTIONARY_H_
 
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <ma.h>
 #include <maassert.h>
 #include <kazlib/dict.h>
+#else
+#include "../MAStd/ma.h"
+#include "../MAStd/maassert.h"
+#include "../kazlib/dict.h"
+#endif
+
 #include "collection_common.h"
 
 namespace MAUtil {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.2">
+<project supports-build-configs="true" version="1.6">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
@@ -22,6 +22,7 @@
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.switches" value="-O2"/>
+<property key="build.prefs:gcc.switches/Debug" value="-O0 -UUSE_NEWLIB"/>
 <property key="build.prefs:gcc.warnings" value="0"/>
 <property key="build.prefs:ignore.default.include.paths" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
@@ -32,9 +33,10 @@
 <property key="build.prefs:ignore.default.library.paths" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
-<property key="build.prefs:project.type" value=""/>
+<property key="build.prefs:project.type" value="app"/>
 <property key="debug" value="false"/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
 <property key="screenHeight" value="320"/>
 <property key="screenWidth" value="240"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x0B9B1B3A"/>

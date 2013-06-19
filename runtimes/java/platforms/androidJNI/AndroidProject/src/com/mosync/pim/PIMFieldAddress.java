@@ -2,6 +2,8 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 
+import com.mosync.api.Pointer;
+
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_CUSTOM;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_HOME;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_OTHER;
@@ -15,7 +17,7 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING_ARRAY;
 
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 
-public class PIMFieldAddress extends PIMField {
+public class PIMFieldAddress extends PIMStringArrayField {
 
 	/**
 	 * Constructor
@@ -89,47 +91,6 @@ public class PIMFieldAddress extends PIMField {
 	boolean hasCustomLabel(int index) {
 		return ((Integer.parseInt(getColumnValue(index, StructuredPostal.TYPE)) == StructuredPostal.TYPE_CUSTOM) ? true
 				: false);
-	}
-
-	char[] getData(int index) {
-		String[] val = getSpecificData(index);
-		DebugPrint("DATA SIZE = " + getDataSize(val));
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeStringArray(val, buffer);
-		return buffer;
-	}
-
-	String[] getSpecificData(int index) {
-		String[] val = mValues.get(index);
-		String[] ret = new String[val.length - 4];
-		for (int i = 0; i < val.length - 4; i++) {
-			ret[i] = val[i + 1];
-		}
-		return ret;
-	}
-
-	int getDataSize(String[] val) {
-		int size = 4;
-		for (int i = 0; i < val.length; i++) {
-			if (val[i] != null) {
-				size += val[i].length();
-			}
-			size += 1;
-		}
-		return size;
-	}
-
-	void setData(int index, char[] buffer) {
-		String[] val = PIMUtil.readStringArray(buffer);
-		setSpecificData(val, index);
-	}
-
-	void setSpecificData(String[] data, int index) {
-		String[] val = mValues.get(index);
-		for (int i = 0; i < data.length; i++) {
-			val[i + 1] = data[i];
-		}
-		mValues.set(index, val);
 	}
 
 	int setAttribute(int index, int attribute) {

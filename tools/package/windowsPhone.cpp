@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <cstring>
 #include <list>
 #include <sstream>
 #include <fstream>
@@ -33,6 +34,7 @@
 using namespace std;
 
 void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
+
 	testDst(s);
 	testName(s);
 	testVendor(s);
@@ -44,22 +46,58 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	printf("Building: %s\n", s.model);
 
-	string dst = s.dst;
-	string templateLocation = string(ri.path) + "/template";
-	string templateFileLocation = string(ri.path) + "/template/mosync.csproj";
-	string csprojOutputFile = dst + "/project/mosync.csproj";
+	string dst;
+	string templateLocation;
+	string templateFileLocation;
+	string templateLibProjectLocation;
+	string outputLibFile;
+	string csprojOutputFile;
+	string libProjOutputFolder;
 
-	string appManifestInputFile = string(ri.path) + "/template/Properties/WMAppManifest.xml";
-	string appManifestOutputFile = dst + "/project/Properties/WMAppManifest.xml";
+	string appManifestInputFile;
+	string appManifestOutputFile;
 
-	string csprojOutput = dst + "/project";
-	string outputType = s.outputType ? string(s.outputType) : string("interpreted");
-	if(s.csOutputDir)
+	string csprojOutput;
+	string outputType;
+
+	bool isNative = !strcmp("native", s.outputType);
+
+	if(isNative)
+	{
+		dst = s.dst;
+		templateLocation = string(ri.path) + "/template_WP8";
+		templateFileLocation = string(ri.path) + "/template_WP8/mosync_WP8/mosync_WP8.csproj";
+		templateLibProjectLocation = string(ri.path) + "/template_WP8/MoSyncLibrary/MoSyncLibrary.vcxproj";
+		csprojOutputFile = dst + "/project/mosync_WP8/mosync_WP8.csproj";
+		libProjOutputFolder = dst + "/project/MoSyncLibrary";
+		outputLibFile = dst + "/project/MoSyncLibrary/MoSyncLibrary.vcxproj";
+		appManifestInputFile = string(ri.path) + "/template_WP8/mosync_WP8/Properties/WMAppManifest.xml";
+		appManifestOutputFile = dst + "/project/mosync_WP8/Properties/WMAppManifest.xml";
+
+		csprojOutput = dst + "/project";
+		outputType = "native";
+	}
+	else
+	{
+		dst = s.dst;
+		templateLocation = string(ri.path) + "/template";
+		templateFileLocation = string(ri.path) + "/template/mosync.csproj";
+		csprojOutputFile = dst + "/project/mosync.csproj";
+
+		appManifestInputFile = string(ri.path) + "/template/Properties/WMAppManifest.xml";
+		appManifestOutputFile = dst + "/project/Properties/WMAppManifest.xml";
+
+		csprojOutput = dst + "/project";
+		outputType = s.outputType ? string(s.outputType) : string("interpreted");
+	}
+
+	if(s.csOutputDir && !isNative)
 	{
 		outputType = "rebuilt";
 	}
 
 	_mkdir(csprojOutput.c_str());
+
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
 
 	generateCmd << getBinary("winphone-builder") <<
@@ -71,6 +109,19 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		" -output-type " << arg(outputType) <<
 		" -input-file " << file(templateFileLocation) <<
 		" -output-file " << file(csprojOutputFile);
+
+	if(isNative)
+	{
+		generateCmd << " -mosync-project-path " << file(s.mosyncProjectPath) <<
+					   " -output-file-library-project " << file(outputLibFile) <<
+					   " -input-file-library-project " << file(templateLibProjectLocation);
+
+		if(s.WPMacroDefines != NULL && strcmp(s.WPMacroDefines, "") != 0)
+			generateCmd << " -macro-defines " << s.WPMacroDefines;
+
+		if(strcmp(s.WPIncludePaths, "") != 0)
+			generateCmd << " -include-paths \"" << s.WPIncludePaths << "\"";
+	}
 
 	if(s.WPguid)
 	{
@@ -90,16 +141,33 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		testCsOutputDir(s);
 		copyFile((csprojOutput + "/RebuildData/data_section.bin").c_str(), (s.csOutputDir + string("/data_section.bin")).c_str());
 		copyFile((csprojOutput + "/RebuildData/rebuild.build.cs").c_str(), (s.csOutputDir + string("/rebuild.build.cs")).c_str());
-	} else {
+	} else if(outputType != "native"){
 		copyFile((csprojOutput + "/program").c_str(), s.program);
 	}
 
-	string resourceFileCopy = csprojOutput + "/resources";
+	string resourceFileCopy;
+	if(isNative)
+	{
+		resourceFileCopy = csprojOutput + "/mosync_WP8/resources";
+	}
+	else
+	{
+		resourceFileCopy = csprojOutput + "/resources";
+	}
+
 	if(s.resource) {
 		copyFile(resourceFileCopy.c_str(), s.resource);
 	} else {
 		//ofstream empty(resourceFileCopy.c_str());
 		//empty.close();
+	}
+
+	string maHeaderFileCopy = csprojOutput + "/MoSyncLibrary/MAHeaders.h";
+	if(isNative && s.resource) //copy MAHeader.h
+	{
+		int pos = dst.find("package");
+		string maHeaderSource = dst.substr(0, pos) + "MAHeaders.h";
+		copyFile(maHeaderFileCopy.c_str(), maHeaderSource.c_str());
 	}
 
 	// Icons!
@@ -110,7 +178,15 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		for(int i = 0; i < 2; i++) {
 			std::ostringstream iconInjectCmd;
 			string size = sizes[i];
-			string outputIcon = csprojOutput + "/" + filenames[i];
+			string outputIcon;
+			if(outputType == "native")
+			{
+				outputIcon = csprojOutput + "/mosync_WP8/" + filenames[i];
+			}
+			else
+			{
+				outputIcon = csprojOutput + "/" + filenames[i];
+			}
 			injectIcon("Windows Phone", size.c_str(), s.icon, outputIcon.c_str(), s.silent, true);
 		}
 	}
@@ -122,26 +198,36 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 		// todo: find this programatically...
 		//std::string vsBuildPath =
 		//	"/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe";
+		if(outputType != "native")
+		{
+			_chdir(csprojOutput.c_str());
 
-		_chdir(csprojOutput.c_str());
+			buildCmd << s.WPvsBuildPath << " mosync.csproj";
 
-		buildCmd << s.WPvsBuildPath << " mosync.csproj";
+			// Set our configuration.
+			buildCmd << " /p:Configuration=" << s.WPconfig;
 
-		// Set our configuration.
-		buildCmd << " /p:Configuration=" << s.WPconfig;
+			// Target rebuild. Means always rebuild.
+			buildCmd << " /t:Rebuild";
 
-		// Target rebuild. Means always rebuild.
-		buildCmd << " /t:Rebuild";
+			// We compile for any cpu.
+			buildCmd << " /p:Platform=\"Any CPU\"";
 
-		// We compile for any cpu.
-		buildCmd << " /p:Platform=\"Any CPU\"";
+			// Doesn't seem to get the DefineConstants from the configurations??
+			if(outputType == "rebuilt")
+				buildCmd << " /p:DefineConstants=\"REBUILD\"";
 
-		// Doesn't seem to get the DefineConstants from the configurations??
-		if(outputType == "rebuilt")
-			buildCmd << " /p:DefineConstants=\"REBUILD\"";
-
-		// Output path will be defined by the config name.
-		buildCmd << " /p:OutputPath=\"Bin\\" << s.WPconfig << "\"";
+			// Output path will be defined by the config name.
+			buildCmd << " /p:OutputPath=\"Bin\\" << s.WPconfig << "\"";
+		}
+		else
+		{
+			string outputDir = csprojOutput + "\\mosync_WP8";
+			_chdir(outputDir.c_str());
+			buildCmd << s.WPvsBuildPath << " mosync_WP8_solution.sln";
+			buildCmd << " /p:OutputPath=\"..\\Bin\\" << s.WPconfig << "\"";
+			printf("%s", buildCmd.str().c_str());
+		}
 
 		sh(buildCmd.str().c_str(), s.silent);
 

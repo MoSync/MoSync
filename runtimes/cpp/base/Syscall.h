@@ -162,7 +162,10 @@ namespace Base {
 #define VSV_ARGPTR_DECL
 #define VSV_ARGPTR_USE
 #endif
+
+#if !(defined(MOSYNC_NATIVE) && defined(__ANDROID__))
 		int GetValidatedStackValue(int offset VSV_ARGPTR_DECL);
+#endif
 
 #ifdef MEMORY_PROTECTION
 		void protectMemory(int start, int length);

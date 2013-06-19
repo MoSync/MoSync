@@ -50,6 +50,8 @@ namespace MAUtil {
 	String doubleToString(double f, int decimals = 5);
 	/** Converts \a f to its string representation in radix \a base. **/
 	String integerToString(int i, int base = 10);
+	/** Converts \a l to its string representation in radix \a base. **/
+	String longToString(long long l, int base);
 	/** Converts a MAUtil::String to lowercase. **/
 	String lowerString(const String& s);
 	/** Converts a MAUtil::String to uppercase. **/
@@ -60,6 +62,8 @@ namespace MAUtil {
 	void stringSplit(const WString& str, const WString& delim, MAUtil::Vector<WString>& output);
 	/** Converts a string to an integer, using the same semantics as strtoul(). **/
 	int stringToInteger(const String &s, int base = 10);
+	/** Converts a string to a long long, using the same semantics as strtoull(). **/
+        long long stringToLong(const String &s, int base = 10);
 	/** Converts a string to a double, using the same semantics as atof(). **/
 	double stringToDouble(const String &s);
 

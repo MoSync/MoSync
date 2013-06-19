@@ -415,6 +415,7 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetScreenShow invalidate menu");
+
 		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;
@@ -476,6 +477,7 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetScreenShowWithTransition invalidate menu");
+
 		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;
@@ -524,6 +526,7 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetStackScreenPush invalidate menu");
+
 		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;

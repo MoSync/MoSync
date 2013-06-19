@@ -31,15 +31,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TRACKOBJECTS
 #endif
 
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <ma.h>
 #include <maheap.h>
+#else
+#include "../MAStd/ma.h"
+#include "../MAStd/maheap.h"
+#endif
 
 #ifdef TRACKOBJECTS
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <MAUtil/Map.h>
 #include <MAUtil/Vector.h>
+#else
+#include "../MAUtil/Map.h"
+#include "../MAUtil/Vector.h"
+#endif //__WINDOWS_PHONE_8__
+
 #include "DebugPrintf.h"
 using namespace MAUtil;
-#endif
+
+#endif //TRACKOBJECTS
 
 namespace MAPUtil
 {

@@ -40,16 +40,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
 #include "helpers/CPP_IX_OPENGL_ES.h"
+#include "helpers/CPP_IX_OPENGL_ES_MA.h"
 #include "helpers/CPP_IX_GL1.h"
 #include "helpers/CPP_IX_GL2.h"
 #include "helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h"
 #include "helpers/CPP_IX_PIM.h"
 #include "helpers/CPP_IX_CELLID.h"
 
+#ifdef MOSYNC_NATIVE
+#define ARG_NO_4 __d
+#define ARG_NO_5 __e
+#define ARG_NO_6 __f
+#define MA_IOCTL_ELLIPSIS , int __d = 0, int __e = 0, int __f = 0
+#else
+#define ARG_NO_4 SYSCALL_THIS->GetValidatedStackValue(0)
+#define ARG_NO_5 SYSCALL_THIS->GetValidatedStackValue(4)
+#define ARG_NO_6 SYSCALL_THIS->GetValidatedStackValue(8)
+#endif
+
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
-#define SYSLOG(...)
+#include "syslog.h"
 
 namespace Base
 {
@@ -290,7 +301,7 @@ namespace Base
 
 	void Syscall::setJNIEnvironment(JNIEnv* je, jobject jthis)
 	{
-		SYSLOG("setJNIEnvironment")
+		SYSLOG("setJNIEnvironment");
 
 		mJNIEnv = je;
 		mJThis = jthis;
@@ -304,7 +315,6 @@ namespace Base
 
 	int Syscall::getEventQueueSize()
 	{
-		SYSLOG("getEventQueueSize");
 		return gEventFifo.count();
 	}
 
@@ -448,19 +458,11 @@ namespace Base
 		return retval;
 	}
 
-	int wcharLength(const wchar* str)
-	{
-		int l = 0;
-		while(str[l] != 0) l++;
-		return l;
-	}
-
 	SYSCALL(MAExtent,  maGetTextSizeW(const wchar* str))
 	{
 		//SYSLOG("maGetTextSizeW");
 
-		jsize len = wcharLength(str);
-		jstring jstr = mJNIEnv->NewString((jchar*)str, len);
+		jstring jstr = WCHAR_TO_JCHAR(mJNIEnv, str);
 
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maGetTextSizeW", "(Ljava/lang/String;)I");
@@ -492,8 +494,7 @@ namespace Base
 	{
 		//SYSLOG("maDrawTextW");
 
-		jsize len = wcharLength(str);
-		jstring jstr = mJNIEnv->NewString((jchar*)str, len);
+		jstring jstr = WCHAR_TO_JCHAR(mJNIEnv, str);
 
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maDrawTextW", "(IILjava/lang/String;)V");
@@ -1068,7 +1069,9 @@ namespace Base
 	SYSCALL(int,  maGetEvent(MAEvent* event))
 	{
 		gSyscall->ValidateMemRange(event, sizeof(MAEvent));
+#ifndef MOSYNC_NATIVE
 		MYASSERT(((uint)event & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
+#endif
 
 		// Exit if event queue is empty.
 		if (gEventFifo.count() == 0) return 0;
@@ -1077,11 +1080,17 @@ namespace Base
 		*event = gEventFifo.get();
 
 		// Copy event data to memory on the MoSync side.
+#ifndef MOSYNC_NATIVE
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
 			memcpy(Core::GetCustomEventPointer(gCore), (void*)event->data, sizeof(dataType)); \
 			delete (dataType*) event->data; \
 			event->data = (int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
-
+#else
+#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
+	memcpy(Core::GetCustomEventPointer(gCore), (void*)event->data, sizeof(dataType)); \
+	delete (dataType*) event->data; \
+	event->data = (int(Core::GetCustomEventPointer(gCore))); }
+#endif
 		// Macro CUSTOM_EVENTS is defined in runtimes/cpp/base/Syscall.h
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
 
@@ -1090,8 +1099,6 @@ namespace Base
 
 	SYSCALL(void,  maWait(int timeout))
 	{
-		SYSLOG("maWait");
-
 		if(gEventFifo.count() != 0)
 			return;
 
@@ -1260,10 +1267,27 @@ namespace Base
 
 	// TODO : Implement maInvokeExtension
 
-	SYSCALL(longlong,  maExtensionFunctionInvoke(MAExtensionFunction function, int a, int b, int c))
+	SYSCALL(longlong,  maExtensionFunctionInvoke(MAExtensionFunction function, int numargs, int args, int dummy))
 	{
-		SYSLOG("maExtensionFunctionInvoke NOT IMPLEMENTED");
-		return -1;
+		SYSLOG("maExtensionFunctionInvoke");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maExtensionFunctionInvoke", "(I[II)I");
+		if (methodID == 0) ERROR_EXIT;
+		int memStart = (int)gCore->mem_ds;
+		jintArray jargs = mJNIEnv->NewIntArray(numargs);
+		jint* body = new jint[numargs];//mJNIEnv->GetIntArrayElements(jargs, 0);
+		for (int i = 0; i < numargs; i++) {
+			int ptr = ((int*) args)[i];
+			body[i] = ptr;
+		}
+		mJNIEnv->SetIntArrayRegion(jargs, 0, numargs, body);
+		int retVal = mJNIEnv->CallIntMethod(mJThis, methodID, function, jargs, memStart);
+		//mJNIEnv->ReleaseIntArrayElements(jargs, body, 0);
+		delete[] body;
+		mJNIEnv->DeleteLocalRef(cls);
+
+		return retVal;
 	}
 
 	// Temporary kludge to include the implementation of glString,
@@ -1306,6 +1330,7 @@ namespace Base
 	 */
 	int maOpenGLInitFullscreen(int glApi)
 	{
+		SYSLOG("maOpenGLInitFullscreen");
 		return _maOpenGLInitFullscreen(glApi, mJNIEnv, mJThis);
 	}
 
@@ -1316,6 +1341,7 @@ namespace Base
 	 */
 	int maOpenGLCloseFullscreen()
 	{
+		SYSLOG("maOpenGLCloseFullscreen");
 		return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
 	}
 
@@ -1356,20 +1382,31 @@ namespace Base
 	*				if this syscall is not implemented on this platfom.
 	*
 	*/
-	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c))
+	SYSCALL(longlong,  maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS))
 	{
-		SYSLOG("maIOCtl");
+		SYSLOG("maIOCtl: %d", function);
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		//handlePendingExceptions(mJNIEnv);
 
 		switch(function)
 		{
+#ifndef MOSYNC_NATIVE
 		maIOCtl_IX_OPENGL_ES_caselist
 		maIOCtl_IX_GL1_caselist
 #ifndef _android_1
 		maIOCtl_IX_GL2_caselist
 #endif
 		maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
+#endif
+
+		case maIOCtl_maOpenGLInitFullscreen:
+			return _maOpenGLInitFullscreen(a, mJNIEnv, mJThis);
+		case maIOCtl_maOpenGLCloseFullscreen:
+			return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
+		case maIOCtl_maOpenGLTexImage2D:
+			return _maOpenGLTexImage2D(a, mJNIEnv, mJThis);
+		case maIOCtl_maOpenGLTexSubImage2D:
+			return _maOpenGLTexSubImage2D(a, mJNIEnv, mJThis);
 
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
@@ -1569,8 +1606,8 @@ namespace Base
 			const char* mime = SYSCALL_THIS->GetValidatedStr(a);
 			int data = b;
 			int offset = c;
-			int length = SYSCALL_THIS->GetValidatedStackValue(0);
-			int flags = SYSCALL_THIS->GetValidatedStackValue(4);
+			int length = ARG_NO_4;
+			int flags = ARG_NO_5;
 
 			return _maAudioDataCreateFromResource(mime, data, offset, length, flags, mJNIEnv, mJThis);
 		}
@@ -1806,8 +1843,8 @@ namespace Base
 			const wchar* _title = GVWS(a);
 			const wchar* _inText = GVWS(b);
 			// Get two parameters from the stack
-			int _maxSize = SYSCALL_THIS->GetValidatedStackValue(0);
-			int _constraints = SYSCALL_THIS->GetValidatedStackValue(4);
+			int _maxSize = ARG_NO_4;
+			int _constraints = ARG_NO_5;
 			// Allocate memory for the output buffer
 			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
@@ -1866,7 +1903,7 @@ namespace Base
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
 			//Read the fourth parameter from the register
 			//(the first three can be read directly)
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = ARG_NO_4;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
 				_valueBufferSize * sizeof(char));
@@ -1877,7 +1914,7 @@ namespace Base
 		case maIOCtl_maWidgetScreenAddOptionsMenuItem:
 		{
 			SYSLOG("maIOCtl_maWidgetScreenAddOptionsMenuItem");
-			int _iconPredefined = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _iconPredefined = ARG_NO_4;
 			return _maWidgetScreenAddOptionsMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), SYSCALL_THIS->GetValidatedStr(c), _iconPredefined, mJNIEnv, mJThis);
 		}
 
@@ -1897,104 +1934,6 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetStackScreenPop");
 			return _maWidgetStackScreenPop(a, mJNIEnv, mJThis);
 
-		// // ********** Action Bar API **********
-		// case maIOCtl_maActionBarSetEnabled:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarSetEnabled");
-		// 	return _maActionBarSetEnabled(a, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarAddMenuItem:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarAddMenuItem");
-		// 	//int displayFlag = SYSCALL_THIS->GetValidatedStackValue(0);
-		// 	//return _maActionBarAddMenuItem(a, SYSCALL_THIS->GetValidatedStr(b), c, displayFlag, mJNIEnv, mJThis);
-		// 	int _handle = a;
-		// 	const char *_title = SYSCALL_THIS->GetValidatedStr(b);
-		// 	int _flag = SYSCALL_THIS->GetValidatedStackValue(0);
-		// 	MA_ACTION_BAR_ITEM_ICON* args = (MA_ACTION_BAR_ITEM_ICON*) SYSCALL_THIS->GetValidatedMemRange(c, sizeof(MA_ACTION_BAR_ITEM_ICON));
-		// 	return _maActionBarAddMenuItem(
-		// 		_handle,
-		// 		_title,
-		// 		args->iconPredefinedId,
-		// 		args->iconHandle,
-		// 		_flag,
-		// 		mJNIEnv,
-		// 		mJThis);
-		// }
-
-		// case maIOCtl_maActionBarRemoveMenuItem:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarRemoveItem");
-		// 	return _maActionBarRemoveMenuItem(a, b, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarSetVisibility:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarSetVisibility");
-		// 	return _maActionBarSetVisibility(a, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarGetHeight:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarGetHeight");
-		// 	return _maActionBarGetHeight(mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarIsShowing:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarIsShowing");
-		// 	return _maActionBarIsShowing(mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarSetTitle:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarSetTitle");
-		// 	const char *_title = SYSCALL_THIS->GetValidatedStr(a);
-		// 	return _maActionBarSetTitle(_title, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarSetIcon:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarSetIcon");
-		// 	return _maActionBarSetIcon(a, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarSetDisplayHomeAsUpEnabled:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarSetDisplayHomeAsUpEnabled");
-		// 	return _maActionBarSetDisplayHomeAsUpEnabled(a, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarShowTitleEnabled:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarShowTitleEnabled");
-		// 	return _maActionBarShowTitleEnabled(a, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarShowLogoEnabled:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarShowLogoEnabled");
-		// 	return _maActionBarShowLogoEnabled(a, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarSetHomeButtonEnabled:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarSetHomeButtonEnabled");
-		// 	return _maActionBarSetHomeButtonEnabled(a, mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarRefresh:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarRefresh");
-		// 	return _maActionBarRefresh(mJNIEnv, mJThis);
-		// }
-
-		// case maIOCtl_maActionBarSetBackgroundImage:
-		// {
-		// 	SYSLOG("maIOCtl_maActionBarSetBackgroundImage");
-		// 	return _maActionBarSetBackgroundImage(a, mJNIEnv, mJThis);
-		// }
 
 		// ********** Notification API **********
 
@@ -2005,7 +1944,7 @@ namespace Base
 				b,
 				SYSCALL_THIS->GetValidatedStr(c),
 				SYSCALL_THIS->GetValidatedStr(
-					SYSCALL_THIS->GetValidatedStackValue(0)),
+					ARG_NO_4),
 				mJNIEnv,
 				mJThis);
 
@@ -2098,9 +2037,9 @@ namespace Base
 				SYSCALL_THIS->GetValidatedStr(b),
 				SYSCALL_THIS->GetValidatedStr(c),
 				SYSCALL_THIS->GetValidatedStr(
-					SYSCALL_THIS->GetValidatedStackValue(0)),
+					ARG_NO_4),
 				SYSCALL_THIS->GetValidatedStr(
-					SYSCALL_THIS->GetValidatedStackValue(4)),
+					ARG_NO_5),
 				mJNIEnv,
 				mJThis);
 
@@ -2137,8 +2076,8 @@ namespace Base
 				_title,
 				_text,
 				_cancel,
-				SYSCALL_THIS->GetValidatedStackValue(0),
-				SYSCALL_THIS->GetValidatedStackValue(4),
+				ARG_NO_4,
+				ARG_NO_5,
 				mJNIEnv,
 				mJThis);
 			}
@@ -2239,7 +2178,7 @@ namespace Base
 				a,
 				b,
 				c,
-				SYSCALL_THIS->GetValidatedStackValue(0),
+				ARG_NO_4,
 				mJNIEnv,
 				mJThis);
 
@@ -2257,7 +2196,7 @@ namespace Base
 				a,
 				b,
 				c,
-				SYSCALL_THIS->GetValidatedStackValue(0),
+				ARG_NO_4,
 				mJNIEnv,
 				mJThis);
 
@@ -2671,6 +2610,26 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		// ********** Extensions API ***********
+		case maIOCtl_maExtensionModuleLoad:
+		{
+			SYSLOG("maIOCtl_maExtensionModuleLoad");
+			const char *_module = SYSCALL_THIS->GetValidatedStr(a);
+			return _maExtensionModuleLoad(mJNIEnv, mJThis, _module, b);
+		}
+
+		case maIOCtl_maExtensionFunctionLoad:
+		{
+			SYSLOG("maIOCtl_maExtensionFunctionLoad");
+			return _maExtensionFunctionLoad(mJNIEnv, mJThis, a, b);
+		}
+
+		case maIOCtl_maExtensionFunctionInvoke2:
+		{
+			SYSLOG("maIOCtl_maExtensionFunctionInvoke2");
+			return _maExtensionFunctionInvoke2(mJNIEnv, mJThis, a, b, c, (int)gCore->mem_ds);
+		}
+
 		// ********** NFC API **********
 
 		case maIOCtl_maNFCStart:
@@ -2710,8 +2669,8 @@ namespace Base
 
 		case maIOCtl_maNFCTransceive:
 		{
-			int dst = SYSCALL_THIS->GetValidatedStackValue(0);
-			int dstLen = SYSCALL_THIS->GetValidatedStackValue(4);
+			int dst = ARG_NO_4;
+			int dstLen = ARG_NO_5;
 			return _maNFCTransceive(
 					a,
 					(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
@@ -2822,8 +2781,8 @@ namespace Base
 
 		case maIOCtl_maNFCAuthenticateMifareSector:
 		{
-			int keyAddr = SYSCALL_THIS->GetValidatedStackValue(0);
-			int keyLen = SYSCALL_THIS->GetValidatedStackValue(4);
+			int keyAddr = ARG_NO_4;
+			int keyLen = ARG_NO_5;
 			return _maNFCAuthenticateMifareSector(
 					a,
 					b,
@@ -2857,7 +2816,7 @@ namespace Base
 
 		case maIOCtl_maNFCReadMifareBlocks:
 		{
-			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			int len = ARG_NO_4;
 			return _maNFCReadMifareBlocks(
 					a,
 					b,
@@ -2870,7 +2829,7 @@ namespace Base
 
 		case maIOCtl_maNFCReadMifarePages:
 		{
-			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			int len = ARG_NO_4;
 			return _maNFCReadMifarePages(
 					a,
 					b,
@@ -2883,7 +2842,7 @@ namespace Base
 
 		case maIOCtl_maNFCWriteMifareBlocks:
 		{
-			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			int len = ARG_NO_4;
 			return _maNFCWriteMifareBlocks(
 					a,
 					b,
@@ -2896,7 +2855,7 @@ namespace Base
 
 		case maIOCtl_maNFCWriteMifarePages:
 		{
-			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			int len = ARG_NO_4;
 			return _maNFCWriteMifarePages(
 					a,
 					b,
@@ -2958,7 +2917,7 @@ namespace Base
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
 			//Read the fourth parameter from the register
 			//(the first three can be read directly)
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = ARG_NO_4;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
 				_valueBufferSize * sizeof(char));
@@ -2999,7 +2958,7 @@ namespace Base
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
 			//Read the fourth parameter from the register
 			//(the first three can be read directly)
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = ARG_NO_4;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
 				_valueBufferSize * sizeof(char));
@@ -3198,7 +3157,7 @@ namespace Base
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
 			//Read the fourth parameter from the register
 			//(the first three can be read directly)
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = ARG_NO_4;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
 				_valueBufferSize * sizeof(char));
@@ -3261,7 +3220,7 @@ namespace Base
 		case maIOCtl_maDBExecSQLParams:
 		{
 			// Get fourth parameter.
-			int d = SYSCALL_THIS->GetValidatedStackValue(0);
+			int d = ARG_NO_4;
 			return _maDBExecSQLParams(
 				// Database handle
 				a,
@@ -3300,7 +3259,7 @@ namespace Base
 		case maIOCtl_maDBCursorGetColumnText:
 		{
 			// Get fourth parameter.
-			int d = SYSCALL_THIS->GetValidatedStackValue(0);
+			int d = ARG_NO_4;
 			return _maDBCursorGetColumnText(
 				a,
 				b,
@@ -3347,6 +3306,9 @@ bool reloadProgram()
 
 void MoSyncExit(int errorCode)
 {
+#ifdef MOSYNC_NATIVE
+	exit(errorCode);
+#else
 	//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Program has exited!");
 
 	if(false == reloadProgram())
@@ -3363,6 +3325,7 @@ void MoSyncExit(int errorCode)
 
 		Base::SYSCALL_THIS->VM_Yield();
 	}
+#endif
 }
 
 void MoSyncErrorExit(int errorCode)
