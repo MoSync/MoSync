@@ -36,7 +36,11 @@ extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA( /*__in_opt*/
 #else
 #include <conprint.h>
 #endif
+#ifndef __WINDOWS_PHONE_8_LIB__
 #include <mavsprintf.h>
+#else
+#include "../MAStd/mavsprintf.h"
+#endif
 
 //
 // Printf statement for trace prints to debugger output,
@@ -79,7 +83,9 @@ inline void DebugAssert( bool condition )
 	//
 	if ( !condition )
 	{
+#ifndef __WINDOWS_PHONE_8_MAP_LIB__
 		__asm { int 3 }
+#endif
 	}
 
 	#else

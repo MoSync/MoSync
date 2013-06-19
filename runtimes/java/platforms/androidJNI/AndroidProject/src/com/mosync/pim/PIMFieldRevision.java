@@ -8,7 +8,7 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_REVISION;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_DATE;
 
-public class PIMFieldRevision extends PIMField {
+public class PIMFieldRevision extends UnsupportedPIMField {
 
 	/**
 	 * Constructor
@@ -16,48 +16,6 @@ public class PIMFieldRevision extends PIMField {
 	public PIMFieldRevision() {
 		mType = MA_PIM_FIELD_CONTACT_REVISION;
 		mDataType = MA_PIM_TYPE_DATE;
-	}
-
-	void createMaps() {
-
-	}
-
-	void read(ContentResolver cr, String contactId) {
-		print();
-	}
-
-	int checkForPreferredAttribute(int index) {
-		return 0;
-	}
-
-	int getAndroidAttribute(int index) {
-		return 0;
-	}
-
-	int setAttribute(int index, int attribute) {
-		return MA_PIM_ERR_NONE;
-	}
-
-	char[] getLabel(int index) {
-		return null;
-	}
-
-	void setLabel(int index, String label) {
-	}
-
-	boolean hasCustomLabel(int index) {
-		return false;
-	}
-
-	char[] getData(int index) {
-		return null;
-	}
-
-	void setData(int index, char[] buffer) {
-	}
-
-	boolean isSupported() {
-		return false;
 	}
 
 	/**

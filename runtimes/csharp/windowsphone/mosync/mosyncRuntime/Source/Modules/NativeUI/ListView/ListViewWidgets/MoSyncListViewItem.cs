@@ -326,10 +326,23 @@ namespace MoSync
                             mStretch = System.Windows.Media.Stretch.Fill;
                             mIcon.Stretch = mStretch;
 
-                            System.Windows.Media.Imaging.BitmapSource bmpSource =
-                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+							Object bmpSource = null;
+							Object internalObj = res.GetInternalObject();
+							if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+							{
+								bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+							}
+							else if (internalObj is System.IO.Stream)
+							{
+								bmpSource = new System.Windows.Media.Imaging.WriteableBitmap(0, 0);
+								(bmpSource as System.Windows.Media.Imaging.WriteableBitmap).SetSource((System.IO.Stream)res.GetInternalObject());
+							}
+							else if (internalObj is System.Windows.Media.Imaging.WriteableBitmap)
+							{
+								bmpSource = res.GetInternalObject();
+							}
 
-                            mIcon.Source = bmpSource;
+                            mIcon.Source = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
                         }
                         else throw new InvalidPropertyValueException();
                     }

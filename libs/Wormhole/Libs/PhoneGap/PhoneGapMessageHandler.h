@@ -200,7 +200,7 @@ namespace Wormhole
 		 * @param errorMessage Optional error message.
 		 * @param keepCallback true if this callback should be kept by PhoneGap.
 		 */
-		virtual void PhoneGapMessageHandler::callError(
+		virtual void callError(
 			const MAUtil::String& callbackID,
 			const MAUtil::String& errorCode,
 			const MAUtil::String& errorMessage = "",
@@ -218,7 +218,7 @@ namespace Wormhole
 		 * @param castFunction Name of an optional JS function that
 		 * will convert the JSON args to a JS object.
 		 */
-		virtual void PhoneGapMessageHandler::callCallback(
+		virtual void callCallback(
 			const MAUtil::String& callbackFunction,
 			const MAUtil::String& callbackID,
 			bool success,

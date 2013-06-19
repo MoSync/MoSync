@@ -8,7 +8,7 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING;
 
 import android.content.ContentResolver;
 
-public class PIMFieldUID extends PIMField {
+public class PIMFieldUID extends PIMStringField {
 
 	/**
 	 * Constructor
@@ -77,25 +77,9 @@ public class PIMFieldUID extends PIMField {
 		return false;
 	}
 
-	char[] getData(int index) {
-		String val = getSpecificData(index);
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeString(val, buffer);
-		return buffer;
-	}
-
 	String getSpecificData(int index) {
 		String[] val = mValues.get(index);
 		return val[0];
-	}
-
-	int getDataSize(String val) {
-		return val.length() + 1;
-	}
-
-	void setData(int index, char[] buffer) {
-		String val = PIMUtil.readString(buffer);
-		setSpecificData(val, index);
 	}
 
 	void setSpecificData(String data, int index) {

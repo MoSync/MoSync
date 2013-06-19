@@ -30,6 +30,7 @@ MA 02110-1301, USA.
 
 // Include library for string conversions.
 #include <mastdlib.h>
+#include <mactype.h>
 
 // Include the engine that performs the wiki requests.
 #include "WikiEngine.h"

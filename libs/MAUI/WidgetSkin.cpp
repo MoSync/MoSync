@@ -238,13 +238,17 @@ namespace MAUI {
 		// If we didn't find a cached widgetskin, let's generate one and save it in the cache.
 		if(!cached) {
 			// set malloc handler to null so that we can catch if we're out of heap and write directly to the screen then.
+			#ifndef MOSYNC_NATIVE
 			malloc_handler mh = set_malloc_handler(NULL);
+			#endif
 			int *data = new int[width*height];
 			if(!data) {
 				drawDirect(x, y, width, height, type);
 				return;
 			}
+			#ifndef MOSYNC_NATIVE
 			set_malloc_handler(mh);
+			#endif
 			drawToData(data, 0, 0, width, height, type);
 			CacheElement cacheElem;
 

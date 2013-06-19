@@ -1,34 +1,31 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_CUSTOM;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_AIM;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_GOOGLE_TALK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_ICQ;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_JABBER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_MSN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_NETMEETING;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_QQ;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_SKYPE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_YAHOO;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_IM;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING_ARRAY;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_HOME;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_WORK;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_OTHER;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_CUSTOM;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
-
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_IM;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING_ARRAY;
-
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_AIM;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_MSN;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_YAHOO;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_SKYPE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_QQ;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_GOOGLE_TALK;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_ICQ;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_JABBER;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_NETMEETING;
-
 import android.provider.ContactsContract.CommonDataKinds.Im;
 
-public class PIMFieldIM extends PIMField {
+public class PIMFieldIM extends PIMStringArrayField {
 
 	Map<Integer, String> mProtocols;
 
@@ -128,47 +125,6 @@ public class PIMFieldIM extends PIMField {
 	boolean hasCustomLabel(int index) {
 		return ((Integer.parseInt(getColumnValue(index, Im.TYPE)) == Im.TYPE_CUSTOM) ? true
 				: false);
-	}
-
-	char[] getData(int index) {
-		String[] val = getSpecificData(index);
-		DebugPrint("DATA SIZE = " + getDataSize(val));
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeStringArray(val, buffer);
-		return buffer;
-	}
-
-	String[] getSpecificData(int index) {
-		String[] val = mValues.get(index);
-		String[] ret = new String[val.length - 4];
-		for (int i = 0; i < val.length - 4; i++) {
-			ret[i] = val[i + 1];
-		}
-		return ret;
-	}
-
-	int getDataSize(String[] val) {
-		int size = 4;
-		for (int i = 0; i < val.length; i++) {
-			if (val[i] != null) {
-				size += val[i].length();
-			}
-			size += 1;
-		}
-		return size;
-	}
-
-	void setData(int index, char[] buffer) {
-		String[] val = PIMUtil.readStringArray(buffer);
-		setSpecificData(val, index);
-	}
-
-	void setSpecificData(String[] data, int index) {
-		String[] val = mValues.get(index);
-		for (int i = 0; i < data.length; i++) {
-			val[i + 1] = data[i];
-		}
-		mValues.set(index, val);
 	}
 
 	int setAttribute(int index, int attribute) {

@@ -3,6 +3,10 @@
 
 /* $Revision: 13240 $ on $Date:: 2010-12-17 15:16:00 -0800 #$ */
 
+
+#ifdef NATIVE_GLES
+#include "glext_native.h"
+#else
 #include "gl.h"
 
 #ifdef MAPIP
@@ -86,6 +90,8 @@ GL_API GLvoid GL_APIENTRY glGenerateMipmapOES (GLenum target);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif /* __glext_h_ */

@@ -15,10 +15,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef __IOS__
 #include "ma.h"
 #include "mastring.h"
 #include "madmath.h"
 #include "maheap.h"
+#else
+#include <ma.h>
+#include <mastring.h>
+#include <madmath.h>
+#include <maheap.h>
+#endif
+
+#ifndef MOSYNC_NATIVE
 
 BOOL StringMatch(const char* a, const char* b) {
 	while(*a && *b) {
@@ -137,34 +146,6 @@ int memcmp(const void *dst, const void *src, size_t n)
 	}
 
 	return *((unsigned char *) dst) - *((unsigned char *) src);
-}
-
-int stricmp(const char *s1, const char *s2)
-{
-	char f, l;
-
-	do
-	{
-		f = ((*s1 <= 'Z') && (*s1 >= 'A')) ? *s1 + 'a' - 'A' : *s1;
-		l = ((*s2 <= 'Z') && (*s2 >= 'A')) ? *s2 + 'a' - 'A' : *s2;
-		s1++;
-		s2++;
-	} while ((f) && (f == l));
-
-	return (int) (f - l);
-}
-
-int strnicmp(const char *s1, const char *s2, size_t count)
-{
-	int f, l;
-
-	do
-	{
-		if (((f = (unsigned char)(*(s1++))) >= 'A') && (f <= 'Z')) f -= 'A' - 'a';
-		if (((l = (unsigned char)(*(s2++))) >= 'A') && (l <= 'Z')) l -= 'A' - 'a';
-	} while (--count && f && (f == l));
-
-	return f - l;
 }
 
 char *strchr(const char *s, int ch)
@@ -477,7 +458,7 @@ char *strtok(char *string, const char *control)
 
 
 #ifdef MAPIP
-
+#ifndef MOSYNC_NATIVE
 void *memset(void *p, int c, size_t n)
 {
 	char *pb = (char *) p;
@@ -485,7 +466,7 @@ void *memset(void *p, int c, size_t n)
 	while (pb != pbend) *pb++ = c;
 	return p;
 }
-
+#endif
 #endif
 
 /*
@@ -503,6 +484,7 @@ src = (char *) src + 1;
 return ret;
 }
 */
+
 void *memccpy(void *dst, const void *src, int c, size_t count)
 {
 	while (count && (*((char *) (dst = (char *) dst + 1) - 1) =
@@ -704,6 +686,38 @@ end:
 	*(dst++) = 0;
 	return dst - orig - 1;
 }
+
+#endif
+
+#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && !defined(__WINDOWS_PHONE_8__))
+int stricmp(const char *s1, const char *s2)
+{
+        char f, l;
+
+        do
+        {
+                f = ((*s1 <= 'Z') && (*s1 >= 'A')) ? *s1 + 'a' - 'A' : *s1;
+                l = ((*s2 <= 'Z') && (*s2 >= 'A')) ? *s2 + 'a' - 'A' : *s2;
+                s1++;
+                s2++;
+        } while ((f) && (f == l));
+
+        return (int) (f - l);
+}
+
+int strnicmp(const char *s1, const char *s2, size_t count)
+{
+        int f, l;
+
+        do
+        {
+                if (((f = (unsigned char)(*(s1++))) >= 'A') && (f <= 'Z')) f -= 'A' - 'a';
+                if (((l = (unsigned char)(*(s2++))) >= 'A') && (l <= 'Z')) l -= 'A' - 'a';
+        } while (--count && f && (f == l));
+
+        return f - l;
+}
+#endif
 
 //****************************************
 //		UTF8 functions

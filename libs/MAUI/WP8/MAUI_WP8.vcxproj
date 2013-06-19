@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\AnimatedImage.cpp" />
+    <ClCompile Include="..\EditBox.cpp" />
+    <ClCompile Include="..\Engine.cpp" />
+    <ClCompile Include="..\Font.cpp" />
+    <ClCompile Include="..\Image.cpp" />
+    <ClCompile Include="..\ImageGenerators.cpp" />
+    <ClCompile Include="..\Label.cpp" />
+    <ClCompile Include="..\Layout.cpp" />
+    <ClCompile Include="..\ListBox.cpp" />
+    <ClCompile Include="..\Scaler.cpp" />
+    <ClCompile Include="..\Screen.cpp" />
+    <ClCompile Include="..\Widget.cpp" />
+    <ClCompile Include="..\WidgetSkin.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\AnimatedImage.h" />
+    <ClInclude Include="..\EditBox.h" />
+    <ClInclude Include="..\Engine.h" />
+    <ClInclude Include="..\Font.h" />
+    <ClInclude Include="..\Image.h" />
+    <ClInclude Include="..\ImageGenerators.h" />
+    <ClInclude Include="..\InputManager.h" />
+    <ClInclude Include="..\Label.h" />
+    <ClInclude Include="..\Layout.h" />
+    <ClInclude Include="..\ListBox.h" />
+    <ClInclude Include="..\Scaler.h" />
+    <ClInclude Include="..\Screen.h" />
+    <ClInclude Include="..\Widget.h" />
+    <ClInclude Include="..\WidgetSkin.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MAStd\WP8\MAStd_WP8.vcxproj">
+      <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MAUtil\WP8\MAUtil_WP8.vcxproj">
+      <Project>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9de05800-4f0a-49df-ad6b-3546014de254}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>MAUI_WP8</ProjectName>
+    <RootNamespace>MAUI</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug\</OutDir>
+    <TargetName>MAUI</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release\</OutDir>
+    <TargetName>MAUI</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../;../../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling />
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../;../../MAStd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

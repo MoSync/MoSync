@@ -19,10 +19,12 @@
 #include <list>
 #include <sstream>
 #include <fstream>
+#include <cstring>
 #include <stdlib.h>
 #include "packagers.h"
 #include "util.h"
 #include "tools.h"
+#include "mustache/mustache.h"
 #include "helpers/mkdir.h"
 
 #if defined (__MACH__) || defined(__APPLE__)
@@ -44,6 +46,8 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 	std::ostringstream generateCmd;
 	std::ostringstream buildCmd;
 
+	bool isNative = !strcmp("native", s.outputType);
+
 	string dst = s.dst;
 	string src = s.cppOutputDir;
 	string templateLocation = string(ri.path) + "/template";
@@ -59,9 +63,15 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	sh(generateCmd.str().c_str(), s.silent);
 
-	// Copy program files to xcode template
-	copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (src + "/rebuild.build.cpp").c_str());
-	copyFile((xcodeprojOutput + "/data_section.bin").c_str(), (src + "/data_section.bin").c_str());
+	if(!isNative) {
+		// Copy program files to xcode template
+		copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (src + "/rebuild.build.cpp").c_str());
+		copyFile((xcodeprojOutput + "/data_section.bin").c_str(), (src + "/data_section.bin").c_str());
+	}
+	else {
+		copyFile((xcodeprojOutput + "/userCode.o").c_str(), (src + "/userCode.o").c_str());
+		copyFile((xcodeprojOutput + "/MoSyncLibs.a").c_str(), (src + "/MoSyncLibs.a").c_str());
+	}
 
 	string resourceFileCopy = xcodeprojOutput + "/resources";
 	if(s.resource) {
@@ -90,6 +100,10 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 		chdir(xcodeprojOutput.c_str());
 		string filteredProjName = filterWhiteSpace(string(s.name));
 		buildCmd << "xcodebuild -project " << arg(filteredProjName) << ".xcodeproj";
+		buildCmd << " -target " << filteredProjName;
+		if (isNative) {
+			buildCmd << "Native";
+		}
 		if (s.iOSSdk) {
 			buildCmd << " -sdk " << arg(s.iOSSdk);
 		}

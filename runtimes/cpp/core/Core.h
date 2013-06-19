@@ -41,8 +41,11 @@ typedef union _LARGE_INTEGER {
 
 #ifdef _android
 #include <jni.h>
-
+#ifndef MOSYNC_NATIVE
 typedef unsigned short wchar;
+#else
+typedef wchar_t wchar;
+#endif
 #endif
 
 #define USE_VAR_INT
@@ -162,7 +165,7 @@ namespace Core {
 #ifndef _android
 	bool LoadVMApp(VMCore* core, const char* modfile, const char* resfile);
 #else
-	bool LoadVMApp(VMCore* core, int modFd, int resFd);
+	bool LoadVMApp(VMCore* core, int modFd, int resFd, bool isNative);
 #endif
 #endif
 	bool LoadVMApp(VMCore* core, Stream& stream, const char* combfile=0);
@@ -186,7 +189,9 @@ namespace Core {
 
 	//for ioctl
 	void* GetValidatedMemRange(VMCore* core, int address, int size);
+#ifndef MOSYNC_NATIVE
 	int GetValidatedStackValue(VMCore* core, int offset);
+#endif
 	int TranslateNativePointerToMoSyncPointer(VMCore* core, void* ptr);
 	const char* GetValidatedStr(const VMCore* core, int address);
 	const wchar* GetValidatedWStr(const VMCore* core, int address);

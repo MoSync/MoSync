@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\YAJLDom.cpp" />
+    <ClCompile Include="..\src\stdlib\stdlib.c" />
+    <ClCompile Include="..\src\yajl.c" />
+    <ClCompile Include="..\src\yajl_alloc.c" />
+    <ClCompile Include="..\src\yajl_buf.c" />
+    <ClCompile Include="..\src\yajl_encode.c" />
+    <ClCompile Include="..\src\yajl_gen.c" />
+    <ClCompile Include="..\src\yajl_lex.c" />
+    <ClCompile Include="..\src\yajl_parser.c" />
+    <ClCompile Include="..\src\yajl_version.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\YAJLDom.h" />
+    <ClInclude Include="..\src\api\yajl_common.h" />
+    <ClInclude Include="..\src\api\yajl_gen.h" />
+    <ClInclude Include="..\src\api\yajl_parse.h" />
+    <ClInclude Include="..\src\api\yajl_version.h" />
+    <ClInclude Include="..\src\stdlib\assert.h" />
+    <ClInclude Include="..\src\stdlib\ctype.h" />
+    <ClInclude Include="..\src\stdlib\errno.h" />
+    <ClInclude Include="..\src\stdlib\math.h" />
+    <ClInclude Include="..\src\stdlib\stdio.h" />
+    <ClInclude Include="..\src\stdlib\stdlib.h" />
+    <ClInclude Include="..\src\stdlib\string.h" />
+    <ClInclude Include="..\src\yajl_alloc.h" />
+    <ClInclude Include="..\src\yajl_buf.h" />
+    <ClInclude Include="..\src\yajl_bytestack.h" />
+    <ClInclude Include="..\src\yajl_encode.h" />
+    <ClInclude Include="..\src\yajl_lex.h" />
+    <ClInclude Include="..\src\yajl_parser.h" />
+  </ItemGroup>
+</Project>

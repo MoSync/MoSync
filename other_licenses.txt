@@ -10,6 +10,8 @@ build-one.rb
 
 /githooks
 
+/runtimes/csharp/windowsphone/mosync/packages/WPtoolkit.4.2012.10.30
+
 /examples/cpp/wolf3d
 /examples/cpp/flashback
 /examples/cpp/MoRaw
@@ -177,6 +179,7 @@ build-one.rb
 /tools/vis/ConvertSLD.rb
 
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries
+/runtimes/csharp/windowsphone/packages
 /runtimes/csharp/windowsphone/mosync/mosync/mosync.csproj
 /tools/winphone-builder/pugixml-1.0
 

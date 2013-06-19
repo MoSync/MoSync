@@ -26,6 +26,7 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 	MoSyncBridge.cpp \
 	AndroidHelpers.cpp \
 	EventQueue.cpp \
+	JNIStrConv.cpp \
 	SyscallImpl.cpp \
 	IOCtl.cpp \
 	../../base/FileStream.cpp \

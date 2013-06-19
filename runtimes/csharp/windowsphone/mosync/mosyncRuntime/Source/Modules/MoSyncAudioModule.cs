@@ -296,7 +296,20 @@ namespace MoSync
 					lock (mAudioInstances)
 					{
 						AudioInstanceDynamic ai = (AudioInstanceDynamic)mAudioInstances[_instance];
+#if !LIB
 						ai.SubmitBuffer(core.GetDataMemory().GetData(), _pointer, _numBytes);
+#else
+						//This code needs propper testing.
+						//Since the new Memory class, SystemMemory needs to be used while
+						//building MoSync as a Library some of the functions that were used before,
+						//such ass Memory.GetData() make no sense in the current context (share memory
+						//poll in between C++ and C#), making it hard/impossible to implement. This is a
+						//workaround and should be treated like one (with some testing done right)
+
+						Byte[] bytes = new Byte[_numBytes];
+						core.GetDataMemory().ReadBytes(bytes, _pointer, _numBytes);
+						ai.SubmitBuffer(bytes, 0, _numBytes);
+#endif
 					}
 				}
 				catch (MoSync.Util.ReturnValueException rve)

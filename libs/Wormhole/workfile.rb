@@ -12,7 +12,8 @@ work.instance_eval do
 			"Libs/Notification",
 	        "Libs/Orientation",
 			"Libs/PhoneGap",
-			"Libs/W3C"]
+			"Libs/W3C",
+			"Libs/Extensions"]
 
 		@EXTRA_INCLUDES = ['.']
 
@@ -22,6 +23,7 @@ work.instance_eval do
 		copyFilesSubDir("Libs/Orientation")
 		copyFilesSubDir("Libs/PhoneGap")
 		copyFilesSubDir("Libs/W3C")
+		copyFilesSubDir("Libs/Extensions")
 
 		@HEADER_DIRS = ['.']
 		@INSTALL_INCDIR = "Wormhole"
