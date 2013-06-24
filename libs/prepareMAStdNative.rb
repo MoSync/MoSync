@@ -28,13 +28,13 @@ FileUtils.cp_r ["IX_OPENGL_ES.h", "maapi.h", "madmath.h", "maxtoa.h", "maapi_def
 FileUtils.cd ".."
 
 FileUtils.cd "MTXml"
-tfn = 'build/_temp.c'
+tfn = 'entities.c'
+sh "touch #{tfn}"
 sh "gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt " +
 	"| #{sed('s/#line/\\/\\/line/')} > #{tfn}"
 if(File.size(tfn) == 0)
 	error "GPERF failed!"
 end
-FileUtils.mv(tfn, "entities.c");
 
 FileUtils.cd ".."
 
