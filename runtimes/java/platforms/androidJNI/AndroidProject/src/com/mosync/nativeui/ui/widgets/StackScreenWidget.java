@@ -242,6 +242,7 @@ public class StackScreenWidget extends ScreenWidget
 			Log.e("@@MoSync", "NativeUI maWidgetScreenShow invalidate menu");
 			MoSyncThread mosyncThread = MoSyncThread.getInstance();
 			mosyncThread.invalidateOptionsMenu(mosyncThread.getActivity());
+
 		}
 	}
 

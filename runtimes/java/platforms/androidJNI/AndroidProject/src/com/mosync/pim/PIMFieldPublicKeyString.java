@@ -1,6 +1,9 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+
+import com.mosync.api.Pointer;
+
 import android.content.ContentResolver;
 
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
@@ -8,7 +11,7 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING;
 
-public class PIMFieldPublicKeyString extends PIMField {
+public class PIMFieldPublicKeyString extends UnsupportedPIMField {
 
 	/**
 	 * Constructor
@@ -16,48 +19,6 @@ public class PIMFieldPublicKeyString extends PIMField {
 	public PIMFieldPublicKeyString() {
 		mType = MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING;
 		mDataType = MA_PIM_TYPE_STRING;
-	}
-
-	void createMaps() {
-
-	}
-
-	void read(ContentResolver cr, String contactId) {
-		print();
-	}
-
-	int checkForPreferredAttribute(int index) {
-		return 0;
-	}
-
-	int getAndroidAttribute(int index) {
-		return 0;
-	}
-
-	int setAttribute(int index, int attribute) {
-		return MA_PIM_ERR_NONE;
-	}
-
-	char[] getLabel(int index) {
-		return null;
-	}
-
-	void setLabel(int index, String label) {
-	}
-
-	boolean hasCustomLabel(int index) {
-		return false;
-	}
-
-	char[] getData(int index) {
-		return null;
-	}
-
-	void setData(int index, char[] buffer) {
-	}
-
-	boolean isSupported() {
-		return false;
 	}
 
 	/**

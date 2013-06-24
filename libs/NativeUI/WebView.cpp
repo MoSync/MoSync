@@ -27,7 +27,7 @@ MA 02110-1301, USA.
 
 #include "WebViewListener.h"
 
-#include "mastring.h"
+#include <mastring.h>
 
 namespace NativeUI
 {
@@ -254,7 +254,7 @@ namespace NativeUI
 	bool WebView::canNavigateBack()
 	{
 		MAUtil::String value = this->getPropertyString(MAW_WEB_VIEW_NAVIGATE);
-		if (strstr(value.c_str(), "back")) {
+		if (NULL != strstr(value.c_str(), "back")) {
 			return true;
 		}
 		else {
@@ -271,7 +271,7 @@ namespace NativeUI
 	bool WebView::canNavigateForward()
 	{
 		MAUtil::String value = this->getPropertyString(MAW_WEB_VIEW_NAVIGATE);
-		if (strstr(value.c_str(), "forward")) {
+		if (NULL != strstr(value.c_str(), "forward")) {
 			return true;
 		}
 		else {

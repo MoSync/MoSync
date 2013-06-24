@@ -73,14 +73,17 @@ public:
 	 */
 	void openColorScreen(int listItemIndex);
 
-    /**
-     * This method is called when a list view item is clicked.
-     * @param listView The list view object that generated the event.
-     * @param listViewItem The ListViewItem object that was clicked.
-     */
-    virtual void listViewItemClicked(
-        ListView* listView,
-        ListViewItem* listViewItem);
+	/**
+	 * This method is called when a list view item is clicked.
+	 * @param listView The list view object that generated the event.
+	 * @param listViewSection The section object that contains the selected item.
+	 * Will be null for default type list views.
+	 * @param listViewItem The item object that was clicked.
+	 */
+	virtual void listViewItemClicked(
+		ListView *listView,
+		ListViewSection *listViewSection,
+		ListViewItem *listViewItem);
 
     /**
      * This method is called when a screen has been popped from a stack

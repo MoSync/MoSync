@@ -15,14 +15,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef __IOS__
 #include "ma.h"
 #include "mastring.h"
 #include "conprint.h"
 #include "maassert.h"
+#else
+#include <ma.h>
+#include <mastring.h>
+#include <conprint.h>
+#include <maassert.h>
+#endif //#ifndef __IOS__
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 const char* FileNameFromPath(const char* path) {
 	const char* backslash = strrchr(path, '\\');
 	const char* frontslash = strrchr(path, '/');
@@ -62,3 +72,6 @@ void panicFunction(const char* msg, const char* function) {
 		maPanic(1, msg);
 	}
 }
+#ifdef __cplusplus
+}
+#endif //extern C

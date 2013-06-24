@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ActivityIndicator.cpp" />
+    <ClCompile Include="..\Button.cpp" />
+    <ClCompile Include="..\Camera.cpp" />
+    <ClCompile Include="..\CameraPreview.cpp" />
+    <ClCompile Include="..\CheckBox.cpp" />
+    <ClCompile Include="..\DatePicker.cpp" />
+    <ClCompile Include="..\Dialog.cpp" />
+    <ClCompile Include="..\EditBox.cpp" />
+    <ClCompile Include="..\GLView.cpp" />
+    <ClCompile Include="..\HorizontalLayout.cpp" />
+    <ClCompile Include="..\Image.cpp" />
+    <ClCompile Include="..\ImageButton.cpp" />
+    <ClCompile Include="..\Label.cpp" />
+    <ClCompile Include="..\Layout.cpp" />
+    <ClCompile Include="..\ListView.cpp" />
+    <ClCompile Include="..\ListViewItem.cpp" />
+    <ClCompile Include="..\ListViewSection.cpp" />
+    <ClCompile Include="..\Location.cpp" />
+    <ClCompile Include="..\Map.cpp" />
+    <ClCompile Include="..\MapLocation.cpp" />
+    <ClCompile Include="..\MapPin.cpp" />
+    <ClCompile Include="..\MapRegion.cpp" />
+    <ClCompile Include="..\NavigationBar.cpp" />
+    <ClCompile Include="..\NumberPicker.cpp" />
+    <ClCompile Include="..\PanoramaView.cpp" />
+    <ClCompile Include="..\ProgressBar.cpp" />
+    <ClCompile Include="..\RadioButton.cpp" />
+    <ClCompile Include="..\RadioGroup.cpp" />
+    <ClCompile Include="..\RatingBar.cpp" />
+    <ClCompile Include="..\RelativeLayout.cpp" />
+    <ClCompile Include="..\Screen.cpp" />
+    <ClCompile Include="..\SearchBar.cpp" />
+    <ClCompile Include="..\Slider.cpp" />
+    <ClCompile Include="..\StackScreen.cpp" />
+    <ClCompile Include="..\TabScreen.cpp" />
+    <ClCompile Include="..\TextWidget.cpp" />
+    <ClCompile Include="..\TimePicker.cpp" />
+    <ClCompile Include="..\ToggleButton.cpp" />
+    <ClCompile Include="..\VerticalLayout.cpp" />
+    <ClCompile Include="..\VideoView.cpp" />
+    <ClCompile Include="..\WebView.cpp" />
+    <ClCompile Include="..\Widget.cpp" />
+    <ClCompile Include="..\WidgetManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ActivityIndicator.h" />
+    <ClInclude Include="..\Button.h" />
+    <ClInclude Include="..\ButtonListener.h" />
+    <ClInclude Include="..\Camera.h" />
+    <ClInclude Include="..\CameraPreview.h" />
+    <ClInclude Include="..\CheckBox.h" />
+    <ClInclude Include="..\CheckBoxListener.h" />
+    <ClInclude Include="..\DatePicker.h" />
+    <ClInclude Include="..\DatePickerListener.h" />
+    <ClInclude Include="..\Dialog.h" />
+    <ClInclude Include="..\DialogListener.h" />
+    <ClInclude Include="..\EditBox.h" />
+    <ClInclude Include="..\EditBoxListener.h" />
+    <ClInclude Include="..\GLView.h" />
+    <ClInclude Include="..\GLViewListener.h" />
+    <ClInclude Include="..\HorizontalLayout.h" />
+    <ClInclude Include="..\Image.h" />
+    <ClInclude Include="..\ImageButton.h" />
+    <ClInclude Include="..\Label.h" />
+    <ClInclude Include="..\Layout.h" />
+    <ClInclude Include="..\ListView.h" />
+    <ClInclude Include="..\ListViewItem.h" />
+    <ClInclude Include="..\ListViewListener.h" />
+    <ClInclude Include="..\ListViewSection.h" />
+    <ClInclude Include="..\Location.h" />
+    <ClInclude Include="..\Map.h" />
+    <ClInclude Include="..\MapListener.h" />
+    <ClInclude Include="..\MapLocation.h" />
+    <ClInclude Include="..\MapPin.h" />
+    <ClInclude Include="..\MapPinListener.h" />
+    <ClInclude Include="..\MapRegion.h" />
+    <ClInclude Include="..\NavigationBar.h" />
+    <ClInclude Include="..\NavigationBarListener.h" />
+    <ClInclude Include="..\NumberPicker.h" />
+    <ClInclude Include="..\NumberPickerListener.h" />
+    <ClInclude Include="..\PanoramaView.h" />
+    <ClInclude Include="..\ProgressBar.h" />
+    <ClInclude Include="..\RadioButton.h" />
+    <ClInclude Include="..\RadioButtonListener.h" />
+    <ClInclude Include="..\RadioGroup.h" />
+    <ClInclude Include="..\RadioGroupListener.h" />
+    <ClInclude Include="..\RatingBar.h" />
+    <ClInclude Include="..\RatingBarListener.h" />
+    <ClInclude Include="..\RelativeLayout.h" />
+    <ClInclude Include="..\Screen.h" />
+    <ClInclude Include="..\ScreenListener.h" />
+    <ClInclude Include="..\SearchBar.h" />
+    <ClInclude Include="..\SearchBarListener.h" />
+    <ClInclude Include="..\Slider.h" />
+    <ClInclude Include="..\SliderListener.h" />
+    <ClInclude Include="..\StackScreen.h" />
+    <ClInclude Include="..\StackScreenListener.h" />
+    <ClInclude Include="..\TabScreen.h" />
+    <ClInclude Include="..\TabScreenListener.h" />
+    <ClInclude Include="..\TextWidget.h" />
+    <ClInclude Include="..\TimePicker.h" />
+    <ClInclude Include="..\TimePickerListener.h" />
+    <ClInclude Include="..\ToggleButton.h" />
+    <ClInclude Include="..\ToggleButtonListener.h" />
+    <ClInclude Include="..\VerticalLayout.h" />
+    <ClInclude Include="..\VideoView.h" />
+    <ClInclude Include="..\VideoViewListener.h" />
+    <ClInclude Include="..\WebView.h" />
+    <ClInclude Include="..\WebViewListener.h" />
+    <ClInclude Include="..\Widget.h" />
+    <ClInclude Include="..\WidgetEventListener.h" />
+    <ClInclude Include="..\WidgetManager.h" />
+    <ClInclude Include="..\Widgets.h" />
+    <ClInclude Include="..\WidgetUtil.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MAStd\WP8\MAStd_WP8.vcxproj">
+      <Project>{eeed04c3-fd4a-47d1-b918-edcbd5b122be}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MAUtil\WP8\MAUtil_WP8.vcxproj">
+      <Project>{2856527d-4dc7-4ef5-bc8b-71d53e632730}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{d505b50e-8649-4030-9d91-965064dbc867}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>NativeUI_WP8</ProjectName>
+    <RootNamespace>NativeUI</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Debug\</OutDir>
+    <TargetName>NativeUI</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(MOSYNCDIR)\lib\windowsPhone8\ARM\Release\</OutDir>
+    <TargetName>NativeUI</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
+      <ExceptionHandling />
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../;../../MAStd;</AdditionalIncludeDirectories>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>WIN32;MOSYNC_NATIVE;_CRT_SECURE_NO_DEPRECATE;__WINDOWS_PHONE_8_LIB__;__WINDOWS_PHONE_8__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

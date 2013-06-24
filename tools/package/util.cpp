@@ -240,6 +240,18 @@ std::string delim(std::vector<std::string>& input, const std::string& delim) {
 	return result;
 }
 
+void split(vector<string>& out, const string& input, const string& delims) {
+	string::size_type lastPos = input.find_first_not_of(delims, 0);
+	string::size_type pos = input.find_first_of(delims, lastPos);
+
+	while (string::npos != pos || string::npos != lastPos) {
+		string part = input.substr(lastPos, pos - lastPos);
+		out.push_back(part);
+		lastPos = input.find_first_not_of(delims, pos);
+		pos = input.find_first_of(delims, lastPos);
+	}
+}
+
 void write72line(std::ostream& output, const std::string& input) {
 	std::vector<std::string> splitLines = std::vector<std::string>();
 	int len = 72;

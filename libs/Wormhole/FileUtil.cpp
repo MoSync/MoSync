@@ -66,7 +66,7 @@ namespace Wormhole
 	 */
 	MAUtil::String FileUtil::getLocalPath()
 	{
-		int bufferSize = 2048;
+		const int bufferSize = 2048;
 		char buffer[bufferSize];
 
 		int size = maGetSystemProperty(

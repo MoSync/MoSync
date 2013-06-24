@@ -21,8 +21,13 @@ namespace MoSync
         {
         }
 
+#if !LIB
         public void InitData(String dataName, int fileSize, int dataSegmentSize)
-        {
+#else
+         public void InitData()
+#endif
+         {
+#if !LIB
             mDataMemory = new Memory(dataSegmentSize);
 
             StreamResourceInfo dataSectionInfo = Application.GetResourceStream(new Uri("RebuildData\\" + dataName, UriKind.Relative));
@@ -39,6 +44,10 @@ namespace MoSync
             int customEventDataSize = 60;
             sp -= customEventDataSize;
             mCustomEventPointer = dataSegmentSize - customEventDataSize;
+#else
+            mDataMemory = new SystemMemory();
+			mCustomEventPointer = MosyncLibrary.WindowsPhoneRuntimeComponent.GetValidEventPointer();
+#endif
         }
 
 

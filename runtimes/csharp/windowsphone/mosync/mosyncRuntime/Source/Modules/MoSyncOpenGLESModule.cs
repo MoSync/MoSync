@@ -25,8 +25,11 @@ namespace MoSync
 			eventData.WriteInt32(MoSync.Struct.MAWidgetEventData.widgetHandle, 0);
 			mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
 		}
-
+#if !LIB
 		Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation = null;
+#else
+        MosyncLibrary.Delegate_maUpdateScreen mOldUpdateScreenImplementation = null;
+#endif
 		Action maUpdateScreenAction = null;
 		public void SetOnUpdateScreenAction(Action a)
 		{
@@ -231,12 +234,22 @@ namespace MoSync
 
 			ioctls.glMultMatrixf = delegate(int _matrix)
 			{
-				mGL.glMultMatrixf(core.GetDataMemory().GetData(), _matrix); return 0;
+#if !LIB
+				mGL.glMultMatrixf(core.GetDataMemory().GetData(), _matrix);
+				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glMultMatrixx = delegate(int _matrix)
 			{
-				mGL.glMultMatrixx(core.GetDataMemory().GetData(), _matrix); return 0;
+#if !LIB
+				mGL.glMultMatrixx(core.GetDataMemory().GetData(), _matrix);
+				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glEnableClientState = delegate(int _array)
@@ -251,26 +264,42 @@ namespace MoSync
 
 			ioctls.glTexCoordPointer = delegate(int _size, int _type, int _stride, int _pointer)
 			{
+#if !LIB
 				mGL.glTexCoordPointer(_size, _type, _stride, core.GetDataMemory().GetData(), _pointer);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glVertexPointer = delegate(int _size, int _type, int _stride, int _pointer)
 			{
+#if !LIB
 				mGL.glVertexPointer(_size, _type, _stride, core.GetDataMemory().GetData(), _pointer);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glColorPointer = delegate(int _size, int _type, int _stride, int _pointer)
 			{
+#if !LIB
 				mGL.glColorPointer(_size, _type, _stride, core.GetDataMemory().GetData(), _pointer);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glNormalPointer = delegate(int _type, int _stride, int _pointer)
 			{
+#if !LIB
 				mGL.glNormalPointer(_type, _stride, core.GetDataMemory().GetData(), _pointer);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glDrawArrays = delegate(int _mode, int _first, int _count)
@@ -281,8 +310,12 @@ namespace MoSync
 
 			ioctls.glDrawElements = delegate(int _mode, int _count, int _type, int _indecies)
 			{
+#if !LIB
 				mGL.glDrawElements(_mode, _count, _type, core.GetDataMemory().GetData(), _indecies);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glEnable = delegate(int _e)
@@ -351,11 +384,15 @@ namespace MoSync
 
 			ioctls.glTexImage2D = delegate(int _target, int _level, int _internalformat, int _width, int _height, int _border, int _format, int _type, int _pixels)
 			{
+#if !LIB
 				if(_pixels == 0)
 					mGL.glTexImage2D(_target, _level, _internalformat, _width, _height, _border, _format, _type, null, _pixels);
 				else
 					mGL.glTexImage2D(_target, _level, _internalformat, _width, _height, _border, _format, _type, core.GetDataMemory().GetData(), _pixels);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glDeleteTextures = delegate(int _n, int _textures)
@@ -371,8 +408,12 @@ namespace MoSync
 
 			ioctls.glTexSubImage2D = delegate(int _target, int _level, int _xofs, int _yofs, int _width, int _height, int _format, int _type, int _pixels)
 			{
+#if !LIB
 				mGL.glTexSubImage2D(_target, _level, _xofs, _yofs, _width, _height, _format, _type, core.GetDataMemory().GetData(), _pixels);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glCompressedTexImage2D = delegate(int _target, int _level, int _internalformat, int _width, int _height, int _border, int _imageSize, int _data)
@@ -404,14 +445,22 @@ namespace MoSync
 
 			ioctls.glBufferData = delegate(int _target, int _size, int _data, int _usage)
 			{
+#if !LIB
 				mGL.glBufferData(_target, _size, core.GetDataMemory().GetData(), _data, _usage);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glBufferSubData = delegate(int _target, int _offset, int _size, int _data)
 			{
+#if !LIB
 				mGL.glBufferSubData(_target, _offset, _size, core.GetDataMemory().GetData(), _data);
 				return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;
+#endif
 			};
 
 			ioctls.glMaterialf = delegate(int face, int pname, float value)
@@ -426,12 +475,20 @@ namespace MoSync
 
 			ioctls.glMaterialfv = delegate(int face, int pname, int data)
 			{
+#if !LIB
 				mGL.glMaterialfv(face, pname, core.GetDataMemory().GetData(), data); return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glMaterialxv = delegate(int face, int pname, int data)
 			{
+#if !LIB
 				mGL.glMaterialxv(face, pname, core.GetDataMemory().GetData(), data); return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glLightf = delegate(int _light, int _pname, float _param)
@@ -446,12 +503,20 @@ namespace MoSync
 
 			ioctls.glLightfv = delegate(int _light, int _pname, int _pointer)
 			{
+#if !LIB
 				mGL.glLightfv(_light, _pname, core.GetDataMemory().GetData(), _pointer); return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glLightxv = delegate(int _light, int _pname, int _pointer)
 			{
+#if !LIB
 				mGL.glLightxv(_light, _pname, core.GetDataMemory().GetData(), _pointer); return 0;
+#else
+				return MoSync.Constants.IOCTL_UNAVAILABLE;;
+#endif
 			};
 
 			ioctls.glShadeModel = delegate(int _mode)

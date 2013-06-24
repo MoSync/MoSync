@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <set>
 #include <string>
-#include "mustache.h"
+#include "mustache/mustache.h"
 
 #define BLUETOOTH "Bluetooth"
 #define CALENDAR "Calendar"

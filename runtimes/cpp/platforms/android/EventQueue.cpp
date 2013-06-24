@@ -17,9 +17,6 @@ MA 02110-1301, USA.
 
 #include "EventQueue.h"
 
-// Use for debugging.
-//#define MYLOG(a) __android_log_write(ANDROID_LOG_INFO, "@@@ MoSync", a);
-
 static int GetSafePointerId(int pointerId)
 {
 	if (pointerId >= 0 &&

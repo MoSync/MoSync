@@ -64,6 +64,7 @@ class NativeGccLinkWork < NativeGccWork
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
 		lld = @LOCAL_DLLS.collect { |ld| FileTask.new(self, @COMMON_BUILDDIR + ld + DLL_FILE_ENDING) }
 		wlo = @WHOLE_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
+		# This comment fixes a build problem. Don't ask me why!
 		@LIBRARIES.each { |l| @EXTRA_LINKFLAGS += " -l" + l }
 		need(:@NAME)
 		need(:@BUILDDIR)

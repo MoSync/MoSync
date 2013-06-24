@@ -37,10 +37,10 @@ extern "C" {
 #define _TIME_H	//to avoid conflicting types for time_t
 #endif
 
+#ifndef MOSYNC_NATIVE
 #ifndef _MSC_VER
 typedef int time_t;
 #endif
-#endif	//_TIME_H
 
 /// Components of a calendar date and time.
 struct tm
@@ -64,6 +64,12 @@ struct tm
 	///Daylight Saving Time flag. Ignored by MoSync functions.
 	int tm_isdst;
 };
+#endif
+#endif	//_TIME_H
+
+#ifdef MOSYNC_NATIVE
+#include <time.h>
+#endif
 
 /**
 * Converts a time value to the structure pointed to by \a tim_p.
@@ -86,11 +92,13 @@ char* sprint_tm(const struct tm* tim_p, char* buf);
 */
 char* sprint_time(time_t timer);
 
+#ifndef MOSYNC_NATIVE
 /**
 * Converts the structure pointed to by \a tim_p into a time value.
 * \see maTime, maLocalTime
 */
 time_t mktime(struct tm* tim_p);
+#endif
 
 #ifdef __cplusplus
 }

@@ -25,7 +25,15 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
+import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -40,17 +48,6 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
-import static com.mosync.internal.generated.MAAPI_consts.MA_IMAGE_PICKER_EVENT_RETURN_TYPE_IMAGE_HANDLE;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
-import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_WAKE_LOCK_ON;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_OK;
-import static com.mosync.internal.generated.MAAPI_consts.MA_CAMERA_RES_SNAPSHOT_IN_PROGRESS;
-
-import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_SHORT;
-import static com.mosync.internal.generated.MAAPI_consts.MA_TOAST_DURATION_LONG;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -58,16 +55,23 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
@@ -92,6 +96,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.opengl.GLUtils;
@@ -100,6 +105,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
@@ -109,13 +115,13 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import android.provider.Settings.Secure;
-import android.net.ConnectivityManager;
 
+import com.mosync.api.MoSyncContext;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
+import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
-import com.mosync.internal.generated.IX_OPENGL_ES;
+import com.mosync.internal.generated.IX_OPENGL_ES_MA;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
@@ -130,13 +136,9 @@ import com.mosync.nativeui.util.MediaManager;
  * Thread that runs the MoSync virtual machine and handles all syscalls.
  * @author Anders Malm
  */
-public class MoSyncThread extends Thread
+public class MoSyncThread extends Thread implements MoSyncContext
 {
-	// When this class is loaded we load the native library.
-	static
-	{
-		System.loadLibrary("mosync");
-	}
+	private static boolean isNative = false;
 
 	/**
 	 * Global reference to the single instance of this class.
@@ -149,7 +151,8 @@ public class MoSyncThread extends Thread
 		FileDescriptor program,
 		long programOffset,
 		FileDescriptor resource,
-		long resourceOffset);
+		long resourceOffset,
+		boolean isNative);
 	//public native boolean nativeLoadResource(ByteBuffer resource);
 	public native boolean nativeLoadResource(
 		FileDescriptor resource,
@@ -158,6 +161,8 @@ public class MoSyncThread extends Thread
 		int placeholder);
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
+	public native void nativeRun2(String appLibPath, String mainFn);
+	public native ByteBuffer nativeGetMemorySlice(int addr, int len);
 	public native void nativePostEvent(int[] eventBuffer);
 	public native int nativeGetEventQueueSize();
 	public native int nativeCreateBinaryResource(
@@ -188,6 +193,7 @@ public class MoSyncThread extends Thread
 	MoSyncCapture mMoSyncCapture;
 	MoSyncPurchase mMoSyncPurchase;
 	MoSyncDB mMoSyncDB;
+	MoSyncExtensionLoader mMoSyncExtensionLoader;
 	MoSyncOrientationHelper mOrientation;
 
 	/**
@@ -197,6 +203,8 @@ public class MoSyncThread extends Thread
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
+
+	static boolean loadedNativeLibs = false;
 
 	/**
 	 * Chunk size used when loading resources.
@@ -335,12 +343,23 @@ public class MoSyncThread extends Thread
 	 */
 	BroadcastReceiver mScreenActivatedReceiver = null;
 
+	String mNativeLibraryDir;
+
+	private HashMap<String, String> mAppLibPaths = new HashMap<String, String>();
+
+	private ArrayList<String> mDeferredModules = new ArrayList<String>();
+
+	private HashSet<String> mStaticModules = new HashSet<String>();
+
+	private String mUserLib = null;
+
 	/**
 	 * MoSyncThread constructor
 	 */
 	public MoSyncThread(Context context, Handler handler) throws Exception
 	{
 		mContext = (MoSync) context;
+		loadNativeLibraries(context);
 
 		// TODO: Clean this up! The static reference should be in one place.
 		// Now the instance of MoSyncThread is passed to many classes and
@@ -446,9 +465,45 @@ public class MoSyncThread extends Thread
 
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
+		mMoSyncExtensionLoader = MoSyncExtensionLoader.getDefault();
+
 		mOrientation = new MoSyncOrientationHelper(mContext);
 
 		nativeInitRuntime();
+	}
+
+	private synchronized void loadNativeLibraries(Context context) {
+		try {
+			InputStream depsList = context.getAssets().open("startup.mf");
+			LineNumberReader reader = new LineNumberReader(new InputStreamReader(depsList, Charset.forName("UTF-8")));
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				if (line.length() > 0) {
+					String[] moduleAndInitFn = line.split(":", 3);
+					String libType = moduleAndInitFn[0];
+					boolean shared = "SHARED".equalsIgnoreCase(libType);
+					String module = moduleAndInitFn[1];
+					mUserLib = module;
+					String initFn = moduleAndInitFn.length > 2 ? moduleAndInitFn[2] : null;
+					if (initFn != null) {
+						// Deferred init until nativeRun2 is executed.
+						// Static ones will be called using the last, main lib.
+						mDeferredModules.add(module);
+						if (!shared) {
+							mStaticModules.add(module);
+						}
+						mAppLibPaths.put(module, initFn);
+					}
+					if (shared) {
+						System.loadLibrary(module);
+					}
+				}
+			}
+			mNativeLibraryDir = context.getApplicationInfo().nativeLibraryDir;
+			isNative = true;
+		} catch (Exception e) {
+			// The native runtime
+			System.loadLibrary("mosync");
+		}
 	}
 
 	public static MoSyncThread getInstance()
@@ -630,11 +685,18 @@ public class MoSyncThread extends Thread
 	 */
 	public synchronized ByteBuffer getMemorySlice(int addr, int len)
 	{
-		mMemDataSection.position(addr);
-		ByteBuffer slice = mMemDataSection.slice().order(null);
-		if(-1 != len)
-			slice.limit(len);
-		return slice;
+		if (len < 0) {
+			maPanic(1, "Negative memory size");
+		}
+		if (isNative) {
+			return nativeGetMemorySlice(addr, len);
+		} else {
+			mMemDataSection.position(addr);
+			ByteBuffer slice = mMemDataSection.slice().order(null);
+			if(-1 != len)
+				slice.limit(len);
+			return slice;
+		}
 	}
 
 	/**
@@ -712,10 +774,6 @@ public class MoSyncThread extends Thread
 		try
 		{
 			AssetManager assetManager = mContext.getAssets();
-			AssetFileDescriptor pAfd = assetManager.openFd(PROGRAM_FILE);
-			FileDescriptor pFd = pAfd.getFileDescriptor();
-			long pFdOffset = pAfd.getStartOffset();
-
 			FileDescriptor rFd = null;
 			mResourceOffset = 0;
 
@@ -730,30 +788,34 @@ public class MoSyncThread extends Thread
 			}
 			catch (FileNotFoundException fnfe)
 			{
-				logError("loadProgram - Has no resources! exception: "
-					+ fnfe.toString(), fnfe);
+				Log.i("@@MoSync", "No resources");
 			}
 
 			// We have a program file so now we sends it to the native side
 			// so it will be loaded into memory. The data section will also be
 			// created and if there are any resources they will be loaded.
-			if (null != pFd)
+			FileDescriptor pFd = null;
+			long pFdOffset = 0;
+			try {
+				AssetFileDescriptor pAfd = assetManager.openFd(PROGRAM_FILE);
+				pFd = pAfd.getFileDescriptor();
+				pFdOffset = pAfd.getStartOffset();
+			} catch (FileNotFoundException fnfe) {
+				Log.i("@@MoSync", "No program file");
+			}
+
+			if (isNative || (null != pFd))
 			{
-				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
+				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset,
+						isNative))
 				{
 					logError("loadProgram - "
-						+ "ERROR Load program was unsuccesfull");
+							+ "ERROR Load program was unsuccesfull");
 
-					if (null == mMemDataSection)
-					{
-						threadPanic(
-							0,
-							"This device does not have enough" +
-							"memory to run this application."
-						);
-					}
-					else
-					{
+					if (null == mMemDataSection) {
+						threadPanic(0, "This device does not have enough"
+								+ "memory to run this application.");
+					} else {
 						threadPanic(0, "Unable to load program or resources");
 					}
 
@@ -824,6 +886,10 @@ public class MoSyncThread extends Thread
 		}
 
 		return byteBuffer;
+	}
+
+	public boolean isNative() {
+		return isNative;
 	}
 
 	/**
@@ -1058,14 +1124,28 @@ public class MoSyncThread extends Thread
 		//Log.i("MoSync Thread", "run");
 
 		// Load the program.
-		if (false == loadProgram())
+		if (false == loadProgram() && !isNative)
 		{
 			logError("load program failed!!");
 			return;
 		}
 
 		// Run program. This enters a while loop in C-code.
-		nativeRun();
+		if (isNative) {
+			for (String deferred : mDeferredModules) {
+				String lib = mStaticModules.contains(deferred) ? mUserLib : deferred;
+				runInitFunction(lib, mAppLibPaths.get(deferred));
+			}
+			mContext.finish();
+			nativeExit();
+		} else {
+			nativeRun();
+		}
+	}
+
+	private void runInitFunction(String module, String initFn) {
+		String lib = mNativeLibraryDir + "/lib" + module + ".so";
+		nativeRun2(lib, initFn);
 	}
 
 	public static void logError(String message , Throwable t)
@@ -1240,9 +1320,10 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
-
 		int[] vertices = new int[count*2];
+
+		IntBuffer ib = getMemorySlice(address, 4 * vertices.length).order(null).asIntBuffer();
+
 		ib.get(vertices);
 
 		Path path = new Path();
@@ -1302,9 +1383,10 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(address);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
-
 		int[] vertices = new int[count*2];
+
+		IntBuffer ib = getMemorySlice(address, 4 * vertices.length).order(null).asIntBuffer();
+
 		ib.get(vertices);
 
 		Path path = new Path();
@@ -1565,12 +1647,11 @@ public class MoSyncThread extends Thread
 			{
 				if (mUsingFrameBuffer)
 				{
-					// TODO: Document why this is commented out.
-					// Was this the old way of doing what is done below?
-					// Delete commented out code if not needed.
-					//mMemDataSection.position(mFrameBufferAddress);
-					//mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
-
+					if (isNative) {
+						// Ok, obviously we need to fix the -1 below. What
+						// should be the proper size?
+						maPanic(1, "Frame buffer not supported when building as library.");
+					}
 					ByteBuffer framebufferSlice = getMemorySlice(mFrameBufferAddress, -1);
 					mFrameBufferBitmap.copyPixelsFromBuffer(framebufferSlice);
 
@@ -1661,7 +1742,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(mem);
 		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = getMemorySlice(mem, -1).asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, 4 * srcRectWidth * srcRectHeight).order(null).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{
@@ -1932,7 +2013,7 @@ public class MoSyncThread extends Thread
 		{
 			int pixels[] = new int[srcWidth * srcHeight];
 
-			IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+			IntBuffer intBuffer = getMemorySlice(dst, 4 * pixels.length).order(null).asIntBuffer();
 
 			imageResource.mBitmap.getPixels(
 				pixels,
@@ -2004,7 +2085,7 @@ public class MoSyncThread extends Thread
 		//mMemDataSection.position(dst);
 		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, 4 * srcWidth * srcHeight).order(null).asIntBuffer();
 
 		try
 		{
@@ -2697,20 +2778,35 @@ public class MoSyncThread extends Thread
 	/**
 	 * maPanic
 	 */
-	void maPanic(int result, String message)
+	public void maPanic(int result, String message)
 	{
 		SYSLOG("maPanic");
 
 		threadPanic(result, message);
 	}
 
+
+	int maExtensionFunctionInvoke(int function, int ptrs, int memstart) {
+		return maInvokeExtension(function, ptrs, memstart);
+	}
+
+	int maExtensionModuleLoad(String name, int hash) {
+		return mMoSyncExtensionLoader.maExtensionModuleLoad(name, hash);
+	}
+
+	int maExtensionFunctionLoad(int module, int ix) {
+		return mMoSyncExtensionLoader.maExtensionFunctionLoad(module, ix);
+	}
+
+
+
 	/**
 	 * maInvokeExtension
 	 */
-	int maInvokeExtension(int function, int a, int b, int c)
+	int maInvokeExtension(int function, int ptr, int memstart)
 	{
 		SYSLOG("maInvokeExtension");
-		return -1;
+		return mMoSyncExtensionLoader.maInvokeExtension(function, ptr, memstart);
 	}
 
 	/**
@@ -2881,7 +2977,7 @@ public class MoSyncThread extends Thread
 		// Add null termination character.
 		//mMemDataSection.put((byte)0);
 
-		ByteBuffer slicedBuffer = getMemorySlice(buf, -1);
+		ByteBuffer slicedBuffer = getMemorySlice(buf, ba.length + 1);
 		slicedBuffer.put(ba);
 		slicedBuffer.put((byte)0);
 
@@ -5120,15 +5216,15 @@ public class MoSyncThread extends Thread
 	int maOpenGLInitFullscreen(int glApi) {
 		if(mOpenGLScreen != -1) return 0;
 
-        if(glApi == IX_OPENGL_ES.MA_GL_API_GL1)
+        if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL1)
             mOpenGLView = maWidgetCreate("GLView");
-        else if(glApi == IX_OPENGL_ES.MA_GL_API_GL2)
+        else if(glApi == IX_OPENGL_ES_MA.MA_GL_API_GL2)
             mOpenGLView = maWidgetCreate("GL2View");
         else
-            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
+            return IX_OPENGL_ES_MA.MA_GL_INIT_RES_UNAVAILABLE_API;
 
         if(mOpenGLView < 0) {
-            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
+            return IX_OPENGL_ES_MA.MA_GL_INIT_RES_UNAVAILABLE_API;
         }
 
         mOpenGLScreen = maWidgetCreate("Screen");
@@ -5828,4 +5924,5 @@ public class MoSyncThread extends Thread
 			}
 		}
 	}
+
 }

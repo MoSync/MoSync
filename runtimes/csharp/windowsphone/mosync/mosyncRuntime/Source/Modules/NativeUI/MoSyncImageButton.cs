@@ -23,14 +23,15 @@ MA 02110-1301, USA.
  *
  * @platform WP 7.1
  **/
-
+using System;
 using Microsoft.Phone.Controls;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Navigation;
-using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Windows.Media.Imaging;
+using System.IO;
 using System.IO.IsolatedStorage;
 
 namespace MoSync
@@ -378,10 +379,23 @@ namespace MoSync
 
                         mForegroundImage.Stretch = mStretchForeground;
 
-                        System.Windows.Media.Imaging.BitmapSource bmpSource =
-                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						Object bmpSource = null;
+						Object internalObj = res.GetInternalObject();
+						if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+						{
+							bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						}
+						else if (internalObj is Stream)
+						{
+							bmpSource = new WriteableBitmap(0, 0);
+							(bmpSource as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+						}
+						else if (internalObj is WriteableBitmap)
+						{
+							bmpSource = res.GetInternalObject();
+						}
 
-                        mForegroundImage.Source = bmpSource;
+						mForegroundImage.Source = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
                         mForegroundImageHandle = value;
                         mForegroundImagePath = "";
                     }
@@ -405,10 +419,23 @@ namespace MoSync
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
                     if (null != res && null != res.GetInternalObject())
                     {
-                        System.Windows.Media.Imaging.BitmapSource bmpSource =
-                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						Object bmpSource = null;
+						Object internalObj = res.GetInternalObject();
+						if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+						{
+							bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						}
+						else if (internalObj is Stream)
+						{
+							bmpSource = new WriteableBitmap(0, 0);
+							(bmpSource as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+						}
+						else if (internalObj is WriteableBitmap)
+						{
+							bmpSource = res.GetInternalObject();
+						}
 
-                        mBackgroundImage.Source = bmpSource;
+						mBackgroundImage.Source = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
 
                         mBackgroundImageHandle = value;
                         mBackgroundImagePath = "";
@@ -433,10 +460,23 @@ namespace MoSync
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
                     if (null != res && null != res.GetInternalObject())
                     {
-                        System.Windows.Media.Imaging.BitmapSource bmpSource =
-                            (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						Object bmpSource = null;
+						Object internalObj = res.GetInternalObject();
+						if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+						{
+							bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						}
+						else if (internalObj is Stream)
+						{
+							bmpSource = new WriteableBitmap(0, 0);
+							(bmpSource as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+						}
+						else if (internalObj is WriteableBitmap)
+						{
+							bmpSource = res.GetInternalObject();
+						}
 
-                        mPressedBackgroundImageSource = bmpSource;
+						mPressedBackgroundImageSource = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
                         mPressedImageHandle = value;
                         mPressedImagePath = "";
                     }

@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\CustomMoblet.cpp" />
+    <ClCompile Include="..\Encoder.cpp" />
+    <ClCompile Include="..\FileUtil.cpp" />
+    <ClCompile Include="..\FunTable.cpp" />
+    <ClCompile Include="..\HighLevelBinaryDownloader.cpp" />
+    <ClCompile Include="..\HighLevelHttpConnection.cpp" />
+    <ClCompile Include="..\HighLevelImageDownloader.cpp" />
+    <ClCompile Include="..\HighLevelTextDownloader.cpp" />
+    <ClCompile Include="..\HybridMoblet.cpp" />
+    <ClCompile Include="..\MessageHandler.cpp" />
+    <ClCompile Include="..\MessageProtocol.cpp" />
+    <ClCompile Include="..\MessageStream.cpp" />
+    <ClCompile Include="..\MessageStreamJSON.cpp" />
+    <ClCompile Include="..\WebAppMoblet.cpp" />
+    <ClCompile Include="..\WebViewMessage.cpp" />
+    <ClCompile Include="..\Libs\JSNativeUI\NativeUIMessageHandler.cpp" />
+    <ClCompile Include="..\Libs\JSNativeUI\ResourceMessageHandler.cpp" />
+    <ClCompile Include="..\Libs\JSONMessage.cpp" />
+    <ClCompile Include="..\Libs\Notification\PushNotificationManager.cpp" />
+    <ClCompile Include="..\Libs\Notification\TCPConnection.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapCamera.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapCapture.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapFile.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapMessageHandler.cpp" />
+    <ClCompile Include="..\Libs\PhoneGap\PhoneGapSensors.cpp" />
+    <ClCompile Include="..\Libs\W3C\SensorManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\CustomMoblet.h" />
+    <ClInclude Include="..\Encoder.h" />
+    <ClInclude Include="..\FileUtil.h" />
+    <ClInclude Include="..\FunTable.h" />
+    <ClInclude Include="..\HighLevelBinaryDownloader.h" />
+    <ClInclude Include="..\HighLevelHttpConnection.h" />
+    <ClInclude Include="..\HighLevelImageDownloader.h" />
+    <ClInclude Include="..\HighLevelTextDownloader.h" />
+    <ClInclude Include="..\HybridMoblet.h" />
+    <ClInclude Include="..\MessageHandler.h" />
+    <ClInclude Include="..\MessageProtocol.h" />
+    <ClInclude Include="..\MessageStream.h" />
+    <ClInclude Include="..\MessageStreamJSON.h" />
+    <ClInclude Include="..\WebAppMoblet.h" />
+    <ClInclude Include="..\WebViewMessage.h" />
+    <ClInclude Include="..\Libs\JSNativeUI\NativeUIMessageHandler.h" />
+    <ClInclude Include="..\Libs\JSNativeUI\ResourceMessageHandler.h" />
+    <ClInclude Include="..\Libs\JSONMessage.h" />
+    <ClInclude Include="..\Libs\Notification\PushNotificationManager.h" />
+    <ClInclude Include="..\Libs\Notification\TCPConnection.h" />
+    <ClInclude Include="..\Libs\PhoneGap\MimeTypes.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapCamera.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapCapture.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapFile.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapMessageHandler.h" />
+    <ClInclude Include="..\Libs\PhoneGap\PhoneGapSensors.h" />
+    <ClInclude Include="..\Libs\W3C\SensorManager.h" />
+  </ItemGroup>
+</Project>

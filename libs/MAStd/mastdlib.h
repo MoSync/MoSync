@@ -35,7 +35,9 @@ extern "C" {
 #ifdef _MSC_VER
 #pragma warning(disable:4273 4005)
 #else
+#ifndef MOSYNC_NATIVE
 #define stricmp strcasecmp
+#endif
 #endif
 #else
 
@@ -72,7 +74,9 @@ int axtoi(const char *hexStg);
 /*
  * Convert a string to a long integer.
  */
+#ifndef __WINDOWS_PHONE_8__
 long strtol(const char *nptr, char **endptr, int base);
+#endif
 
 /*
  * Convert a string to an unsigned long integer.

@@ -85,7 +85,13 @@
 #include <cfloat>
 #include <limits>
 #include <cstdio>
+
+#if defined(MOSYNC_NATIVE) && defined(__IOS__)
+#include <tr1/type_traits>
+#else
 #include <type_traits>
+#endif
+
 #include "core/setup.hpp"
 
 #if(defined(GLM_MESSAGES) && !defined(GLM_MESSAGE_CORE_INCLUDED_DISPLAYED))

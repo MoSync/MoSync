@@ -79,11 +79,29 @@ namespace MAUtil {
 
 	String integerToString(int i, int base) {
 		char cBuf[64];
+#ifdef __WINDOWS_PHONE_8__
+		return _itoa(i, cBuf, base);
+#else
 		return itoa(i, cBuf, base);
+#endif
 	}
 
 	int stringToInteger(const String &s, int base) {
 		return strtoul(s.c_str(), 0, base);
+	}
+
+	String longToString(long long l, int base) {
+#ifndef lltoa
+		// This is just plain stupid.
+		return integerToString((int) l, base);
+#else
+		char cBuf[128];
+        return lltoa(l, cBuf, base);
+#endif
+	}
+
+	long long stringToLong(const String &s, int base) {
+		return strtoull(s.c_str(), 0, base);
 	}
 
 	double stringToDouble(const String &s) {

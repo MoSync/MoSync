@@ -22,8 +22,8 @@ MA 02110-1301, USA.
 #include "GFont.h"
 #include <GLES2/gl2.h>
 #include <glm/glm.hpp>
-#include <hash_map>
 #include "Shaders.h"
+#include "Utils.h"
 
 struct VertStore
 {
