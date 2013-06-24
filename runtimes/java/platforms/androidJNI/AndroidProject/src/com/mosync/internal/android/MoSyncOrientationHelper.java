@@ -64,8 +64,28 @@ public class MoSyncOrientationHelper {
 		// Store supported orientation flag.
 		mSupportedOrientations = orientation;
 
+		Boolean isLandscape = false;
+		Boolean isPortrait = false;
+
+		if (((orientation & MA_SCREEN_ORIENTATION_PORTRAIT_UP)
+				== MA_SCREEN_ORIENTATION_PORTRAIT_UP) ||
+			((orientation & MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN)
+				== MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN))
+		{
+			isPortrait = true;
+		}
+
+		if (((orientation & MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT)
+				== MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT) ||
+			((orientation & MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT)
+				== MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT))
+		{
+			isLandscape = true;
+		}
+
 		// Set to FULL_SENSOR or SENSOR.
-		if ( orientation == MA_SCREEN_ORIENTATION_DYNAMIC )
+		if ( (isLandscape && isPortrait) ||
+				(orientation == MA_SCREEN_ORIENTATION_DYNAMIC) )
 		{
 			setOrientation(
 					ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR,
