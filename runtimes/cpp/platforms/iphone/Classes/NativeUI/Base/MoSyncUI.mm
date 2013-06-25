@@ -142,11 +142,11 @@
             returnedPoint.x = width - originalPoint.x;
             returnedPoint.y = height - originalPoint.y;
             break;
-        case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
+        case MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT:
             returnedPoint.x = originalPoint.y;
             returnedPoint.y = width - originalPoint.x;
             break;
-        case MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT:
+        case MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT:
             returnedPoint.x = height - originalPoint.y;
             returnedPoint.y = originalPoint.x;
             break;

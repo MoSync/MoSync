@@ -123,6 +123,7 @@ public class MoSync extends Activity
 	 * values retrieved when configuration changes.
 	 */
 	private static int mScreenRotation = Surface.ROTATION_0;
+	private static int mConfigOrientation = Configuration.ORIENTATION_PORTRAIT;
 
 	/**
 	 * Sets screen and window properties.
@@ -311,13 +312,18 @@ public class MoSync extends Activity
 
 		SYSLOG("@@MoSync rotation = " + newRotation);
 
-		// Has the rotation changed?
-		if (mScreenRotation != newRotation)
+		int newConfigOrientation = getResources().getConfiguration().orientation;
+
+		// Has the rotation or orientation changed?
+		if ((mScreenRotation != newRotation) ||
+				(mConfigOrientation != newConfigOrientation))
 		{
-			// Save current rotation.
+			// Save current rotation and config orientation.
 			mScreenRotation = newRotation;
+			mConfigOrientation = newConfigOrientation;
 
 			int screenOrientation = getScreenOrientation();
+
 			// Post rotation event.
 			ScreenWidget screen = mMoSyncThread.getUnconvertedCurrentScreen();
 			if (null != screen)
@@ -362,24 +368,47 @@ public class MoSync extends Activity
 	}
 
 	/**
-	 * Get the screen orientation based on latest rotation.
+	 * Get the screen orientation based on latest rotation and config orientation.
 	 * @return
 	 */
 	public static int getScreenOrientation()
 	{
-		switch(mScreenRotation)
+		final Activity activity = MoSyncThread.getInstance().getActivity();
+
+		int configOrientation = activity.getResources().getConfiguration().orientation;
+
+		int screenOrientation;
+
+		switch (configOrientation)
 		{
-		case Surface.ROTATION_0:
-			return MA_SCREEN_ORIENTATION_PORTRAIT_UP;
-		case Surface.ROTATION_180:
-			return MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
-		case Surface.ROTATION_270:
-			return MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
-		case Surface.ROTATION_90:
-			return MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+		case Configuration.ORIENTATION_PORTRAIT:
+			if(mScreenRotation == Surface.ROTATION_90 ||
+				mScreenRotation == Surface.ROTATION_180)
+			{
+				screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+			}
+			else
+			{
+				screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+			}
+			break;
+		case Configuration.ORIENTATION_LANDSCAPE:
+			if(mScreenRotation == android.view.Surface.ROTATION_0 ||
+				mScreenRotation == android.view.Surface.ROTATION_90)
+			{
+				screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+			}
+			else
+			{
+				screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+			}
+			break;
 		default:
-			return MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+			screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+			break;
 		}
+
+		return screenOrientation;
 	}
 
 	@Override
