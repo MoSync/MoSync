@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B2BE81517784A1C00AFDAD4 /* entities.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B2BE81417784A1C00AFDAD4 /* entities.c */; };
 		0B80AC96171D9A78002EDBD1 /* maassert.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B80AC95171D9A78002EDBD1 /* maassert.c */; };
 		0B81C65217292425006E6E7D /* OrientationMessageHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B81C65017292425006E6E7D /* OrientationMessageHandler.cpp */; };
 		0B81C6541729253E006E6E7D /* conprint.c in Sources */ = {isa = PBXBuildFile; fileRef = 0B81C6531729253E006E6E7D /* conprint.c */; };
@@ -231,6 +232,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0B2BE81417784A1C00AFDAD4 /* entities.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = entities.c; path = ../../MTXml/entities.c; sourceTree = "<group>"; };
 		0B80AC95171D9A78002EDBD1 /* maassert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = maassert.c; sourceTree = "<group>"; };
 		0B81C65017292425006E6E7D /* OrientationMessageHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OrientationMessageHandler.cpp; sourceTree = "<group>"; };
 		0B81C65117292425006E6E7D /* OrientationMessageHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrientationMessageHandler.h; sourceTree = "<group>"; };
@@ -1705,6 +1707,7 @@
 		8B3FD682173A4C6400419203 /* MTXml */ = {
 			isa = PBXGroup;
 			children = (
+				0B2BE81417784A1C00AFDAD4 /* entities.c */,
 				8B3FD684173A4C9000419203 /* entities.h */,
 				8B3FD685173A4C9000419203 /* MTSax.cpp */,
 				8B3FD686173A4C9000419203 /* MTSax.h */,
@@ -2023,6 +2026,7 @@
 				8B3FD6C5173A50C400419203 /* MemoryMgr.cpp in Sources */,
 				8B3FD6C6173A50C400419203 /* OpenStreetMapSource.cpp in Sources */,
 				8B3FD6C7173A50C400419203 /* TimeSpan.cpp in Sources */,
+				0B2BE81517784A1C00AFDAD4 /* entities.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

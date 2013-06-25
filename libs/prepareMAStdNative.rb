@@ -27,6 +27,17 @@ FileUtils.cp_r ["IX_OPENGL_ES.h", "maapi.h", "madmath.h", "maxtoa.h", "maapi_def
 
 FileUtils.cd ".."
 
+FileUtils.cd "MTXml"
+tfn = 'entities.c'
+sh "touch #{tfn}"
+sh "gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt " +
+	"| #{sed('s/#line/\\/\\/line/')} > #{tfn}"
+if(File.size(tfn) == 0)
+	error "GPERF failed!"
+end
+
+FileUtils.cd ".."
+
 @target_dir = "MAStdNative/"
 Dir.glob('**/*.h*').each do |file|
 	dir, filename = File.dirname(file), File.basename(file)
