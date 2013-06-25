@@ -397,8 +397,8 @@ public class MoSync extends Activity
 			}
 			break;
 		case Configuration.ORIENTATION_LANDSCAPE:
-			if(mScreenRotation == android.view.Surface.ROTATION_0 ||
-				mScreenRotation == android.view.Surface.ROTATION_90)
+			if(mScreenRotation == Surface.ROTATION_0 ||
+				mScreenRotation == Surface.ROTATION_90)
 			{
 				screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
 			}
