@@ -179,18 +179,22 @@ public class MoSync extends Activity
 		// Options Menu is enabled for devices prior to Honeycomb.
 		// ActionBar is disabled by default starting with Honeycomb, and can be
 		// enabled using maActionBarSetEnabled(true)
-		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
-		{
-			// Action bar will not be supported on pre-Honeycomb devices
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			NativeUI.mActionBarEnabled = false;
-		}
-		else
-		{
-			requestWindowFeature(Window.FEATURE_ACTION_BAR);
-			NativeUI.mActionBarEnabled = true;
-			getActionBar().hide();
-		}
+
+//		This part will be needed when adding the Action-bar but please reevaluate all
+//		Action-bar related code and do proper testing.
+//
+//		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB )
+//		{
+//			// Action bar will not be supported on pre-Honeycomb devices
+//			requestWindowFeature(Window.FEATURE_NO_TITLE);
+//			NativeUI.mActionBarEnabled = false;
+//		}
+//		else
+//		{
+//			requestWindowFeature(Window.FEATURE_ACTION_BAR);
+//			NativeUI.mActionBarEnabled = true;
+//			getActionBar().hide();
+//		}
 
 		// Create the view.
 		mMoSyncView = createMoSyncView();
@@ -527,31 +531,20 @@ public class MoSync extends Activity
 			for (int i=0; i < items.size(); i++)
 			{
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
-				if (NativeUI.mActionBarEnabled)
-					item.setShowAsAction(items.get(i).getShowActionFlag());
-				if ( items.get(i).hasIconFromResources() )
+//				if (NativeUI.mActionBarEnabled)
+//					item.setShowAsAction(items.get(i).getShowActionFlag());
+				if ( items.get(i).hasIconPredefined() )
 				{
 					item.setIcon( items.get(i).getIconResId() );
 				}
-				else
+				else if ( items.get(i).hasIconFromResources() )
 				{
 					item.setIcon( items.get(i).getIcon() );
 				}
 			}
-//			return true;
 		}
 		else
 			Log.e("@@MoSync"," onCreateOptionsMenu screen is NULL");
-//
-//		return super.onCreateOptionsMenu(menu);
-
-//    	MenuItem item1 = menu.add(0, 1, 0, "btn");
-//    	item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//    	item1.setIcon(17301555);
-//
-//    	MenuItem item2 = menu.add(1,0,0,"t");
-//    	item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//    	item2.setIcon(17301583);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -564,16 +557,6 @@ public class MoSync extends Activity
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
 		Log.e("@@MoSync", "MoSync onPrepareOptionsMenu");
-
-//    	MenuItem item1 = menu.add(0, 1, 0, "btn");
-//    	item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//    	item1.setIcon(17301555);
-//
-//    	MenuItem item2 = menu.add(1,0,0,"t");
-//    	item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//    	item2.setIcon(17301583);
-
-//		return super.onPrepareOptionsMenu(menu);
 
 //		// Remove all the items from the menu.
 		menu.clear();
@@ -591,27 +574,25 @@ public class MoSync extends Activity
 			{
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
 				// When enabled, use ActionBar items.
-				if (NativeUI.mActionBarEnabled)
-				{
-					item.setShowAsAction(items.get(i).getShowActionFlag());
-				}
+//				if (NativeUI.mActionBarEnabled)
+//				{
+//					item.setShowAsAction(items.get(i).getShowActionFlag());
+//				}
 
-				if ( items.get(i).hasIconFromResources() )
+				if ( items.get(i).hasIconPredefined() )
 				{
 					item.setIcon( items.get(i).getIconResId() );
 				}
-				else if ( items.get(i).hasIconPredefined() )
+				else if ( items.get(i).hasIconFromResources() )
 				{
 					item.setIcon( items.get(i).getIcon() );
 				}
 			}
-//			return true;
 		}
 		else
 			Log.e("@@MoSync"," onPrepareOptionsMenu screen is NULL");
 
 		return super.onPrepareOptionsMenu(menu);
-//		return false;
 	}
 
 	@Override

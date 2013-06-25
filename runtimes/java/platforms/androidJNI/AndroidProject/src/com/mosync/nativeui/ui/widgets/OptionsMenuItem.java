@@ -72,7 +72,11 @@ public class OptionsMenuItem
 	public OptionsMenuItem(int handle, String title, Drawable icon ){
 		m_itemId = handle;
 		m_title = title;
-		m_icon = icon;
+		if ( icon != null )
+		{
+			m_icon = icon;
+			m_iconResource = true;
+		}
 	}
 
 	/**
@@ -86,7 +90,6 @@ public class OptionsMenuItem
 	public OptionsMenuItem(int handle, String title, int iconRes){
 		m_itemId = handle;
 		m_title = title;
-		m_iconResource = true;
 		m_iconResID = iconRes;
 	}
 
