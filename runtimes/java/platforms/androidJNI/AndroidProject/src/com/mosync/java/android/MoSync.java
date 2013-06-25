@@ -533,13 +533,13 @@ public class MoSync extends Activity
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
 //				if (NativeUI.mActionBarEnabled)
 //					item.setShowAsAction(items.get(i).getShowActionFlag());
-				if ( items.get(i).hasIconPredefined() )
+				if ( items.get(i).hasPredefinedIcon() )
 				{
-					item.setIcon( items.get(i).getIconResId() );
+					item.setIcon( items.get(i).getPredefinedIconID() );
 				}
-				else if ( items.get(i).hasIconFromResources() )
+				else if ( items.get(i).hasCustomIcon() )
 				{
-					item.setIcon( items.get(i).getIcon() );
+					item.setIcon( items.get(i).getCustomIcon() );
 				}
 			}
 		}
@@ -579,13 +579,13 @@ public class MoSync extends Activity
 //					item.setShowAsAction(items.get(i).getShowActionFlag());
 //				}
 
-				if ( items.get(i).hasIconPredefined() )
+				if ( items.get(i).hasPredefinedIcon() )
 				{
-					item.setIcon( items.get(i).getIconResId() );
+					item.setIcon( items.get(i).getPredefinedIconID() );
 				}
-				else if ( items.get(i).hasIconFromResources() )
+				else if ( items.get(i).hasCustomIcon() )
 				{
-					item.setIcon( items.get(i).getIcon() );
+					item.setIcon( items.get(i).getCustomIcon() );
 				}
 			}
 		}
