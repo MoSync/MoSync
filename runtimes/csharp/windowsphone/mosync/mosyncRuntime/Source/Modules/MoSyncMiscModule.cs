@@ -65,7 +65,7 @@ namespace MoSync
 
             syscalls.maExit = delegate(int res)
             {
-                MoSync.Util.Exit(res);
+                mCore.Stop();
             };
 
             DateTime startDate = System.DateTime.Now;
