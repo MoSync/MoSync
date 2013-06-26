@@ -399,7 +399,7 @@ namespace NativeUI
 			return MAW_RES_ERROR;
 		}
 
-		if (index < 0 || index >= mChildren.size())
+		if (index < 0 || index > mChildren.size())
 		{
 			return MAW_RES_INVALID_INDEX;
 		}

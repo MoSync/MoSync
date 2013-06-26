@@ -2,13 +2,18 @@
 <project supports-build-configs="true" version="1.5">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
+<criteria>
+<filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
+<capabilities optional="" required="File\ Storage Internet\ Access"/>
+</filter>
+</criteria>
 <properties>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, mafsD.lib, benchdb.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, benchdb.lib"/>
-<property key="build.prefs:additional.library.paths/Debug" value=""/>
-<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:additional.library.paths/Debug" value="%current-project%/libs"/>
+<property key="build.prefs:additional.library.paths/Release" value="%current-project%/libs"/>
 <property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibration"/>
 <property key="build.prefs:app.vendor/Release" value="MoSync"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
@@ -26,8 +31,10 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value="linpack.c"/>
 <property key="excludes/Release" value="getbuildinfo.c getbuildinfo.bat getbuildinfo.exe linpack.c build"/>
+<property key="profile.mgr.type" value="0"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x042db65a"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xe811792f"/>
 <property key="template.id" value="project.c"/>
+<property key="winmobilecs:guid" value="3c1935f0-ae5c-1030-809d-f3cf84b95d3c"/>
 </properties>
 </project>
