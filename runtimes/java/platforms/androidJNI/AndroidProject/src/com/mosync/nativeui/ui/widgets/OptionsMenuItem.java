@@ -36,20 +36,14 @@ public class OptionsMenuItem
 	private String m_title = "";
 
 	/**
-	 * Icon of this menu item.
+	 * Custom icon of this menu item.
 	 */
-	private Drawable m_icon = null;
+	private Drawable m_customIcon = null;
 
 	/**
-	 * If true, the icon is taken from resources.
-	 * If false it is a user defined icon.
+	 * The id of the predefined icon for this menu item.
 	 */
-	private Boolean m_iconResource = false;
-
-	/**
-	 * The icon resource id.
-	 */
-	private int m_iconResID = -1;
+	private int m_predefinedIconID = -1;
 
 	/**
 	 * The item id.
@@ -66,28 +60,32 @@ public class OptionsMenuItem
 	/**
 	 * Constructor
 	 *
-	 * @param handle handle Integer handle corresponding to this instance.
-	 * @param view A screen wrapped by this widget.
+	 * @param handle Integer handle corresponding to this instance.
+	 * @param title The text that will be displayed on the menu item.
+	 * @param icon The icon that will be displayed on the menu item.
 	 */
 	public OptionsMenuItem(int handle, String title, Drawable icon ){
 		m_itemId = handle;
 		m_title = title;
-		m_icon = icon;
+		if ( icon != null )
+		{
+			m_customIcon = icon;
+		}
 	}
 
 	/**
 	 * Constructor.
 	 *
-	 * @param handle handle Integer handle corresponding to this instance.
-	 * @param iconRes The resource id of the icon. One of the
+	 * @param handle Integer handle corresponding to this instance.
+	 * @param title The text that will be displayed on the menu item.
+	 * @param predefinedIconId The resource id of the predefined icon
+	 * that will be displayed on this menu item. One of the
 	 * MAW_OPTIONS_MENU_ICON_CONSTANT_ constants.
-	 * @param view A screen wrapped by this widget.
 	 */
-	public OptionsMenuItem(int handle, String title, int iconRes){
+	public OptionsMenuItem(int handle, String title, int predefinedIconId){
 		m_itemId = handle;
 		m_title = title;
-		m_iconResource = true;
-		m_iconResID = iconRes;
+		m_predefinedIconID = predefinedIconId;
 	}
 
 	public void setShowAsAction(int flag)
@@ -100,14 +98,14 @@ public class OptionsMenuItem
 		return m_displayFlag;
 	}
 
-	public Boolean hasIconFromResources()
+	public Boolean hasCustomIcon()
 	{
-		return m_iconResource;
+		return (m_customIcon != null ? true : false);
 	}
 
-	public Boolean hasIconPredefined()
+	public Boolean hasPredefinedIcon()
 	{
-		return (m_iconResID != -1 ? true : false );
+		return (m_predefinedIconID != -1 ? true : false );
 	}
 
 	public String getTitle()
@@ -120,13 +118,13 @@ public class OptionsMenuItem
 		return m_itemId;
 	}
 
-	public Drawable getIcon()
+	public Drawable getCustomIcon()
 	{
-		return m_icon;
+		return m_customIcon;
 	}
 
-	public int getIconResId()
+	public int getPredefinedIconID()
 	{
-		return m_iconResID;
+		return m_predefinedIconID;
 	}
 }

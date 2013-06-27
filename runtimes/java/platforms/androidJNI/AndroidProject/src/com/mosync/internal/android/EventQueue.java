@@ -114,9 +114,6 @@ public class EventQueue
 	 */
 	public void postWidgetTabChangedEvent(int tabScreen, int newTabIndex)
 	{
-		// Save the current tab screen.
-		sMoSyncThread.setCurrentScreen(tabScreen);
-
 		postWidgetEvent(
 			IX_WIDGET.MAW_EVENT_TAB_CHANGED,
 			tabScreen,
