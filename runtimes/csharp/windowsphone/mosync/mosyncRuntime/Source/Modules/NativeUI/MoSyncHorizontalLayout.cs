@@ -101,15 +101,15 @@ namespace MoSync
 
                 View = mGrid;
 
-                mGrid.Margin = new Thickness(0);
+                mGrid.Margin = new Thickness(0.0);
 
                 mStackPanels = new System.Collections.Generic.List<StackPanel>();
 
                 setHorizontalSizePolicyFlags(true, false);
                 setVerticalSizePolicyFlags(true, false);
-//#if DEBUG
+                //#if DEBUG
                 //mGrid.ShowGridLines = true;
-//#endif
+                //#endif
             }
 
             /**
@@ -183,7 +183,10 @@ namespace MoSync
                 // Adding a new container
                 mStackPanels.Insert(sIndex, new StackPanel());
 
-                int stackPanelIndex = sIndex;
+                // by default, the stack panel orientation is Vertical (inside a horizontal layout it should
+                // be Horizontal
+                mStackPanels[sIndex].Orientation = Orientation.Horizontal;
+
                 bool stackPanelRequired = true;
 
                 // The column for the widget has the default GridUnitType set on 1 x Auto
@@ -208,17 +211,17 @@ namespace MoSync
                     // FILL_SPACE_H && WRAP_CONT_V
                     else if (widget.WRAP_CONT_V)
                     {
-                        mStackPanels[stackPanelIndex].Orientation = Orientation.Vertical;
+                        mStackPanels[sIndex].Orientation = Orientation.Vertical;
                     }
                 }
                 // WRAP_CONT_H
                 else if (widget.WRAP_CONT_H)
                 {
-                    mStackPanels[stackPanelIndex].Orientation = Orientation.Vertical;
+                    mStackPanels[sIndex].Orientation = Orientation.Vertical;
                     // WRAP_CONT_V && WRAP_CONT_H
                     if (widget.FILL_SPACE_V)
                     {
-                        mStackPanels[stackPanelIndex].Orientation = Orientation.Horizontal;
+                        mStackPanels[sIndex].Orientation = Orientation.Horizontal;
                     }
                 }
 
@@ -231,11 +234,11 @@ namespace MoSync
                 {
                     // If the stack panel container is required the widget gets added to that container
                     // and then this goes to the grid. Read above for the logical explanation.
-                    mStackPanels[stackPanelIndex].Children.Add((widget.View as System.Windows.FrameworkElement));
-                    Grid.SetRow(mStackPanels[stackPanelIndex], 1);
-                    Grid.SetColumn(mStackPanels[stackPanelIndex], gIndex);
+                    mStackPanels[sIndex].Children.Add((widget.View as System.Windows.FrameworkElement));
+                    Grid.SetRow(mStackPanels[sIndex], 1);
+                    Grid.SetColumn(mStackPanels[sIndex], gIndex);
 
-                    mGrid.Children.Add(mStackPanels[stackPanelIndex]);
+                    mGrid.Children.Add(mStackPanels[sIndex]);
                 }
                 else
                 {
@@ -244,10 +247,10 @@ namespace MoSync
                     // posible use. (in case the size policy changes after the child widget
                     // was added to the parent.
                     Grid.SetRow((widget.View as FrameworkElement), 1);
-                    Grid.SetColumn(mStackPanels[stackPanelIndex], gIndex);
+                    Grid.SetColumn(mStackPanels[sIndex], gIndex);
                     Grid.SetColumn((widget.View as FrameworkElement), gIndex);
 
-                    mGrid.Children.Add(mStackPanels[stackPanelIndex]);
+                    mGrid.Children.Add(mStackPanels[sIndex]);
                     mGrid.Children.Add(widget.View);
                 }
 

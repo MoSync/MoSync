@@ -182,8 +182,6 @@ namespace MoSync
 
                 // Adding a new container
                 mStackPanels.Insert(sIndex, new StackPanel());
-
-                int stackPanelIndex = sIndex;
                 bool stackPanelRequired = true;
 
                 // The row for the widget has the default GridUnitType set on 1 x Auto
@@ -208,18 +206,18 @@ namespace MoSync
                     // FILL_SPACE_V && WRAP_CONT_H
                     else if (widget.WRAP_CONT_H)
                     {
-                        mStackPanels[stackPanelIndex].Orientation = Orientation.Horizontal;
+                        mStackPanels[sIndex].Orientation = Orientation.Horizontal;
                     }
                 }
                 // WRAP_CONT_V
                 else if (widget.WRAP_CONT_V)
                 {
-                    mStackPanels[stackPanelIndex].Orientation = Orientation.Vertical;
+                    mStackPanels[sIndex].Orientation = Orientation.Vertical;
 
                     // WRAP_CONT_V && WRAP_CONT_H
                     if (widget.WRAP_CONT_H)
                     {
-                        mStackPanels[stackPanelIndex].Orientation = Orientation.Horizontal;
+                        mStackPanels[sIndex].Orientation = Orientation.Horizontal;
                     }
                 }
 
@@ -232,11 +230,11 @@ namespace MoSync
                 {
                     // If the stack panel container is required the widget gets added to that container
                     // and then this goes to the grid. Read above for the logical explanation.
-                    mStackPanels[stackPanelIndex].Children.Add((widget.View as System.Windows.FrameworkElement));
-                    Grid.SetColumn(mStackPanels[stackPanelIndex], 1);
-                    Grid.SetRow(mStackPanels[stackPanelIndex], gIndex);
+                    mStackPanels[sIndex].Children.Add((widget.View as System.Windows.FrameworkElement));
+                    Grid.SetColumn(mStackPanels[sIndex], 1);
+                    Grid.SetRow(mStackPanels[sIndex], gIndex);
 
-                    mGrid.Children.Add(mStackPanels[stackPanelIndex]);
+                    mGrid.Children.Add(mStackPanels[sIndex]);
                 }
                 else
                 {
@@ -245,10 +243,10 @@ namespace MoSync
                     // posible use. (in case the size policy changes after the child widget
                     // was added to the parent.
                     Grid.SetColumn((widget.View as FrameworkElement), 1);
-                    Grid.SetRow(mStackPanels[stackPanelIndex], gIndex);
+                    Grid.SetRow(mStackPanels[sIndex], gIndex);
                     Grid.SetRow((widget.View as FrameworkElement), gIndex);
 
-                    mGrid.Children.Add(mStackPanels[stackPanelIndex]);
+                    mGrid.Children.Add(mStackPanels[sIndex]);
                     mGrid.Children.Add(widget.View);
                 }
 
@@ -287,6 +285,7 @@ namespace MoSync
                     }
 
                     // go through all the widget and modify their row numbers
+                    // TODO SA: should this loop start from gridIndex?
                     for (int j = 0; j < mChildren.Count; j++)
                     {
                         WidgetBaseWindowsPhone widget = mChildren[j] as WidgetBaseWindowsPhone;
@@ -361,11 +360,12 @@ namespace MoSync
                             {
                                 FrameworkElement control = currentControls.First() as FrameworkElement;
                                 int controlRow = Grid.GetRow(control);
-                                Grid.SetRow(control, controlRow - 1 > 0 ? controlRow - 1 : 0);
+                                Grid.SetRow(control, controlRow - 1 > 0 ? controlRow - 1 : 1);
                             }
                         }
 
                         // update all the widgets row numbers
+                        // TODO SA: should this start from widget.RowNumber?
                         for (int i = 0; i < mChildren.Count; i++)
                         {
                             WidgetBaseWindowsPhone currentWidget = mChildren[i] as WidgetBaseWindowsPhone;
