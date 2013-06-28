@@ -1,2 +1,4 @@
-.res RES_IMAGE
+.res RES_IMAGE_SEND
 .image "send.png"
+.res RES_IMAGE_UNSCHEDULE
+.image "unschedule.png"

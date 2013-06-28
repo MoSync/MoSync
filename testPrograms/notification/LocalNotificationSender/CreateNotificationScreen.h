@@ -216,7 +216,8 @@ private:
      * On click will create and schedule the local notification.
      */
     ImageButton* mCreateNotificationButton;
-//    Button* mUnschedule;Button* mDestroy;
+    ImageButton* mUnscheduleNotificationButton;
+    //Button* mDestroy;
 
     /**
      * Store local notification objects.

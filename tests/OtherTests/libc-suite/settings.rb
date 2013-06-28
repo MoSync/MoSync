@@ -1,0 +1,19 @@
+SETTINGS = {
+	#:source_path => '/glibc-2.11.1/',
+	:source_path => '/MoSyncDev/MoSyncF/glibc/',
+	:stop_on_fail => true,
+	:rebuild_failed => true,
+	:retry_failed => true,
+	:rebuild_missing_log => true,
+	:test_dead_code_elimination => false,
+	:test_release => false,
+	:copy_targets => [],
+	:loader_base_url => 'http://10.0.2.2:4042/libctests/',
+	#:loader_base_url => 'http://192.168.0.136:4042/',
+	#:htdocs_dir => '/htdocs/',	# set to nil or false to disable copying.
+	:htdocs_dir => '/wamp/www/libctests/',
+	:write_master_dump => false,
+	:copy_dce => false,
+	:dce_only => false,
+	:force_copy_htdocs => true,
+}
