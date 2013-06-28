@@ -109,10 +109,11 @@ static ScreenOrientation *sharedInstance = nil;
 		    UIInterfaceOrientationMaskPortrait : mSupportedOrientations;
 		mSupportedOrientations |= mAllowedScreenOrientations &MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN ?
 					UIInterfaceOrientationMaskPortraitUpsideDown : mSupportedOrientations;
+        // MoSync landscape left/right concept is the opposite of the native ios landscape left/right.
         mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT ?
-				UIInterfaceOrientationMaskLandscapeLeft : mSupportedOrientations;
+                UIInterfaceOrientationMaskLandscapeRight : mSupportedOrientations;
 		mSupportedOrientations |= mAllowedScreenOrientations & MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT?
-		    UIInterfaceOrientationMaskLandscapeRight : mSupportedOrientations;
+            UIInterfaceOrientationMaskLandscapeLeft : mSupportedOrientations;
 		return MA_SCREEN_ORIENTATION_RES_OK;
     }
 }
@@ -143,11 +144,12 @@ static ScreenOrientation *sharedInstance = nil;
         case UIInterfaceOrientationPortraitUpsideDown:
             returnValue = [self isPortraitUpsideDownModeSupported];
             break;
+        // MoSync landscape left/right concept is the opposite of the native ios landscape left/right.
         case UIInterfaceOrientationLandscapeLeft:
-            returnValue = [self isLandscapeLeftModeSupported];
+            returnValue = [self isLandscapeRightModeSupported];
             break;
         case UIInterfaceOrientationLandscapeRight:
-            returnValue = [self isLandscapeRightModeSupported];
+            returnValue = [self isLandscapeLeftModeSupported];
             break;
     }
     return returnValue;
@@ -232,11 +234,12 @@ static ScreenOrientation *sharedInstance = nil;
         case UIInterfaceOrientationPortraitUpsideDown:
             returnValue = MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
             break;
+        // MoSync landscape left/right concept is the opposite of the native ios landscape left/right.
         case UIInterfaceOrientationLandscapeLeft:
-            returnValue = MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+            returnValue = MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
             break;
         case UIInterfaceOrientationLandscapeRight:
-            returnValue = MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+            returnValue = MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
             break;
     }
 

@@ -416,16 +416,9 @@ namespace MoSync
 
             //DebugDumpState();
 
-            //while(mRunning)
-            while (true)
+            while(mRunning)
             {
                 //DebugLogStateChanges();
-                /*
-                if (mIp == 16754)
-                {
-                    int a = 2;
-                }
-                */
 
                 oldIp = mIp;
 
