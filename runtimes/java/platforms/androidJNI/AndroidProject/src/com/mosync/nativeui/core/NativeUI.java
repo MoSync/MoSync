@@ -595,7 +595,7 @@ public class NativeUI
 		else if(m_currentScreen instanceof ScreenWidget )
 			return (ScreenWidget) m_currentScreen;
 
-		return null;//(ScreenWidget) m_currentScreen;
+		return null;
 	}
 
 	/**
@@ -761,7 +761,10 @@ public class NativeUI
 		// Create a menu item with no icon if iconHandle is left null.
 		if ( TextUtils.isEmpty(iconHandle) )
 		{
-			return screen.addOptionsMenuItem(title, null);
+			int index = screen.addOptionsMenuItem(title, null);
+			mMoSyncThread.invalidateOptionsMenu(m_activity);
+			// When adding a new menu item the id is returned.
+			return index;
 		}
 
 		// Parse iconHandle to get the iconPredefinedId, or iconId.
@@ -784,12 +787,10 @@ public class NativeUI
 					.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD)
 					&& iconID <= Integer
 							.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM))
-				//return screen.addMenuItem(title, iconID);
 			{
 				int index = screen.addOptionsMenuItem(title, iconID);
-
 				mMoSyncThread.invalidateOptionsMenu(m_activity);
-				//m_activity.onCreateOptionsMenu( screen.getMenu() );
+				// When adding a new menu item the id is returned.
 				return index;
 			}
 			else
@@ -807,8 +808,10 @@ public class NativeUI
 				Bitmap icon = NativeUI.getBitmap( iconID );
 				if( icon != null )
 				{
+					int index = screen.addOptionsMenuItem(title, new BitmapDrawable(icon));
+					mMoSyncThread.invalidateOptionsMenu(m_activity);
 					// When adding a new menu item the id is returned.
-					return screen.addOptionsMenuItem(title, new BitmapDrawable(icon));
+					return index;
 				}
 			}
 			Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon handle: " + iconHandle);
@@ -822,297 +825,6 @@ public class NativeUI
 		}
 		}
 	}
-
-//	public Boolean checkActionBar()
-//	{
-//		if (!mActionBarEnabled)
-//		{
-//			SYSLOG("@@MoSync ActionBar is disabled.");
-//			return false;
-//		}
-//		return true;
-//	}
-//
-//	/**
-//	 *
-//	 * @param handle
-//	 * @param title
-//	 * @param iconPredefinedId
-//	 * @param iconHandle
-//	 * @param displayFlag
-//	 * @return
-//	 */
-//	public int maActionBarAddMenuItem(final int handle, final String title,
-//			final int iconPredefinedId, final int iconHandle, final int displayFlag)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if ( TextUtils.isEmpty(title))
-//		{
-//			Log.e("@@MoSync","maActionbarAddMenuItem null title");
-//		}
-//		else
-//			Log.e("@@MoSync","maActionbarAddMenuItem title is not null");
-//
-//		if ( checkActionBar() )
-//		{
-//			Widget widget = m_widgetTable.get( handle );
-//			if( widget == null || !(widget instanceof ScreenWidget) )
-//			{
-//				Log.e( "@@MoSync", "maActionBarAddMenuItem: Invalid screen widget handle: "
-//							+ handle );
-//				return IX_WIDGET.MAW_RES_INVALID_HANDLE;
-//			}
-//
-//			ScreenWidget screen = (ScreenWidget) widget;
-//
-//			// Create a menu item with no icon.
-//			if ( iconPredefinedId <= 0 && iconHandle <= 0 )
-//			{
-//				return screen.addActionBarMenuItem(title, null, displayFlag);
-//			}
-//
-//			// Create the menu item based on a predefined icon.
-//			if ( iconHandle <= 0 )
-//			{
-//				// If the icon is predefined, match the id to one of the
-//				// OptionsMenuIconConstants constants.
-//				if (iconPredefinedId >= Integer
-//						.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD)
-//						&& iconPredefinedId <= Integer
-//								.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM))
-//					return screen.addActionBarMenuItem(
-//							title, iconPredefinedId, displayFlag);
-//			}
-//
-//			// Create the menu item based on a project resource.
-//			if ( iconPredefinedId <=  0)
-//			{
-//				if ( m_imageTable.containsKey( iconHandle ) )
-//				{
-//					Bitmap icon = NativeUI.getBitmap( iconHandle );
-//					if( icon != null )
-//					{
-//						// When adding a new menu item the id is returned.
-//						return screen.addActionBarMenuItem(
-//								title, new BitmapDrawable(icon), displayFlag);
-//					}
-//				}
-//			}
-//
-//			Log.e("@@MoSync",
-//					"maActionBarAddMenuItem: Error while converting property value: "
-//							+ iconPredefinedId);
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_INVALID_ICON;
-//		}
-//
-//		Log.e("@@MoSync", "ActionBar feature cannot be applied. Action bar is disabled.");
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	/**
-//	 *
-//	 * @param screenHandle
-//	 * @param itemHandle
-//	 * @return
-//	 */
-//	public int maActionBarRemoveItem(final int screenHandle, final int itemHandle)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		//return mMoSyncNativeUI.maActionBarRemoveItem(screenHandle, itemHandle);
-//		if ( checkActionBar() )
-//		{
-//			Widget widget = m_widgetTable.get( screenHandle );
-//			if( widget == null || !(widget instanceof ScreenWidget) )
-//			{
-//				Log.e( "@@MoSync", "maActionBarAddMenuItem: Invalid screen widget handle: "
-//							+ screenHandle );
-//				return IX_WIDGET.MAW_RES_INVALID_HANDLE;
-//			}
-//
-//			ScreenWidget screen = (ScreenWidget) widget;
-//			int result = screen.removeActionBarMenuItem(itemHandle);
-//			mMoSyncThread.invalidateOptionsMenu(m_activity);
-//			return result;
-//		}
-//
-//		Log.e("@@MoSync","maActionBarRemoveItem: ActionBar was disabled.");
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarSetEnabled(Boolean state)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if ( state)
-//		{
-//			mActionBarEnabled = true;
-//		}
-//		else
-//		{
-//			mActionBarEnabled = false;
-//		}
-//
-//		return ((MoSync)m_activity).setActionBarState(state);
-//	}
-//
-//	public int maActionBarSetVisibility(Boolean visibility)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			return ((MoSync)m_activity).setActionBarVisibility(visibility);
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarGetHeight()
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			return m_activity.getActionBar().getHeight();
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarIsShowing()
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			return (m_activity.getActionBar().isShowing() == true ? 1 : 0 );
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarSetTitle(final String title)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			m_activity.getActionBar().setTitle(title);
-//			return IX_WIDGET.MAW_RES_OK;
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarSetIcon(int iconHandle)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			// Create the logo based on a project resource.
-//			if ( (iconHandle >=  0) && (m_imageTable.containsKey(iconHandle)) )
-//			{
-//				Bitmap icon = NativeUI.getBitmap( iconHandle );
-//				if( icon != null )
-//				{
-//					m_activity.getActionBar().setIcon(new BitmapDrawable(icon));
-//					return IX_WIDGET.MAW_RES_OK;
-//				}
-//			}
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_INVALID_ICON;
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarSetDisplayHomeAsUpEnabled(Boolean enableUp)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			m_activity.getActionBar().setDisplayHomeAsUpEnabled(enableUp);
-//			return IX_WIDGET.MAW_RES_OK;
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarShowTitleEnabled(Boolean enable)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			m_activity.getActionBar().setDisplayShowTitleEnabled(enable);
-//			return IX_WIDGET.MAW_RES_OK;
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarSetHomeButtonEnabled(Boolean state)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			m_activity.getActionBar().setHomeButtonEnabled(state);
-//			return IX_WIDGET.MAW_RES_OK;
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarRefresh()
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			mMoSyncThread.invalidateOptionsMenu(m_activity);
-//			return IX_WIDGET.MAW_RES_OK;
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
-//
-//	public int maActionBarSetBackgroundImage(final int iconHandle)
-//	{
-//		if (! MoSync.checkActionBarCompatibility())
-//			return IX_WIDGET.MAW_RES_ACTION_BAR_NOT_AVAILABLE;
-//
-//		if (checkActionBar())
-//		{
-//			if ( m_imageTable.containsKey( iconHandle ) )
-//			{
-//				Bitmap icon = NativeUI.getBitmap( iconHandle );
-//				if( icon != null )
-//				{
-//					m_activity.getActionBar().setBackgroundDrawable(new BitmapDrawable(icon));
-//					return IX_WIDGET.MAW_RES_OK;
-//				}
-//			}
-//			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
-//		}
-//
-//		return IX_WIDGET.MAW_RES_ACTION_BAR_DISABLED;
-//	}
 
 	/**
 	 * Called when the back button has been pressed.

@@ -287,9 +287,6 @@ namespace MoSync
                 IWidget widget = mWidgets[_widget];
                 if (widget != null)
                 {
-                    widget.RemoveFromParent();
-                    mWidgets[_widget] = null;
-
                     mWidgetTypeDictionary.Remove(_widget);
                     Thread widgetCreationThread = null;
                     mWidgetThreadDictionary.TryGetValue(_widget, out widgetCreationThread);
@@ -297,10 +294,13 @@ namespace MoSync
                     {
                         if (widgetCreationThread.IsAlive)
                         {
-                            widgetCreationThread.Abort();
+                            widgetCreationThread.Join();
                         }
                         mWidgetThreadDictionary.Remove(_widget);
                     }
+
+                    widget.RemoveFromParent();
+                    mWidgets[_widget] = null;
                 }
                 return MoSync.Constants.MAW_RES_OK;
             };

@@ -135,6 +135,7 @@ public class LocalNotificationsService extends Service
 		// Here we set a flag to signal that the service was started
 		// from the MoSync application.
 		serviceIntent.putExtra("StartedByTheMoSyncApplication", true);
+
 		context.startService(serviceIntent);
 	}
 
@@ -154,7 +155,7 @@ public class LocalNotificationsService extends Service
 			sMe = null;
 			return MA_NOTIFICATION_RES_OK;
 		}
-		Log.e("@@@MoSync", "LocalNotificationsService is not started");
+		SYSLOG("@@@MoSync LocalNotificationsService is not started");
 		return MA_NOTIFICATION_RES_ERROR;
 	}
 
@@ -290,6 +291,11 @@ public class LocalNotificationsService extends Service
 		// The notification is already created, just trigger it.
 		mLatestNotification.trigger();
 
+		if (LocalNotificationsManager.sLocalNotificationsManager != null)
+		{
+			LocalNotificationsManager.sLocalNotificationsManager.setActive(mLatestNotification.getId());
+		}
+
 		PendingIntent contentIntent = PendingIntent.getActivity(
 			context,
 			mLatestNotification.getId(),
@@ -307,7 +313,7 @@ public class LocalNotificationsService extends Service
 		NotificationManager notificationManager = (NotificationManager)
 			getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(
-				(int)System.currentTimeMillis(),
+				mLatestNotification.getId(),
 				mLatestNotification.getNotification());
 	}
 

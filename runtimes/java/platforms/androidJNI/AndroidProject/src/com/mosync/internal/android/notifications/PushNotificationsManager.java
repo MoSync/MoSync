@@ -56,6 +56,7 @@ public class PushNotificationsManager
 	/**
 	 * Constructor.
 	 */
+	@SuppressWarnings("deprecation")
 	public PushNotificationsManager(MoSyncThread mThread, Context context)
 	{
 		Log.e("@@MoSync","GCM Create PushNotificationManager");
@@ -430,6 +431,7 @@ public class PushNotificationsManager
 	 * @param displayFlag
 	 * @return MA_NOTIFICATION_RES_OK or MA_NOTIFICATION_RES_ERROR.
 	 */
+	@SuppressWarnings("deprecation")
 	public int setDisplayFlag(int displayFlag)
 	{
 		switch ( displayFlag)

@@ -551,6 +551,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		else if (widgetEventType == MAW_EVENT_ITEM_CLICKED)
 		{
 			widgetEvent->listItemIndex = intArray[3];
+			widgetEvent->listSectionIndex = intArray[4];
 		}
 		else if (widgetEventType == MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED)
 		{

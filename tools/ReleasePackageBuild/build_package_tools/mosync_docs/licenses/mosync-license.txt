@@ -1,4 +1,4 @@
-CCopyright (C) 2012 MoSync AB. MoSync(R) is a registered trademark of MoSync AB in the European Union, the United States, and other countries.
+Copyright (C) 2012 MoSync AB. MoSync(R) is a registered trademark of MoSync AB in the European Union, the United States, and other countries.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License published by the Free Software Foundation, version 2.
 
@@ -38,7 +38,7 @@ tlsf-license.txt covers the Two-level Segregate Fit (TLSF) allocator.
 
 yasper-license.txt covers Yasper (Yet Another Smart Process EditoR).
 
-Permission from Andreas Jönsson has kindly been given for the use of Angelcode BMFont and redistribution of its binary files.
+Permission from Andreas Jï¿½nsson has kindly been given for the use of Angelcode BMFont and redistribution of its binary files.
 
 iphonesim.txt covers iphoneSim from Jeff Haynie (jhaynie@appcelerator.com)
 

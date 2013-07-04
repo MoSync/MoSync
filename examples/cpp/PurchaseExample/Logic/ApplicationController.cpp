@@ -165,16 +165,20 @@ void ApplicationController::purchaseRefunded(Purchase& purchase)
 /**
  * This method is called when a list view item is clicked.
  * @param listView The list view object that generated the event.
- * @param index The index on which the list view item is positioned.
+ * @param sectionIndex The index of the section that contains the selected item.
+ * Will be #MAW_RES_INVALID_INDEX for default type list views.
+ * @param itemIndex The index (within the parent section if the section is valid)
+ * of the list view item clicked.
  */
 void ApplicationController::listViewItemClicked(
-    ListView* listView,
-    int index)
+	ListView *listView,
+	const int sectionIndex,
+	const int itemIndex)
 {
 	// An owned item was clicked, so now get the receipt for it
 	// and display it in a dialog.
-	mCurrentPurchase = index;
-	mPurchases[index]->verifyReceipt();
+	mCurrentPurchase = itemIndex;
+	mPurchases[itemIndex]->verifyReceipt();
 }
 
 /**

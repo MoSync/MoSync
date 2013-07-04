@@ -155,7 +155,7 @@ void NativeScreen::customEvent(const MAEvent& event)
 
 	        if ( strcmp(value.c_str(),"true") == 0 )
 	        {
-				resCode = handleImageData(event.imagePickerItem);
+	        	resCode = handleImageData(event.imagePickerItem);
 			}
 			else
 			{

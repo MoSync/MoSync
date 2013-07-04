@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1.4">
+<project supports-build-configs="true" version="1.5">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <criteria>
 <filter mgr="0" profiles="" require="0" type="com.mobilesorcery.mosync.filters.profile" vendors="Android,BlackBerry,JavaME,Moblin,Symbian,Windows Mobile,Windows Phone,iOS"/>
 <filter type="com.mobilesorcery.sdk.capabilities.devices.elementfactory">
-<capabilities optional="" required="Camera Bluetooth Power\ Management File\ Storage Location Internet\ Access Contacts Calendar HTML5 SMS"/>
+<capabilities optional="" required="Camera File\ Storage Power\ Management Contacts Internet\ Access Location HTML5 Calendar SMS"/>
 </filter>
 </criteria>
 <properties>
@@ -16,7 +16,7 @@
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib, yajl.lib, Notification.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.permissions" value="Bluetooth Calendar Calendar/Read Calendar/Write Camera Contacts Contacts/Read Contacts/Write File\ Storage Home\ Screen Internet\ Access Location Location/Coarse Location/Fine Power\ Management SMS SMS/Read SMS/Receive SMS/Send Vibrate"/>
+<property key="build.prefs:app.permissions" value="Calendar Calendar/Read Calendar/Write Camera Contacts Contacts/Read Contacts/Write File\ Storage Home\ Screen Internet\ Access Location Location/Coarse Location/Fine Power\ Management Push\ Notifications SMS SMS/Read SMS/Receive SMS/Send Vibrate"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>

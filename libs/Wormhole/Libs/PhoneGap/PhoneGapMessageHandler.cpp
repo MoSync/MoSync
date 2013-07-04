@@ -524,7 +524,7 @@ namespace Wormhole
 
 		String script = callbackFunction + "(";
 		script += "'" + callbackID + "'";
-		script += ",'" + successStr + "'";
+		script += "," + successStr;
 		script += ",'" + status + "'";
 		script += "," + Encoder::JSONStringify(args.c_str());
 		script += ",'" + keepCallbackStr + "'";
