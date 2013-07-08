@@ -6569,7 +6569,6 @@ group PurchaseAPI "Purchase API" {
 } // End of Purchase API
 
 group OrientationAPI "Orientation API" {
-// Testing modules
 #include "Modules/orientation.idl"
 } // End of Orientation API
 

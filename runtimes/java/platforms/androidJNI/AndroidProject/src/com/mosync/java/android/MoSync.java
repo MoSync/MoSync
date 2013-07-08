@@ -510,6 +510,11 @@ public class MoSync extends Activity
 			for (int i=0; i < items.size(); i++)
 			{
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
+				// When enabled, use ActionBar items.
+//				if (NativeUI.mActionBarEnabled)
+//				{
+//					item.setShowAsAction(items.get(i).getShowActionFlag());
+//				}
 
 				if ( items.get(i).hasPredefinedIcon() )
 				{
