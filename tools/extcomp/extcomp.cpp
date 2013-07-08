@@ -39,6 +39,7 @@
 #include "androidext.h"
 #include "iosext.h"
 #include "jsext.h"
+#include "util.h"
 
 void parseArgs(int argc, const char** argv, map<string, string>& argmap);
 string requiredArg(string arg, map<string, string>& args);
@@ -51,20 +52,24 @@ int main(int argc, const char** argv) {
 		parseArgs(argc, argv, args);
 
 		string extDir = requiredArg("project", args);
+		toDir(extDir);
 		string extName = requiredArg("extension", args);
 		string androidPackageName = args["android-package-name"];
-		string androidClassName = args["android-class-name"];
+		//string androidClassName = args["android-class-name"];
 		string iosInterfaceName = args["ios-interface-name"];
 
 		bool generateStubs = !args["generate-stubs"].empty();
 		bool generateLib = !args["generate-lib"].empty();
 		bool generateJS = !args["generate-js"].empty();
 
-		// This one is empty for extensions.
 		vector<string> ixs;
 		ixs.push_back(extName);
 
-		string inputIdl = extDir + "/" + extName + ".idl";
+
+		string inputIdl = args["idl"];
+		if (inputIdl.empty()) {
+			inputIdl = extDir + "/" + extName + ".idl";
+		}
 		printf("Parsing %s for extension %s.\n", inputIdl.c_str(), extName.c_str());
 		chdir(extDir.c_str());
 		Interface ext = parseInterface(ixs, inputIdl);
@@ -76,10 +81,21 @@ int main(int argc, const char** argv) {
 		}
 
 		if (generateLib) {
-			string headerOut = extName + ".h";
+			string headerDir = args["header-out"];
+			if (headerDir.empty()) {
+				headerDir = ".";
+			}
+			toDir(headerDir);
+			string headerOut = headerDir + extName + ".h";
 			writeHeaders(headerOut, ext, true);
+			printf("Generated header file to %s\n", headerOut.c_str());
 
-			string sourceOut = "_" + extName + ".pipe.c";
+			string sourceDir = args["source-out"];
+			if (sourceDir.empty()) {
+				sourceDir = ".";
+			}
+			toDir(sourceDir);
+			string sourceOut = sourceDir + "_" + extName + ".c";
 			ofstream sourcefile(sourceOut.c_str());
 
 			sourcefile << "// *** GENERATED FILE - Do not modify ***\n\n";
@@ -94,23 +110,37 @@ int main(int argc, const char** argv) {
 
 			//sourcefile << "#endif\n";
 			sourcefile.close();
+			printf("Generated C bindings source file to %s\n", sourceOut.c_str());
 
 			streamExtensionManifest(args);
 
-			generateAndroidFiles(extDir, ext, androidPackageName, androidClassName);
+			string androidAssetsDir = args["android-assets-out"];
+			if (androidAssetsDir.empty()) {
+				string androidOut = extDir + "Android/";
+				_mkdir(androidOut.c_str());
+				string androidManifestOut = androidOut + "assets/";
+				_mkdir(androidManifestOut.c_str());
+				androidAssetsDir = androidManifestOut;
+			}
+			string androidClassName = toJavaClassName(ext.name);
+			generateAndroidFiles(androidAssetsDir, ext, androidPackageName, androidClassName);
 		}
 
 		if (generateStubs) {
-			string stubsDir = extDir + "/stubs/";
-			_mkdir(stubsDir.c_str());
+			string androidStubsDir = args["android-classes-out"];
+			bool generateImpl = args["android-no-impl-stub"].empty();
+			if (androidStubsDir.empty()) {
+				string stubsDir = extDir + "/stubs/";
+				_mkdir(stubsDir.c_str());
 
-			string androidStubsDir = stubsDir + "android/";
-			_mkdir(androidStubsDir.c_str());
-			writeAndroidStubs(androidStubsDir, ext, androidPackageName);
+				androidStubsDir = stubsDir + "android/";
+				_mkdir(androidStubsDir.c_str());
+			}
+			writeAndroidStubs(androidStubsDir, ext, androidPackageName, generateImpl);
 
-			string iosStubsDir = stubsDir + "iphoneos/";
-			_mkdir(iosStubsDir.c_str());
-			writeIosStubs(iosStubsDir, ext, iosInterfaceName, false);
+			//string iosStubsDir = stubsDir + "iphoneos/";
+			//_mkdir(iosStubsDir.c_str());
+			//writeIosStubs(iosStubsDir, ext, iosInterfaceName, false);
 		}
 
 		if (generateJS) {
@@ -198,7 +228,7 @@ void writeHeaders(string& headerOut, Interface& ext, bool includeFunctions) {
 			Member m = s.members[j];
 			headerfile << "\t" << directCType(ext, m.pod[0].type) << " " << m.pod[0].name << ";\n";
 		}
-		headerfile << "} __attribute__ ((aligned(4))) " << s.name << ";\n\n";
+		headerfile << "} " << s.name << ";\n\n";
 	}
 
 	for (size_t i = 0; includeFunctions && i < ext.functions.size(); i++) {
@@ -311,7 +341,7 @@ void streamExtHashValue(ostream& out, Interface& ext) {
 }
 
 bool isReturnType(Interface& ext, string& type) {
-	printf("TYPE: %s\n", type.c_str());
+	//printf("TYPE: %s\n", type.c_str());
 	return strcmp("void", cType(ext, type).c_str());
 }
 
@@ -357,15 +387,38 @@ Struct* getStruct(Interface& ext, string& structType) {
 	return NULL;
 }
 
-int getPadding(Interface& ext, string& type) {
-	string resolvedType = resolveTypedef(ext, type);
+int getPadding(Interface& ext, string& type, size_t offset) {
+	size_t extra = offset % cTypeAlignedSize(ext, type);
+	size_t padding = extra == 0 ? 0 : cTypeAlignment(ext, type) - extra;
+	return padding;
+	/*string resolvedType = resolveTypedef(ext, type);
 	Struct* s = getStruct(ext, resolvedType);
 	// Structs are already properly aligned!
-	return s ? 0 : cTypeAlignedSize(ext, type) - cTypeSize(ext, type);
+	return s ? 0 : cTypeAlignedSize(ext, type) - cTypeSize(ext, type);*/
+}
+
+size_t cTypeAlignment(Interface& ext, string& type) {
+	string resolvedType = resolveTypedef(ext, type);
+	Struct* s = getStruct(ext, resolvedType);
+	size_t alignment = 0;
+	if (s) {
+		for(size_t j = 0; j < s->members.size(); j++) {
+			Member m = s->members[j];
+			for(size_t k=0; k<m.pod.size(); k++) {
+				PlainOldData pod = m.pod[k];
+				alignment = MAX(alignment, cTypeAlignment(ext, pod.type));
+			}
+		}
+	} else {
+		// No alignment pragmas.
+		alignment = cTypeSize(ext, type);
+	}
+	return alignment;
 }
 
 size_t cTypeAlignedSize(Interface& ext, string& type) {
 	string resolvedType = resolveTypedef(ext, type);
+	size_t unaligned = 0;
 	Struct* s = getStruct(ext, resolvedType);
 	if (s) {
 		int size = 0;
@@ -378,12 +431,15 @@ size_t cTypeAlignedSize(Interface& ext, string& type) {
 			}
 			size += max;
 		}
-		return size;
+		unaligned = size;
 	} else {
-		size_t size = cTypeSize(ext, type);
-		size_t result = size % 4 ? size + (4 - size % 4) : size;
-		return result;
+		unaligned = cTypeSize(ext, type);
 	}
+
+	size_t alignment = cTypeAlignment(ext, type);
+	size_t result = unaligned % alignment ? unaligned + (alignment - unaligned % alignment) : unaligned;
+
+	return result;
 }
 
 void streamInvokePrefix(ostream& stream, const Function& f) {

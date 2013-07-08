@@ -165,7 +165,7 @@ void NativeScreen::customEvent(const MAEvent& event)
 	        if (resCode == RES_OK)
 				setLabelText(mLabel, "Preview is available");
 	        else
-	        	setLabelText(mLabel, "Preview is not available");
+				setLabelText(mLabel, "Preview is not available");
 		}
 		else
 		{

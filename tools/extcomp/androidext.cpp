@@ -31,17 +31,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "extcomp.h"
 #include "androidext.h"
 
+#include "util.h"
+
 #define JAVA_STRING_CLASS "Ljava/lang/String;"
 #define CSTRING_CLASS "Lcom/mosync/api/CString;"
 #define POINTER_CLASS "Lcom/mosync/api/Pointer;"
 
 void generateAndroidFiles(string& outputDir, Interface& ext, string& androidPackageName, string& androidClassName) {
-	string androidOut = outputDir + "/Android/";
-	_mkdir(androidOut.c_str());
-	string androidManifestOut = androidOut + "assets/";
-	_mkdir(androidManifestOut.c_str());
 	string extName = ext.name;
-	string androidMFOut = androidManifestOut + extName + ".xml";
+	toDir(outputDir);
+	string androidMFOut = outputDir + extName + ".xml";
 	ofstream androidMFfile(androidMFOut.c_str());
 
 	// TODO: We can use the same mechanism for native and interpreted
@@ -49,6 +48,7 @@ void generateAndroidFiles(string& outputDir, Interface& ext, string& androidPack
 	//writeJNIBridge(outputDir, ext, androidPackageName);
 
 	streamAndroidExtMF(androidMFfile, ext, androidPackageName, androidClassName);
+	printf("Generated module manifest %s\n", androidMFOut.c_str());
 	androidMFfile.close();
 }
 
@@ -212,33 +212,50 @@ string getJavaByteCodeSignature(Interface& ext, Function& f, string& androidPack
 	return result;
 }
 
+string toJavaClassName(string& name) {
+	string result(name);
+	result[0] = toupper(result[0]);
+	return result;
+}
 
-void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackageName) {
-	_mkdir(outputDir.c_str());
-
-	// The interface stub
-	string extensionFileName = outputDir + "Extension.java";
+void writeExtensionClass(string& extensionFileName, Interface& ext, string& androidPackageName, bool interface) {
 	ofstream extensionFile(extensionFileName.c_str());
 
-	extensionFile << "package " << androidPackageName << ";\n\n";
+	string name = toJavaClassName(ext.name);
+
+	extensionFile << "package " << androidPackageName;
+	if (interface) {
+		extensionFile << ".interfaces";
+	}
+	extensionFile << ";\n\n";
 
 	extensionFile << "import com.mosync.api.*;\n";
-	extensionFile << "import " << androidPackageName << ".types.*;\n\n";
-
-	extensionFile << "public class Extension extends MoSyncExtension {\n\n";
-
-	for (size_t i = 0; i < ext.constSets.size(); i++) {
-		ConstSet cs = ext.constSets[i];
-		string name = cs.name;
-		for (size_t j = 0; j < cs.constants.size(); j++) {
-			Constant c = cs.constants[j];
-			extensionFile << "\tpublic final static " << toAndroidType(ext, androidPackageName, c.type, false, true, false) << " " << name << c.name << " = " << c.value << ";\n";
-		}
-		extensionFile << "\n";
+	if (!ext.structs.empty()) {
+		extensionFile << "import " << androidPackageName << ".types.*;\n";
 	}
 
-	extensionFile << "\t/*public void onLoad(MoSyncContext context) {\n\t}*/\n\n";
-	extensionFile << "\t/*public void onUnload(MoSyncContext context) {\n\t}*/\n\n";
+	if (interface) {
+		extensionFile << "public interface I" << name << " {\n\n";
+		extensionFile << "\tpublic final static String MODULE_NAME = \"" << ext.name << "\";\n\n";
+		extensionFile << "\tpublic final static int MODULE_HASH = 0x";
+		streamExtHashValue(extensionFile, ext);
+		extensionFile << ";\n\n";
+
+		for (size_t i = 0; i < ext.constSets.size(); i++) {
+			ConstSet cs = ext.constSets[i];
+			string name = cs.name;
+			for (size_t j = 0; j < cs.constants.size(); j++) {
+				Constant c = cs.constants[j];
+				extensionFile << "\tpublic final static " << toAndroidType(ext, androidPackageName, c.type, false, true, false) << " " << name << c.name << " = " << c.value << ";\n";
+			}
+			extensionFile << "\n";
+		}
+	} else {
+		extensionFile << "import " << androidPackageName << ".interfaces.I" << name << ";\n\n";
+		extensionFile << "public class " << name << " extends MoSyncExtension implements I" << name << " {\n\n";
+		extensionFile << "\tpublic void onLoad(MoSyncContext context) {\n\t\tsuper.onLoad(context);\n\t}\n\n";
+		extensionFile << "\tpublic void onUnload(MoSyncContext context) {\n\t\tsuper.onUnload(context);\n\t}\n\n";
+	}
 
 	for (size_t i = 0; i < ext.functions.size(); i++) {
 		Function f = ext.functions[i];
@@ -253,19 +270,51 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 			extensionFile << " ";
 			extensionFile << arg.name;
 		}
-		extensionFile << ") {\n\t\t/* TODO: Replace this with an implementation */\n";
-		if (isReturnType(ext, f.returnType)) {
-			extensionFile << "\t\treturn " << getAndroidDefaultValue(returnType) << ";\n";
+		extensionFile << ")";
+		if (interface) {
+			extensionFile << ";\n\n";
+		} else {
+			extensionFile << " {\n\t\t/* TODO: Replace this with an implementation */\n";
+			if (isReturnType(ext, f.returnType)) {
+				extensionFile << "\t\treturn " << getAndroidDefaultValue(returnType) << ";\n";
+			}
+			extensionFile << "\t}\n\n";
 		}
-		extensionFile << "\t}\n\n";
 	}
 
 	extensionFile << "}\n";
 
 	extensionFile.close();
+}
+
+void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackageName, bool generateImplStub) {
+	_mkdir(outputDir.c_str());
+
+	string packageOutputDir = outputDir;
+	vector<string> fragments;
+	split(fragments, androidPackageName, ".");
+	for (size_t i = 0; i < fragments.size(); i++) {
+		packageOutputDir = packageOutputDir + "/" + fragments[i];
+		_mkdir(packageOutputDir.c_str());
+	}
+	toDir(packageOutputDir);
+
+	// The interface stub
+	if (generateImplStub) {
+		string extensionFileName = packageOutputDir + toJavaClassName(ext.name) + ".java";
+		writeExtensionClass(extensionFileName, ext, androidPackageName, false);
+	}
+
+	string name = toJavaClassName(ext.name);
+	string interfaceDir = packageOutputDir + "/interfaces/";
+	_mkdir(interfaceDir.c_str());
+	string interfaceFileName = interfaceDir + "I" + name + ".java";
+	writeExtensionClass(interfaceFileName, ext, androidPackageName, true);
+
+	printf("Generated Android classes for %s in directory %s\n", ext.name.c_str(), outputDir.c_str());
 
 	// The structs
-	string typesDir = outputDir + "types/";
+	string typesDir = packageOutputDir + "types/";
 	if (!ext.structs.empty()) {
 		_mkdir(typesDir.c_str());
 	}
@@ -303,9 +352,9 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 			string ctype = m.pod[0].type;
 			string name = m.pod[0].name;
 			string cast = toAndroidType(ext, androidPackageName, ctype, true, false, false);
-			int padding = getPadding(ext, ctype);
+			int padding = getPadding(ext, ctype, size);
 			structFile << "\t\ts." << name << " = (" << cast << ")__" << name << ".unmarshal(data, offset + " << (size + padding) << ");\n";
-			size += cTypeAlignedSize(ext, ctype);
+			size += cTypeAlignedSize(ext, ctype) + padding;
 		}
 		structFile << "\t\treturn s;\n";
 		structFile << "\t}\n\n";
@@ -319,13 +368,13 @@ void writeAndroidStubs(string& outputDir, Interface& ext, string& androidPackage
 			string ctype = m.pod[0].type;
 			string name = m.pod[0].name;
 			string cast = toAndroidType(ext, androidPackageName, ctype, true, false, false);
-			int padding = getPadding(ext, ctype);
+			int padding = getPadding(ext, ctype, size);
 			structFile << "\t\t__" << name << ".marshal(s." << name << ", data, offset + " << (size + padding) << ");\n";
-			size += cTypeAlignedSize(ext, ctype);
+			size += cTypeAlignedSize(ext, ctype) + padding;
 		}
 		structFile << "\t}\n\n";
 
-		structFile << "\tpublic int size() { return " << size << "; }\n\n";
+		structFile << "\tpublic int size() { return " << cTypeAlignedSize(ext, s.name) << "; }\n\n";
 
 		structFile << "}\n";
 

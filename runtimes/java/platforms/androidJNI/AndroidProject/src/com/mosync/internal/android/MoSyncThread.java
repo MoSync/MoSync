@@ -117,7 +117,9 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mosync.api.MoSyncContext;
+import com.mosync.api.MoSyncExtension;
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
+import com.mosync.internal.android.extensions.ExtensionModule;
 import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
@@ -195,6 +197,7 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	MoSyncDB mMoSyncDB;
 	MoSyncExtensionLoader mMoSyncExtensionLoader;
 	MoSyncOrientationHelper mOrientation;
+
 
 	/**
 	 * Synchronization monitor for postEvent
@@ -5923,6 +5926,11 @@ public class MoSyncThread extends Thread implements MoSyncContext
 				mMoSyncThread.postEvent(event);
 			}
 		}
+	}
+
+	public MoSyncExtension getExtension(String name) {
+		ExtensionModule module = MoSyncExtensionLoader.getDefault().getModule(name);
+		return module == null ? null : module.getModule();
 	}
 
 }
