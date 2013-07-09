@@ -142,9 +142,10 @@ namespace MoSync {
 						buttonClicked(item);
 				}
 				break;
-				case MAW_EVENT_EDIT_BOX_RETURN:
+				case MAW_EVENT_EDIT_BOX_RETURN: {
 					UIItem* item = Widget::itemByHandle(data->widgetHandle);
 					editBoxReturned(item);
+				}
 				break;
 				case MAW_EVENT_ITEM_CLICKED: {
 					UIItem* item = Widget::itemByHandle(data->widgetHandle);

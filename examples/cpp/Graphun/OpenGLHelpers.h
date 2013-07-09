@@ -28,7 +28,7 @@ void MoSync_InitFullscreenGL();
 void MoSync_UpdateScreenGL();
 void gluPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar);
 void resizeWindow(int x, int y, int width, int height);
-void initGL(GLvoid);
+void initGL();
 void gluLookAt(GLfloat eyex, GLfloat eyey, GLfloat eyez,
           GLfloat centerx, GLfloat centery, GLfloat centerz,
           GLfloat upx, GLfloat upy, GLfloat upz);

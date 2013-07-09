@@ -222,10 +222,11 @@ public class MoSync extends Activity
 
 	@Override
 	public void onNewIntent(Intent intent) {
+		String action = intent.getAction();
 		if (MoSyncNFCService.handleNFCIntent(this, intent)) {
 			Log.d("@@@ MoSync", "Discovered tag");
 		}
-		else if(intent.getAction().equals(LocalNotificationsService.ACTION_NOTIFICATION_RECEIVED))
+		else if(LocalNotificationsService.ACTION_NOTIFICATION_RECEIVED.equals(action))
 		{
 			Log.e("@@MoSync", "onNewIntent: Local Notification received ");
 			int notificationId = intent.getIntExtra(
