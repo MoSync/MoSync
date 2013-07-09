@@ -223,6 +223,9 @@ namespace MAUtil {
 		 * Do cleanup and send downloadCancelled to listeners.
 		 * \return \>0 on success, or \link #CONNERR_NO_ACTIVE_DOWNLOAD CONNERR \endlink
 		 * code if there is no active download.
+		 * \note If you call this function from inside a DownloadListener callback,
+		 * the canceling is delayed until the callback returns.
+		 * That means you can't call beginDownloading() until you've gotten the downloadCancelled() callback.
 		 */
 		virtual int cancelDownloading();
 
@@ -300,6 +303,7 @@ namespace MAUtil {
 	protected:
 		HttpConnection *mConn;
 		bool mIsDownloading;
+		bool mIsInsideReader, mIsCanceling;
 		bool mIsDataPlaceholderSystemAllocated;
 		MAHandle mDataPlaceholder;
 		Vector<DownloadListener*> mDownloadListeners;

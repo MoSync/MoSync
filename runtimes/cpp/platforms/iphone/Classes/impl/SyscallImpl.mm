@@ -185,7 +185,7 @@ namespace Base {
 
 	bool MAProcessEvents() //returns true if maWait should return
 	{
-		return false;
+		return Base::gEventQueue.processInternalEvents();
 	}
 
 	//***************************************************************************
