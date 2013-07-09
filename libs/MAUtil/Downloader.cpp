@@ -46,6 +46,8 @@ bool DownloadListener::outOfMemory(Downloader*)
 
 Downloader::Downloader()
 : mIsDownloading(false),
+  mIsInsideReader(false),
+  mIsCanceling(false),
   mIsDataPlaceholderSystemAllocated(false),
   mDataPlaceholder(NULL),
   mReader(NULL),
@@ -121,6 +123,12 @@ int Downloader::cancelDownloading()
 	{
 		// Inactive download cancelled.
 		return CONNERR_NO_ACTIVE_DOWNLOAD;
+	}
+
+	if(mIsInsideReader)
+	{
+		mIsCanceling = true;
+		return CONNERR_DOWNLOADER_OTHER;
 	}
 
 	closeConnection(CLEANUP);
@@ -314,7 +322,13 @@ void Downloader::connRecvFinished(Connection* conn, int result)
 		return;
 	}
 
+	mIsInsideReader = true;
 	mReader->connRecvFinished(conn, result);
+	mIsInsideReader = false;
+	if(mIsCanceling) {
+		mIsCanceling = false;
+		cancelDownloading();
+	}
 }
 
 MAHandle Downloader::getHandle()

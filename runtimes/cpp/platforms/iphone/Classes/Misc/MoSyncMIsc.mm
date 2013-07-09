@@ -41,6 +41,10 @@
 static mach_timebase_info_data_t gTimeBase;
 static uint64_t gTimeStart;
 
+namespace Base {
+    bool MAProcessEvents();
+}
+
 //This delegate is needed for the SMS system, because iOS does not automatically
 //hide the sms window after the user sends an SMS or clicks cancel
 @interface SMSResultDelegate:NSObject<MFMessageComposeViewControllerDelegate>{
@@ -370,8 +374,10 @@ SYSCALL(int, maGetEvent(MAEvent *dst))
         Base::gEventOverflow = false;
     }
 
+    Base::MAProcessEvents();
+
     MAEvent ev;
-    bool ret = Base::gEventQueue.getAndProcess(ev);
+    bool ret = Base::gEventQueue.getExternalEvent(ev);
     if(!ret) return 0;
     else *dst = ev; //gEventQueue.get();
 
@@ -381,7 +387,6 @@ delete (dataType*)ev.data;\
 dst->data = (int)MoSync_GetCustomEventDataMoSyncPointer(); }
 
     CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
-
     return 1;
 }
 

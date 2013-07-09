@@ -211,24 +211,39 @@ public:
 	
 	void handleInternalEvent(int type, void *e);
 
-	bool getAndProcess(MAEvent& event) {
-		if(count()==0) return false;
-		MAEvent e = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
-		if(e.type<0) {
-			handleInternalEvent(e.type, (void*)e.data);
-			return getAndProcess(event);
-		} else {
-			event = e;
-			return true;
+	bool processInternalEvents() {
+		if( count() == 0 )
+			return false;
+
+		while ( count() > 0 )
+		{
+			MAEvent latestEvent = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
+			if  (latestEvent.type < 0 )
+			{
+				handleInternalEvent(latestEvent.type, (void*)latestEvent.data);
+			}
+			else // Put in external event queue
+			{
+				externalEventQueue.put(latestEvent);
+			}
 		}
+		return true;
+	}
+
+	bool getExternalEvent(MAEvent& event) {
+		if ( externalEventQueue.count() == 0 )
+			return false;
+
+		event = externalEventQueue.get();
+		return true;
 	}
 
 	void put(const MAEvent& e) {
-            CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
+			CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
 
-            pthread_mutex_lock(&mMutex);
-            pthread_cond_signal(&mCond);
-            pthread_mutex_unlock(&mMutex);
+			pthread_mutex_lock(&mMutex);
+			pthread_cond_signal(&mCond);
+			pthread_mutex_unlock(&mMutex);
 	}
 
     /**
@@ -307,6 +322,7 @@ private:
 	bool mEventOverflow;
 	bool mWaiting;
 	
+	CircularFifo<MAEvent, EVENT_BUFFER_SIZE> externalEventQueue;
 };
 
 namespace Base
