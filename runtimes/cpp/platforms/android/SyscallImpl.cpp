@@ -1934,7 +1934,6 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetStackScreenPop");
 			return _maWidgetStackScreenPop(a, mJNIEnv, mJThis);
 
-
 		// ********** Notification API **********
 
 		case maIOCtl_maNotificationAdd:
@@ -1964,7 +1963,7 @@ namespace Base
 			// Not available on Android.
 			return -1;
 
-		case maIOCtl_maScreenSetOrientation:
+		/*case maIOCtl_maScreenSetOrientation:
 			SYSLOG("maIOCtl_maScreenSetOrientation");
 			return _maScreenSetOrientation(a, mJNIEnv, mJThis);
 
@@ -1982,7 +1981,7 @@ namespace Base
 
 		case maIOCtl_maScreenGetCurrentOrientation:
 			SYSLOG("maIOCtl_maScreenGetCurrentOrientation");
-			return _maScreenGetCurrentOrientation(mJNIEnv, mJThis);
+			return _maScreenGetCurrentOrientation(mJNIEnv, mJThis);*/
 
 		case maIOCtl_maHomeScreenEventsOn:
 			SYSLOG("maIOCtl_maHomeScreenEventsOn");

@@ -6,4 +6,6 @@ public interface MoSyncContext {
 
 	public Context getActivity();
 
+	public MoSyncExtension getExtension(String name);
+
 }

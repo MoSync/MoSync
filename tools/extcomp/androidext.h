@@ -34,7 +34,9 @@ void streamJNIFunctionWrapper(ostream& out, Interface& ext, Function& f, string&
 string getJavaByteCodeSignature(Interface& ext, Function& f, string& androidPackageNames);
 string getBytecodeStructClass(string& package, string& type);
 void streamAndroidExtMF(ostream&, Interface&, string&, string&);
-void writeAndroidStubs(string&, Interface&, string&);
+void writeExtensionClass(string& extensionFile, Interface& ext, string& androidPackageName, bool interface);
+void writeAndroidStubs(string&, Interface&, string&, bool);
+string toJavaClassName(string& name);
 string toAndroidType(Interface&, string&, string&, bool, bool, bool);
 string getAndroidDefaultValue(string&);
 

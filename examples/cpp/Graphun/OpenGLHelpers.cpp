@@ -87,7 +87,7 @@ void resizeWindow(int x, int y, int width, int height)
     glLoadIdentity();
 }
 
-void initGL(GLvoid)
+void initGL()
 {
     /* Enable Texture Mapping ( NEW ) */
     glEnable(GL_TEXTURE_2D);
