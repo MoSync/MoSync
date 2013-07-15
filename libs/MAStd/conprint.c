@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef __IOS__
 #include "ma.h"
 #include "maarg.h"
 #include "mastring.h"
@@ -24,11 +25,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mawvsprintf.h"
 #include "maheap.h"
 #include "conprint.h"
+#else
+#include <ma.h>
+#include <maarg.h>
+#include <mastring.h>
+#include <mavsprintf.h>
+#include <mawstring.h>
+#include <wchar.h>
+#include <mawvsprintf.h>
+#include <maheap.h>
+#include <conprint.h>
+#endif
 
 // Console width, in characters
 // Note that not all characters on a line may be visible on a given device, due
 // to varying screen widths
 #define CONSOLE_WIDTH 47
+
+#ifdef __IOS__
+#define MB_LEN_MAX sizeof(wchar)
+#endif
 
 typedef struct
 {
@@ -148,7 +164,6 @@ void PrintConsole(const wchar_t *str)
 	{
 		static const char prefix[] = "PrintConsole: ";
 		maWriteLog(prefix, strlen(prefix));
-
 		length = wcslen(str);
 		if (length > 0)
 		{
@@ -220,7 +235,7 @@ void PrintConsole(const wchar_t *str)
 }
 
 #define PRINTF_BUFSIZE 2048
-int vprintf(const char *fmt, va_list args)
+CON(int, vprintf(const char *fmt, va_list args))
 {
 	char buf[PRINTF_BUFSIZE];
 	int len;
@@ -237,7 +252,7 @@ int vprintf(const char *fmt, va_list args)
 	return len;
 }
 
-int printf(const char *fmt, ...)
+CON(int, printf(const char *fmt, ...))
 {
 	va_list args;
 	int len;
@@ -249,7 +264,7 @@ int printf(const char *fmt, ...)
 	return len;
 }
 
-int puts(const char* str)
+CON(int, puts(const char* str))
 {
 	wchar_t wbuf[PRINTF_BUFSIZE];
 	wsprintf(wbuf, L"%s", str);
@@ -257,14 +272,14 @@ int puts(const char* str)
 	return 0;
 }
 
-int wputs(const wchar_t* str) {
+CON(int, wputs(const wchar_t* str)) {
 	PrintConsole(str);
 	if(!sConsole.postponedLineFeed)
 		FeedLine();
 	return 0;
 }
 
-int wvprintf(const wchar_t *fmt, va_list args)
+CON(int, wvprintf(const wchar_t *fmt, va_list args))
 {
 	wchar_t wbuf[PRINTF_BUFSIZE];
 	int len;
@@ -283,7 +298,7 @@ int wvprintf(const wchar_t *fmt, va_list args)
 	return len;
 }
 
-int wprintf(const wchar_t* fmt, ...) {
+CON(int, wprintf(const wchar_t* fmt, ...)) {
 	va_list args;
 	int len;
 
@@ -294,7 +309,7 @@ int wprintf(const wchar_t* fmt, ...) {
 	return len;
 }
 
-int putchar(int character)
+CON(int, putchar(int character))
 {
 	wchar_t temp[2];
 	temp[0] = character;

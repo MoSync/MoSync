@@ -58,6 +58,16 @@ extern "C" {
 void xtoa(unsigned long val, char *buf, unsigned radix, int negative);
 
 /**
+* Convert long long integer to ascii string.
+* \param val The integer value to convert.
+* \param buf The output buffer for the ascii representation.
+* \param radix The output radix.
+* \param negative The output sign.
+*/
+
+void xxtoa(unsigned long long val, char *buf, unsigned radix, int negative);
+
+/**
 * Convert integer to ascii string.
 * \param val The integer value to convert.
 * \param buf The output buffer for the ascii representation.
@@ -83,6 +93,23 @@ char *ltoa(long val, char *buf, int radix);
 */
 
 char *ultoa(unsigned long val, char *buf, int radix);
+
+/**
+* Convert integer to ascii string.
+* \param val The integer value to convert.
+* \param buf The output buffer for the ascii representation.
+* \param radix The output radix.
+* \param negative The output sign.
+*/
+void xxtoa(unsigned long long val, char *buf, unsigned radix, int negative);
+
+/**
+* Convert long long to ascii string.
+* \param val The integer value to convert.
+* \param buf The output buffer for the ascii representation.
+* \param radix The output radix.
+*/
+char *lltoa(long long val, char *buf, int radix);
 
 #ifdef __cplusplus
 }	//extern "C"

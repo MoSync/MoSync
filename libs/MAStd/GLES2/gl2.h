@@ -5,6 +5,11 @@
 
 #include <ma.h>
 #include <maapi_defs.h>
+#include <IX_OPENGL_ES_MA.h>
+#ifdef NATIVE_GLES2
+#undef __gl2_h_
+#include <GLES2/gl2_native.h>
+#else
 #include <IX_OPENGL_ES.h>
 #include <IX_GL2.h>
 #define GL_API
@@ -630,6 +635,8 @@ GL_APICALL void         GL_APIENTRY glViewport (GLint x, GLint y, GLsizei width,
 #endif
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif /* __gl2_h_ */

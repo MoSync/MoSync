@@ -193,25 +193,27 @@ sh( "#{File.join(androidSDKTools, "/aapt")} package -f -v " +
 puts "Compiling Java Source Files\n\n"
 
 packages = ["src/com/mosync/java/android/*.java",
-            "src/com/mosync/internal/android/*.java",
-            "src/com/mosync/internal/generated/*.java",
-            "src/com/mosync/nativeui/core/*.java",
-			"src/com/mosync/nativeui/ui/egl/*.java",
-            "src/com/mosync/nativeui/ui/factories/*.java",
-            "src/com/mosync/nativeui/ui/widgets/*.java",
-            "src/com/mosync/nativeui/util/*.java",
-            "src/com/mosync/nativeui/util/properties/*.java",
-			"src/com/mosync/pim/*.java",
-			"src/com/mosync/nativeui/ui/custom/*.java",
-			"gen/com/mosync/java/android/*.java",
-            "src/com/mosync/internal/android/nfc/*.java",
-            "src/com/mosync/internal/android/nfc/ops/*.java",
-	        "src/com/mosync/nativeui/ui/ads/*.java",
-			"src/com/mosync/internal/android/notifications/*.java",
-			"src/com/mosync/internal/android/billing/*.java",
-			"src/com/mosync/internal/android/billing/util/*.java",
-			"gen/com/android/vending/billing/IInAppBillingService.java"
-            ]
+		"src/com/mosync/api/*.java",
+		"src/com/mosync/internal/android/*.java",
+		"src/com/mosync/internal/android/extensions/*.java",
+		"src/com/mosync/internal/generated/*.java",
+		"src/com/mosync/nativeui/core/*.java",
+		"src/com/mosync/nativeui/ui/egl/*.java",
+		"src/com/mosync/nativeui/ui/factories/*.java",
+		"src/com/mosync/nativeui/ui/widgets/*.java",
+		"src/com/mosync/nativeui/util/*.java",
+		"src/com/mosync/nativeui/util/properties/*.java",
+		"src/com/mosync/pim/*.java",
+		"src/com/mosync/nativeui/ui/custom/*.java",
+		"gen/com/mosync/java/android/*.java",
+		"src/com/mosync/internal/android/nfc/*.java",
+		"src/com/mosync/internal/android/nfc/ops/*.java",
+		"src/com/mosync/nativeui/ui/ads/*.java",
+		"src/com/mosync/internal/android/notifications/*.java",
+		"src/com/mosync/internal/android/billing/*.java",
+		"src/com/mosync/internal/android/billing/util/*.java",
+		"gen/com/android/vending/billing/IInAppBillingService.java"
+]
 
 # Concatenate each list element with package_root, and flatten the list to a string
 java_files = packages.map { |package| File.join(package_root, package) }.join(" ")

@@ -62,7 +62,11 @@ namespace Wormhole
 			if(duration > 0)
 			{
 				char durationString[16];
+#ifdef __WINDOWS_PHONE_8__
+				maCaptureSetProperty(MA_CAPTURE_MAX_DURATION, _itoa(duration,durationString,10));
+#else
 				maCaptureSetProperty(MA_CAPTURE_MAX_DURATION, itoa(duration,durationString,10));
+#endif //__WINDOWS_PHONE_8__
 			}
 
 			mCaptureCallBack = message.getParam("PhoneGapCallBackId");

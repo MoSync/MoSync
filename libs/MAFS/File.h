@@ -64,7 +64,10 @@ typedef struct MA_FILE_t MA_FILE;
 
 #ifndef DONT_USE_TYPE_DEFINES
 //typedef unsigned int size_t;
-typedef unsigned int fpos_t;
+#ifdef fpos_t
+#undef fpos_t
+#endif
+#define fpos_t unsigned int
 #endif
 
 /**

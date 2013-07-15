@@ -24,6 +24,7 @@ namespace MoSync
 
 			syscalls.strcpy = delegate(int dst, int src)
 			{
+#if !LIB
 				byte[] mem = core.GetDataMemory().GetData();
 				int origDst = dst;
 				src--;
@@ -34,10 +35,19 @@ namespace MoSync
 					dst++;
 				} while (mem[src] != 0);
 				return origDst;
+#else
+				string source = core.GetDataMemory().ReadStringAtAddress(src);
+				Byte[] bytes = new Byte[source.Length * sizeof(char)];
+				System.Buffer.BlockCopy(source.ToCharArray(), 0, bytes, 0, bytes.Length);
+
+				core.GetDataMemory().WriteBytes(dst, bytes, source.Length * sizeof(char));
+				return dst;
+#endif
 			};
 
 			syscalls.strcmp = delegate(int str1, int str2)
 			{
+#if !LIB
 				byte[] mem = core.GetDataMemory().GetData();
 				while (mem[str1] != 0 && mem[str1] == mem[str2])
 				{
@@ -45,6 +55,12 @@ namespace MoSync
 					str2++;
 				}
 				return (mem[str1] - mem[str2]);
+#else
+				string s1 = core.GetDataMemory().ReadStringAtAddress(str1);
+				string s2 = core.GetDataMemory().ReadStringAtAddress(str2);
+
+				return s1.CompareTo(s2);
+#endif
 			};
 
 			syscalls.maCreateData = delegate(int placeholder, int size)
@@ -72,7 +88,13 @@ namespace MoSync
 				Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, data);
 				Stream mem = (Stream)res.GetInternalObject();
 				mem.Seek(offset, SeekOrigin.Begin);
+#if !LIB
 				mem.Write(core.GetDataMemory().GetData(), src, size);
+#else
+				byte[] bytes = new byte[size];
+				core.GetDataMemory().ReadBytes(bytes, src, size);
+				mem.Write(bytes, 0, size); //TO BE TESTED
+#endif
 			};
 
 			syscalls.maReadData = delegate(int data, int dst, int offset, int size)
@@ -80,7 +102,13 @@ namespace MoSync
 				Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, data);
 				Stream mem = (Stream)res.GetInternalObject();
 				mem.Seek(offset, SeekOrigin.Begin);
+#if !LIB
 				mem.Read(core.GetDataMemory().GetData(), dst, size);
+#else
+				byte[] bytes = new byte[size];
+				mem.Read(bytes, 0, size);
+				core.GetDataMemory().WriteBytes(dst, bytes, size); //TO BE TESTED
+#endif
 			};
 
 			syscalls.maGetDataSize = delegate(int data)

@@ -20,14 +20,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "tools.h"
 #include "permissions.h"
 #include "nfc.h"
-#include "mustache.h"
+#include "mustache/mustache.h"
 #include "helpers/mkdir.h"
 #include "filelist/filelist.h"
 #include "profiledb/profiledb.h"
 #include <fstream>
+#include <map>
+#include <set>
 #include <sstream>
 #include <errno.h>
 #include <vector>
+#include <cstring>
 #include <stdlib.h>
 
 using namespace std;
@@ -41,6 +44,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri);
 static string packageNameToByteCodeName(const string& packageName);
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug, bool& staticLib);
 
 class AndroidContext : public DefaultContext {
 private:
@@ -74,6 +78,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	testAndroidPackage(s);
 	testAndroidVersionCode(s);
 	testAndroidInstallLocation(s);
+	testAndroidHeap(s);
 
 	// copy program and resource files to add/assets/*.mp3
 	// build AndroidManifest.xml, res/layout/main.xml, res/values/strings.xml
@@ -94,8 +99,11 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	_mkdir(add.c_str());
 	_mkdir(assets.c_str());
-	copyFile(programMp3.c_str(), s.program);
-	if(s.resource) {
+	if (s.program && existsFile(s.program)) {
+		copyFile(programMp3.c_str(), s.program);
+	}
+
+	if(s.resource && existsFile(s.resource)) {
 		string resMp3 = assets + "/resources.mp3";
 		copyFile(resMp3.c_str(), s.resource);
 	}
@@ -117,6 +125,89 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		writeNFCResource(s, ri);
 	}
 
+	string extensionDex;
+	string extensionRes;
+
+	vector<string> extensions;
+	getExtensions(s.extensions ? s.extensions : "", extensions);
+
+	// Extensions & modules.
+	vector<string> modules;
+	set<string> staticModules;
+	map<string,string> initFuncs;
+
+	bool isDebug = s.debug;
+	bool isNative = !strcmp("native", s.outputType);
+
+	// TODO: beta
+	bool useSTL = true;
+	/*for (size_t i = 0; i < extensions.size(); i++) {
+		useSTL |= "stlport" == extensions[i];
+	}*/
+	if (isNative) {
+		// Default modules; todo: externalize?
+		if (useSTL) {
+			modules.push_back("stlport_shared");
+		}
+		modules.push_back("mosync");
+		modules.push_back("mosynclib");
+		initFuncs["mosynclib"] = "resource_selector";
+		//staticModules.insert("mosynclib");
+
+		for (size_t i = 0; i < extensions.size(); i++) {
+			string extension = extensions[i];
+			if ("stlport" != extension) {
+				modules.push_back(extension);
+			}
+		}
+		modules.push_back(s.name);
+		initFuncs[string(s.name)] = "MAMain";
+	}
+
+	string assetDir = dstDir + "/assets";
+	extensionRes.append(" -A " + file(assetDir));
+	toDir(assetDir);
+	_mkdir(assetDir.c_str());
+
+	if (!extensions.empty()) {
+		for (size_t i = 0; i < extensions.size(); i++) {
+			string extension = trim(extensions[i]);
+			string extensionDir = mosyncdir() + string("/modules/") + extension + string("/Android/");
+			string extManifestDir = extensionDir + "assets/";
+			string assetDst = assetDir + extension + ".xml";
+			string assetSrc = extManifestDir + extension + ".xml";
+			if (existsFile(assetSrc.c_str())) {
+				copyFile(assetDst.c_str(), assetSrc.c_str());
+				string extLib = extensionDir + extension + ".jar";
+				extensionDex.append(" " + file(extLib));
+			} /*else {
+				printf("Error: no extension manifest for extension %s (tried %s)!\n",
+						extension.c_str(), assetSrc.c_str());
+				exit(1);
+			}*/
+		}
+	}
+
+	if (isNative) {
+		// Write list of modules
+		string moduleList = assetDir + "startup.mf";
+		ofstream moduleListOut(moduleList.c_str());
+		for (size_t i = 0; i < modules.size(); i++) {
+			string module = modules[i];
+			moduleListOut << (staticModules.count(module) ?
+					"STATIC:" : "SHARED:");
+			// Last one in list is the 'app' lib
+			moduleListOut << module;
+			string initFunc = initFuncs[module];
+			if (!initFunc.empty()) {
+				moduleListOut << ":" << initFunc;
+			}
+			moduleListOut << "\n";
+		}
+		moduleListOut.flush();
+		moduleListOut.close();
+	}
+
 	string mainXml = layout + "/main.xml";
 	writeMain(mainXml.c_str(), s, ri);
 	string stringsXml = values + "/strings.xml";
@@ -131,6 +222,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		" -F "<<file(resourcesAp_)<<
 		" -I \""<<mosyncdir()<<"/bin/android/android-"<<ri.androidVersion<<".jar\""<<
 		" -S "<<file(res)<<
+		extensionRes<<
 		" -0 -A "<<file(add);
 	sh(cmd.str().c_str());
 
@@ -144,35 +236,74 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		" -d \""<<classes<<"\"";
 	sh(cmd.str().c_str());
 
-	// move libmosync.so
 	string addlib = dstDir + "/addlib";
-	string armeabi = addlib + "/armeabi";
-	_mkdir(addlib.c_str());
-	_mkdir(armeabi.c_str());
 
-	string classesSo = classes + "/libmosync.so";
-	string armeabiSo = armeabi + "/libmosync.so";
-	remove(armeabiSo.c_str());
-	renameFile(armeabiSo, classesSo);
+	vector<string> archs;
+	archs.push_back("armeabi");
+	archs.push_back("armeabi-v7a");
+
+	for (size_t i = 0; i < archs.size(); i++) {
+		string arch = archs[i];
+
+		string armeabi = addlib + "/" + arch;
+		_mkdir(addlib.c_str());
+		_mkdir(armeabi.c_str());
+
+		if (!isNative && arch == "armeabi") {
+			string classesSo = classes + "/libmosync.so";
+			string armeabiSo = armeabi + "/libmosync.so";
+			remove(armeabiSo.c_str());
+			renameFile(armeabiSo, classesSo);
+		}
+
+		for (size_t j = 0; j < modules.size(); j++) {
+			string module = modules[j];
+			bool staticLib = false;
+			string nativeLib = findNativeLibrary(s, modules, module, arch, isDebug, staticLib);
+			bool mustExist = !staticLib && module != "stlport_shared";
+			if (!nativeLib.empty()) {
+				string dstLibDir = addlib + "/" + arch + "/";
+				_mkdir(dstLibDir.c_str());
+				string dstLib = dstLibDir + "lib" + module + ".so";
+				copyFile(dstLib.c_str(), nativeLib.c_str());
+			} else if (mustExist) {
+				printf("Could not find library %s!\n", module.c_str());
+				exit(1);
+			}
+		}
+
+		// Copy the gdbserver thingy
+		if (isDebug) {
+			string variantDirName = string("android_") + arch + (isDebug ? "_debug" : "_release");
+			string gdbServerDst = addlib + "/" + arch + "/gdbserver";
+			string gdbServerSrc = string(s.dst) + "/../" + variantDirName + "/gdbserver";
+			copyFile(gdbServerDst.c_str(), gdbServerSrc.c_str());
+		}
+	}
 
 	// run android/dx.jar
 	string classesDex = classes + "/classes.dex";
+
 	cmd.str("");
 	cmd <<"java -jar "<<getBinary("android/dx.jar")<<
 		" --dex --patch-string com/mosync/java/android"
 		" "<<packageNameToByteCodeName(s.androidPackage)<<""
-		" \"--output="<<classesDex<<"\" \""<<classes<<"\"";
+		" \"--output="<<classesDex<<"\" \""<<classes<<"\""<<extensionDex;
 	sh(cmd.str().c_str());
 
 	// run android/apkbuilder.jar
 	string unsignedUnalignedApk = dstDir + "/" + string(s.name) + "_unsigned_unaligned.apk";
 	cmd.str("");
-	cmd <<"java -jar "<<getBinary("android/apkbuilder.jar")<<
-		" "<<file(unsignedUnalignedApk)<<
+	cmd <<"java -classpath "<<getBinary("android/apkbuilder.jar")<<
+		" com.android.sdklib.build.ApkBuilderMain "
+		<<file(unsignedUnalignedApk)<<
 		" -u -z "<<file(resourcesAp_)<<
 		" -f "<<file(classesDex)<<
 		" -nf "<<file(addlib);
-	sh(cmd.str().c_str());
+	if (isDebug) {
+		cmd<<" -d";
+	}
+	sh(cmd.str().c_str(), true);
 
 	// sign the apk
 	string signedUnalignedApk = dstDir + "/" + string(s.name) + "_unaligned.apk";
@@ -237,6 +368,43 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 		" -signedjar "<<file(signedApk)<<
 		" "<<file(unsignedApk)<<
 		" "<<arg(alias);
+}
+
+static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug, bool& staticLib) {
+	vector<string> paths;
+
+	string variantDirName = string("android_") + arch + (debug ? "_debug" : "_release");
+
+	// 1. Look for the one built for this project, if any.
+	string projLibPath = string(s.dst) + "/../" + variantDirName;
+	paths.push_back(projLibPath);
+
+	// 2. Look in the lib directory
+	string libPath = mosyncdir() + string("/lib/") + variantDirName;
+	paths.push_back(libPath);
+
+	// 3. Look in the modules directory
+	for (size_t i = 0; i < modules.size(); i++) {
+		string module = modules[i];
+		string moduleLibPath = mosyncdir() + string("/modules/") + module + string("/lib/") + variantDirName;
+		paths.push_back(moduleLibPath);
+	}
+
+	for (size_t i = 0; i < paths.size(); i++)  {
+		string path = paths[i];
+		toDir(path);
+		string potentialSharedLib = path + "lib" + name + ".so";
+		string potentialStaticLib = path + "lib" + name + ".a";
+		if (existsFile(potentialSharedLib.c_str())) {
+			staticLib = false;
+			return potentialSharedLib;
+		}
+		if (existsFile(potentialStaticLib.c_str())) {
+			staticLib = true;
+			return potentialStaticLib;
+		}
+	}
+	return "";
 }
 
 static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
@@ -325,6 +493,7 @@ static void fromTemplate(const char* templateFile, const char* filename, const S
 	string versionCode = string(s.androidVersionCode);
 	string version = string(s.version);
 	string installLocation = string(s.androidInstallLocation ? s.androidInstallLocation : "internalOnly");
+	string largeHeap = string(s.androidHeap ? s.androidHeap : "");
 
 	MustacheParser parser(true);
 	AndroidContext root(NULL, ri.androidVersion);
@@ -333,6 +502,7 @@ static void fromTemplate(const char* templateFile, const char* filename, const S
 	root.setParameter("version-code", versionCode);
 	root.setParameter("version", version);
 	root.setParameter("install-location", installLocation);
+	root.setParameter("heap", largeHeap);
 	char androidVersionStr[8];
 	sprintf(androidVersionStr, "%d", ri.androidVersion);
 	root.setParameter("sdk-version", androidVersionStr);

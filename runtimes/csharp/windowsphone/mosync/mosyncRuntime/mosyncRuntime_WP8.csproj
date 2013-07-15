@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8318207D-3E1C-408B-8A4E-75E45B9F1E96}</ProjectGuid>
+    <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>mosyncRuntime</RootNamespace>
+    <AssemblyName>mosyncRuntime_WP8</AssemblyName>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
+    <SilverlightVersion>
+    </SilverlightVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkIdentifier>WindowsPhone</TargetFrameworkIdentifier>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'debug_lib_build|ARM' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\debug_lib_build\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;WINDOWS_PHONE;LIB</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Advertising.Mobile, Version=6.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Advertising.Mobile.UI, Version=6.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Phone.Controls, Version=8.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Phone.Controls.Maps, Version=8.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Phone.Controls.Toolkit">
+      <HintPath>..\packages\WPtoolkit.4.2012.10.30\lib\wp8\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Graphics">
+      <HintPath>c:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.0\Tools\MDILXAPCompile\Framework\Microsoft.Xna.Framework.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Interop">
+      <HintPath>c:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.0\Tools\MDILXAPCompile\Framework\Microsoft.Xna.Framework.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Mp3MediaStreamSource.Phone, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\Media\debug_lib_build\Mp3MediaStreamSource.Phone.dll</HintPath>
+    </Reference>
+    <Reference Include="WP7Contrib.View.Controls">
+      <HintPath>Libraries\WP7Contrib.View.Controls\WP7Contrib.View.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="WriteableBitmapExWinPhone">
+      <HintPath>Libraries\WriteableBitmapEx_v0.9.7.0\WindowsPhone\WriteableBitmapExWinPhone.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Source\Modules\Audio\MoSyncMp3Audio.cs" />
+    <Compile Include="Source\Modules\MoSyncSoundModule.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIAsync.cs" />
+    <Compile Include="Source\MosyncMachineGeneratedCode.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\CustomPickerDataSources.cs" />
+    <Compile Include="Source\maapi.cs" />
+    <Compile Include="Source\maapiWP8.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudio.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudioData.cs" />
+    <Compile Include="Source\Modules\Audio\MoSyncAudioInstance.cs" />
+    <Compile Include="Source\Modules\GL\GL.cs" />
+    <Compile Include="Source\Modules\GL\GLConstants.cs" />
+    <Compile Include="Source\Modules\GL\GLTypes.cs" />
+    <Compile Include="Source\Modules\MoSyncAdsModule.cs" />
+    <Compile Include="Source\Modules\MoSyncAudioModule.cs" />
+    <Compile Include="Source\Modules\MoSyncCameraModule.cs" />
+    <Compile Include="Source\Modules\MoSyncCommunicationsModule.cs" />
+    <Compile Include="Source\Modules\MoSyncExtensionModule.cs" />
+    <Compile Include="Source\Modules\MoSyncFileModule.cs" />
+    <Compile Include="Source\Modules\MoSyncFontModule.cs" />
+    <Compile Include="Source\Modules\MoSyncGraphicsModule.cs" />
+    <Compile Include="Source\Modules\MoSyncImagePickerModule.cs" />
+    <Compile Include="Source\Modules\MoSyncMathModule.cs" />
+    <Compile Include="Source\Modules\MoSyncMemoryModule.cs" />
+    <Compile Include="Source\Modules\MoSyncMiscModule.cs" />
+    <Compile Include="Source\Modules\MoSyncModalDialogModule.cs" />
+    <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
+    <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
+    <Compile Include="Source\Modules\MoSyncOptionsBoxModule.cs" />
+    <Compile Include="Source\Modules\MoSyncScreenOrientationModule.cs" />
+    <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
+    <Compile Include="Source\Modules\NativeUI\ListView\ListViewModel\ListItem.cs" />
+    <Compile Include="Source\Modules\NativeUI\ListView\ListViewModel\ListSection.cs" />
+    <Compile Include="Source\Modules\NativeUI\ListView\ListViewWidgets\MoSyncListViewSection.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncActivityIndicator.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncAd.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncCameraPreview.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncCustomNumberPicker.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncDatePicker.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Source\Modules\NativeUI\MoSyncDialogView.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncMap.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncMapPin.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNumberPicker.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNumberPickerValueChangedEventArgs.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncPanoramaView.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncPickerPageCustomUriStrings.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncSearchBar.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncStackScreen.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncTabScreen.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncProgressBar.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncEditBox.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncTimePicker.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Source\Modules\NativeUI\MoSyncScreenTransitions.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncVideoView.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncWebView.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncButton.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncCheckBox.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncHorizontalLayout.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncImage.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncImageButton.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncLabel.cs" />
+    <Compile Include="Source\Modules\NativeUI\ListView\ListViewWidgets\MoSyncListView.cs" />
+    <Compile Include="Source\Modules\NativeUI\ListView\ListViewWidgets\MoSyncListViewItem.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNativeUI.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIWindowsPhone.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncRelativeLayout.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncScreen.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncSlider.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncToggleButton.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncVerticalLayout.cs" />
+    <Compile Include="Source\MoSyncCore.cs" />
+    <Compile Include="Source\MoSyncCoreInterpreted.cs" />
+    <Compile Include="Source\MoSyncCoreNative.cs" />
+    <Compile Include="Source\MoSyncGraphicsUtil.cs" />
+    <Compile Include="Source\MoSyncMemory.cs" />
+    <Compile Include="Source\MoSyncMachine.cs" />
+    <Compile Include="Source\MoSyncResource.cs" />
+    <Compile Include="Source\MoSyncRuntime.cs" />
+    <Compile Include="Source\MoSyncUtil.cs" />
+    <Compile Include="Views\CustomNumberPickerPage.xaml.cs">
+      <DependentUpon>CustomNumberPickerPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Views\CustomNumberPickerPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="README_FIRST.txt" />
+    <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Check.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Delete.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Select.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MoSyncLibrary\MoSyncLibrary.vcxproj">
+      <Project>{0C38E13D-28C7-4A22-899D-96BC215E5E46}</Project>
+      <Name>MoSyncLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
+  <ProjectExtensions />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

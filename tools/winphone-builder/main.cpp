@@ -35,8 +35,8 @@ using namespace std;
 // can be used as a template bundled with the mosync framework.
 // It takes an input filename and an output filename, and finally
 // an output project type. The type of project determines which
-// files the project requires. The two types available now
-// are rebuilt and interpreted.
+// files the project requires. The types available now
+// are rebuilt, interpreted and library.
 
 // TODO:
 // AppManifest.xml should be modified from here to.
@@ -79,6 +79,16 @@ struct ApplicationBarIconReference
 
 	std::string iconPath;
 };
+
+struct CppFileReference
+{
+	CppFileReference(const std::string _path) :
+		filePath(_path)
+	{}
+
+	std::string filePath;
+};
+
 
 static std::string createFileName(const std::string& name)
 {
@@ -129,19 +139,23 @@ static bool updateWMAppManifest(const std::string& filename, const std::string& 
 }
 
 int main(int argc, char **argv) {
-
 	string inputFile = "";
+	string inputFileLibProject = "";
 	string outputType = "rebuilt";
 	string outputFile = "";
+	string outputLibraryFile = "";
 
 	std::vector<LibraryReference> libraryReferences;
 	std::vector<ApplicationBarIconReference> applicationBarIconReferences;
+	std::vector<CppFileReference> cppFilesReferences;
 
 	bool extensionDevMode = false;
 	string releaseInterpretedConfig = " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ";
 	string debugInterpretedConfig = " '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ";
 	string releaseRebuildConfig = "'$(Configuration)|$(Platform)' == 'rebuild_release|AnyCPU'";
 	string debugRebuildConfig = "'$(Configuration)|$(Platform)' == 'rebuild_debug|AnyCPU'";
+	string releaseNativeConfig = "'$(Configuration)|$(Platform)' == 'debug_build_lib|ARM'";
+	string debugNativeConfig = "'$(Configuration)|$(Platform)' == 'debug_build_lib|ARM'";
 	string programFileRelativePath = "program";
 	string resourceFileRelativePath = "resources";
 	string dataSectionFileRelativePath = "RebuildData\\data_section.bin";
@@ -153,6 +167,10 @@ int main(int argc, char **argv) {
 	string inputAppManifestFile = ""; // defaults to none.
 	string outputAppManifestFile = ""; // defaults to none.
 	string runtimePath = "Libraries\\mosyncRuntime\\mosyncRuntime.dll";
+	string runtimePathWP8 = "Libraries\\mosyncRuntime\\mosyncRuntime_WP8.dll";
+	string mosyncProjectPath = "";
+	string macroDefines = "";
+	string includePaths = "";
 
 	bool hasResourceFile = true;
 
@@ -203,6 +221,11 @@ int main(int argc, char **argv) {
 			if(i>=argc) error("Invalid argument to -input.");
 			inputFile = argv[i];
 		} else
+		if(strcmp("-input-file-library-project", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -input-file-library-project.");
+			inputFileLibProject = argv[i];
+		} else
 		if(strcmp("-input-app-manifest-file", argv[i])==0) {
 			i++;
 			if(i>=argc) error("Invalid argument to -input-app-manifest-file.");
@@ -214,23 +237,50 @@ int main(int argc, char **argv) {
 			outputAppManifestFile = argv[i]; // WMAppManifest.xml
 		} else
 		if(strcmp("-output-type", argv[i])==0) {
-				i++;
-				if(i>=argc) error("Invalid argument to -output-type.");
-				outputType = argv[i];
+			i++;
+			if(i>=argc) error("Invalid argument to -output-type.");
+			outputType = argv[i];
 		} else
 		if(strcmp("-output-file", argv[i])==0) {
-				i++;
-				if(i>=argc) error("Invalid argument to -output-file.");
-				outputFile = argv[i];
+			i++;
+			if(i>=argc) error("Invalid argument to -output-file.");
+			outputFile = argv[i];
+		}
+		if(strcmp("-output-file-library-project", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -input-file-library-project.");
+			outputLibraryFile = argv[i];
+		} else
+		if(strcmp("-mosync-project-path", argv[i]) == 0)
+		{
+			i++;
+			if(i>=argc) error("Invalid argument to -mosync-project-path.");
+			mosyncProjectPath = argv[i];
+		}
+		if(strcmp("-macro-defines", argv[i]) == 0)
+		{
+			i++;
+			if(i>=argc) error("Invalid argument to -macro-defines.");
+			macroDefines = argv[i];
+		}
+		if(strcmp("-include-paths", argv[i]) == 0)
+		{
+			i++;
+			if(i>=argc) error("Invalid argument to -include-paths.");
+			includePaths = argv[i];
 		}
 	}
 
 	if(inputFile=="")
 		error("Must specify an input file using -input-file.");
-	if(outputType!="rebuilt" && outputType!="interpreted")
-		error("Must specify an output type using -output-type. It can either be rebuild or interpreted.");
+	if(outputType!="rebuilt" && outputType!="interpreted" && outputType!="native")
+		error("Must specify an output type using -output-type. It can either be rebuild, interpreted or native.");
+	if(outputType == "native" && inputFileLibProject == "")
+		error("Must specify an input file for the library projectu sing -input-file-library-project.");
 	if(outputFile=="")
 		error("Must specify an output file using -output-file.");
+	if(outputLibraryFile == "" && outputType == "native")
+		error("Must specify an output file using -output-file-library-project.");
 
 	pugi::xml_document document;
 	pugi::xml_parse_result res = document.load_file(inputFile.c_str());
@@ -239,9 +289,20 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
+	pugi::xml_document librayProjectDocument;
+	if(outputType == "native")
+	{
+		res = librayProjectDocument.load_file(inputFileLibProject.c_str());
+		if(res.status != pugi::status_ok) {
+			error("Xml parsing failed!");
+			return 0;
+		}
+	}
+
 
 	pugi::xpath_query projectQuery("Project");
 	pugi::xml_node project = document.select_single_node(projectQuery).node();
+	pugi::xml_node libraryProject = librayProjectDocument.select_single_node(projectQuery).node();
 	std::string version = project.attribute("ToolsVersion").value();
 
 	if(!extensionDevMode)
@@ -254,12 +315,6 @@ int main(int argc, char **argv) {
 			relCnfNode.parent().remove_child(relCnfNode);
 			dbgCnfNode.parent().remove_child(dbgCnfNode);
 			programContentNode.parent().remove_child(programContentNode);
-
-			if(!hasResourceFile)
-			{
-				pugi::xml_node resContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + resourceFileRelativePath + "\"]");
-				resContentNode.parent().remove_child(resContentNode);
-			}
 		}
 		else if(outputType == "interpreted")
 		{
@@ -271,12 +326,12 @@ int main(int argc, char **argv) {
 			dbgRebuildCnfNode.parent().remove_child(dbgRebuildCnfNode);
 			dataSectionContentNode.parent().remove_child(dataSectionContentNode);
 			rebuildCsIncludeNode.parent().remove_child(rebuildCsIncludeNode);
+		}
 
-			if(!hasResourceFile)
-			{
-				pugi::xml_node resContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + resourceFileRelativePath + "\"]");
-				resContentNode.parent().remove_child(resContentNode);
-			}
+		if(!hasResourceFile)
+		{
+			pugi::xml_node resContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + resourceFileRelativePath + "\"]");
+			resContentNode.parent().remove_child(resContentNode);
 		}
 	}
 
@@ -287,12 +342,16 @@ int main(int argc, char **argv) {
 */
 
 	// insert a reference to the mosync runtime dll
-	pugi::xml_node firstReferenceNode = getNode(project, "ItemGroup/Reference[@Include]");
-	pugi::xml_node mosyncRuntimeRefNode = firstReferenceNode.parent().insert_child_before("Reference", firstReferenceNode);
-	pugi::xml_attribute mosyncRuntimeRefAttrNode = mosyncRuntimeRefNode.append_attribute("Include");
-	mosyncRuntimeRefAttrNode.set_value("mosyncRuntime");
-	pugi::xml_node mosyncRuntimeHintPath = mosyncRuntimeRefNode.append_child("HintPath").append_child(pugi::node_pcdata);
-	mosyncRuntimeHintPath.set_value(runtimePath.c_str());
+
+	if(outputType != "native")
+	{
+		pugi::xml_node firstReferenceNode = getNode(project, "ItemGroup/Reference[@Include]");
+		pugi::xml_node mosyncRuntimeRefNode = firstReferenceNode.parent().insert_child_before("Reference", firstReferenceNode);
+		pugi::xml_attribute mosyncRuntimeRefAttrNode = mosyncRuntimeRefNode.append_attribute("Include");
+		mosyncRuntimeRefAttrNode.set_value("mosyncRuntime");
+		pugi::xml_node mosyncRuntimeHintPath = mosyncRuntimeRefNode.append_child("HintPath").append_child(pugi::node_pcdata);
+		mosyncRuntimeHintPath.set_value(runtimePath.c_str());
+	}
 
 	for(size_t i = 0; i < libraryReferences.size(); i++)
 	{
@@ -335,7 +394,14 @@ int main(int argc, char **argv) {
 	std::string outputDirPath;
 
 	outputDirPath.append(outputFile.substr(0, position));
-	outputDirPath.append("project/AppBar.Icons");
+	if(outputType == "native")
+	{
+		outputDirPath.append("project/mosync_WP8/AppBar.Icons");
+	}
+	else
+	{
+		outputDirPath.append("project/AppBar.Icons");
+	}
 
 	_mkdir(outputDirPath.c_str());
 
@@ -379,6 +445,74 @@ int main(int argc, char **argv) {
 		closedir(d);
 	}
 
+	if(outputType == "native")
+	{
+		//fill the cpp files references vector
+		de = NULL;
+		d = NULL;
+
+		// Open the application bar icons directory and create an ApplicationBarIconReference obj for each.
+		d = opendir(mosyncProjectPath.c_str());
+		string currentPath = mosyncProjectPath;
+		vector<string> dirs;
+
+		int pos = outputLibraryFile.find("\\MoSyncLibrary.vcxproj");
+		outputDirPath = outputLibraryFile.substr(0, pos);
+		string copyCmd;
+
+		while(NULL != d)
+		{
+			de = readdir(d);
+
+			while(de)
+			{
+				// Ignore the . and .. entries
+				string name = de->d_name;
+#ifdef WIN32
+				copyCmd = "copy /Y ";
+#else
+				copyCmd = "cp -f ";
+#endif
+				if(strcmp(name.c_str(), ".") != 0 && strcmp(name.c_str(), "..") != 0 && name[0] != '.' &&
+					(strstr(name.c_str(), ".c") != NULL || strstr(name.c_str(), ".cpp") != NULL ||
+					strstr(name.c_str(), ".h") != NULL || strstr(name.c_str(), ".hpp") != NULL))
+				{
+					copyCmd += "\"" + (currentPath + "\\" + name) + "\" \"" + outputDirPath;
+					string relativePath = currentPath.substr(mosyncProjectPath.length(), currentPath.length() - mosyncProjectPath.length());
+					copyCmd += relativePath + "\\" + name + "\"";
+
+					system(("mkdir \"" + outputDirPath + relativePath + "\"").c_str());
+					int r = system(copyCmd.c_str());
+					if(r) {
+						printf("Command failed: %s %i\n", copyCmd.c_str(), r);
+						exit(r);
+					}
+
+					if(strstr(name.c_str(), ".h") == NULL && strstr(name.c_str(), ".hpp") == NULL)
+					{
+						CppFileReference fileRef(outputDirPath + relativePath + "\\" + name);
+						cppFilesReferences.push_back(fileRef);
+					}
+				}
+				else if(name[0] != '.' && strcmp(name.c_str(), "Output") != 0 && strcmp(name.c_str(), "ReleasePackages") != 0)
+				{
+					dirs.push_back(currentPath + "\\" + name);
+				}
+				de = readdir(d);
+			}
+
+			closedir(d);
+			d = NULL;
+
+			while(NULL == d && dirs.size() != 0)
+			{
+				d = opendir(dirs.back().c_str());
+				if(d != NULL)
+					currentPath = dirs.back();
+				dirs.pop_back();
+			}
+		}
+	}
 	// Write the changes to the csproj file.
 	pugi::xml_node mosyncApplicationBarIcons = project.append_child("ItemGroup");
 
@@ -394,8 +528,58 @@ int main(int argc, char **argv) {
 		applicationBarIconReferences.pop_back();
 	}
 
+	//Add the cpp files references to the library csproj
+	if(outputType == "native")
+	{
+		//remove the reference to main.cpp
+		pugi::xml_node mainCppReferenceNode;
+		pugi::xml_node includePathNode;
+		pugi::xml_node definesNode;
+		pugi::xml_node parentNode;
+
+		definesNode = getNode(libraryProject,
+							  "ItemDefinitionGroup [@Condition=\"'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'\"]/ClCompile/PreprocessorDefinitions");
+
+		string newValue = definesNode.first_child().value();
+		newValue += ";" + macroDefines;
+		definesNode.first_child().set_value(newValue.c_str());
+
+		includePathNode = getNode(libraryProject, "PropertyGroup [@Condition=\"'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'\"]/IncludePath");
+
+		newValue = includePathNode.first_child().value();
+		newValue += ";" + includePaths;
+		includePathNode.first_child().set_value(newValue.c_str());
+
+		mainCppReferenceNode = getNode(libraryProject, "ItemGroup/ClCompile [@Include=\"main.cpp\"]");
+		mainCppReferenceNode.parent().remove_child(mainCppReferenceNode);
+
+		// Write the changes to the csproj file.
+		pugi::xml_node mosyncCppFiles = libraryProject.append_child("ItemGroup");
+
+		while(cppFilesReferences.empty() == false)
+		{
+			pugi::xml_node contentChild = mosyncCppFiles.append_child("ClCompile");
+			std::string nodeValue;
+			nodeValue.append(cppFilesReferences.back().filePath);
+			contentChild.append_attribute("Include").set_value(nodeValue.c_str());
+
+			if(strcmp(nodeValue.substr(nodeValue.length() - 2, 2).c_str(), ".c") == 0) //a .c file
+			{
+				pugi::xml_node conditionChild = contentChild.append_child("CompileAsWinRT");
+				conditionChild.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='debug_lib_build|ARM'");
+				conditionChild.append_child(pugi::node_pcdata).set_value("false");
+			}
+
+			cppFilesReferences.pop_back();
+		}
+	}
+
 	// remove a reference to the mosync runtime project
-	pugi::xml_node mosyncRuntimeProjectReferenceNode = getNode(project, "ItemGroup/ProjectReference[@Include=\"..\\mosyncRuntime\\mosyncRuntime.csproj\"]");
+	pugi::xml_node mosyncRuntimeProjectReferenceNode;
+	if(outputType != "native")
+	{
+		mosyncRuntimeProjectReferenceNode = getNode(project, "ItemGroup/ProjectReference[@Include=\"..\\mosyncRuntime\\mosyncRuntime.csproj\"]");
+	}
 	mosyncRuntimeProjectReferenceNode.parent().remove_child(mosyncRuntimeProjectReferenceNode);
 
 	pugi::xml_node rootNameSpaceNode = getNode(project, "PropertyGroup/RootNamespace");
@@ -421,6 +605,15 @@ int main(int argc, char **argv) {
 	{
 		error("csproj xml writing failed!");
 		return 1;
+	}
+
+	if(outputType == "native")
+	{
+		if(!saveXML(librayProjectDocument, outputLibraryFile))
+		{
+			error("vcxproj xml writing failed!");
+			return 1;
+		}
 	}
 
 	return 0;

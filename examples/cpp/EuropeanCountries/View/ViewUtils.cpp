@@ -27,6 +27,7 @@
 
 #include <NativeUI/Label.h>
 #include <NativeUI/VerticalLayout.h>
+#include <mactype.h>
 
 #include "ViewUtils.h"
 

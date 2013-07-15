@@ -28,6 +28,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *
  */
 
+#ifdef MOSYNC_NATIVE
+#include <stdlib.h>
+#endif
+
 #define _NO_OLDNAMES	//avoid conflicts with y1()
 #include <ma.h>
  

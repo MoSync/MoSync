@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "Graphics.h"
+#include <maapi.h>
 #include <maassert.h>
 
 #define MA_CLIP_STACK_DEPTH 128

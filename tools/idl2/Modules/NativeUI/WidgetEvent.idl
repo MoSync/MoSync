@@ -22,10 +22,25 @@ group WidgetEvent "Widget event" {
 
 		union {
 			/**
-			* @brief The index when a #MAW_EVENT_CLICKED or a #MAW_EVENT_ITEM_WILL_SELECT
-			* event is received for a #MAW_LIST_VIEW.
+			* @brief The parameters for the #MAW_EVENT_ITEM_CLICKED.
 			*/
-			int listItemIndex;
+			struct {
+				/**
+				* @brief A index number identifying the clicked #ListViewItem object in a
+				* section(for alphabetical and segmented list views), otherwise in a
+				* list(for default list views).
+				* Valid for #MAW_EVENT_ITEM_CLICKED, #MAW_EVENT_ITEM_WILL_SELECT.
+				*/
+				int listItemIndex;
+
+				/**
+				* @brief A index number identifying the section that contains the clicked
+				* #ListViewItem object only for alphabetical and segmented list views.
+				* For default list view the value will be #MAW_RES_INVALID_INDEX.
+				* Valid for #MAW_EVENT_ITEM_CLICKED, #MAW_EVENT_ITEM_WILL_SELECT.
+				*/
+				int listSectionIndex;
+			} listInfo;
 
 			/**
 			* @brief The parameters for the #MAW_EVENT_SEGMENTED_LIST_ITEM_CLICKED.
@@ -33,10 +48,12 @@ group WidgetEvent "Widget event" {
 			struct {
 				/**
 				* @brief The index of the section that contains the selected item.
+				* @deprecated Use #listItemIndex.
 				*/
 				int sectionIndex;
 				/**
 				* @brief The index of the selected item within its parent section.
+				* @deprecated Use #listSectionIndex.
 				*/
 				int sectionItemIndex;
 			} listViewSectionInfo;
@@ -243,7 +260,11 @@ group WidgetEvent "Widget event" {
 			CLICKED = 5;
 
 			/**
-			* @brief Sent when an item in a list view is clicked.
+			* @brief Sent when an #ListViewItem object is clicked.
+			* Event is sent for default, alphabetical and segmented list view types.
+			* The event will contain the #listItemIndex and the #listSectionIndex
+			* coresponding to the selected item.
+			* Available on Windows Phone 7, Android and iOS.
 			*/
 			ITEM_CLICKED = 6;
 
@@ -417,9 +438,8 @@ group WidgetEvent "Widget event" {
 			MAP_PIN_CLICKED = 32;
 
 			/**
-			* @brief Sent by a ListView when an item is about to be selected.
-			* The listItemIndex member from MAWidgetEventData struct will contain the item index
-			* that is about to be selected.
+			* @brief Sent by a #ListView object when an item is about to be selected.
+			* The #listItemIndex and #listSectionIndex will identify the item.
 			* Available only on iOS.
 			*/
 			ITEM_WILL_SELECT = 33;
@@ -429,6 +449,7 @@ group WidgetEvent "Widget event" {
 			* The event will contain the sectionIndex and the sectionItemIndex coresponding to the
 			* selected item.
 			* Available on Windows Phone 7, Android and iOS.
+			* @deprecated Use #MAW_EVENT_ITEM_CLICKED.
 			*/
 			SEGMENTED_LIST_ITEM_CLICKED = 34;
 
@@ -438,6 +459,7 @@ group WidgetEvent "Widget event" {
 			* item. Insert button is visible only in editing mode and if its editing style is
 			* #MAW_LIST_VIEW_ITEM_EDIT_STYLE_INSERT.
 			* Available on iOS.
+			* @deprecated Use #MAW_EVENT_LIST_ITEM_INSERT_BTN
 			*/
 			SEGMENTED_LIST_ITEM_INSERT_BTN = 35;
 
@@ -447,6 +469,7 @@ group WidgetEvent "Widget event" {
 			* item. The delete button is visible only in editing mode and if its editing style is
 			* #MAW_LIST_VIEW_ITEM_EDIT_STYLE_DELETE.
 			* Available on iOS.
+			* @deprecated Used #MAW_EVENT_LIST_ITEM_DELETE_BTN
 			*/
 			SEGMENTED_LIST_ITEM_DELETE_BTN = 36;
 
@@ -468,6 +491,26 @@ group WidgetEvent "Widget event" {
 			* Available on Android.
 			*/
 			ACTION_BAR_MENU_ITEM_SELECTED = 39;
+
+			/**
+			* @brief Sent when a #ListViewItem insert button is clicked.
+			* The event will contain the #listItemIndex and the #listSectionIndex pointing
+			* to the clicked button's item.
+			* Insert button is visible only in editing mode and if its editing style is
+			* #MAW_LIST_VIEW_ITEM_EDIT_STYLE_INSERT.
+			* Available on iOS.
+			*/
+			LIST_ITEM_INSERT_BTN = 40;
+
+			/**
+			* @brief Sent when a #ListViewItem delete button is clicked.
+			* The event will contain the #listItemIndex and the #listSectionIndex pointing
+			* to the clicked button's item.
+			* The delete button is visible only in editing mode and if its editing style is
+			* #MAW_LIST_VIEW_ITEM_EDIT_STYLE_DELETE.
+			* Available on iOS.
+			*/
+			LIST_ITEM_DELETE_BTN = 41;
 		}
 	} // end of WidgetEventTypes
 } // end of WidgetEvent

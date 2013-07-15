@@ -50,7 +50,7 @@
 extern "C" {
 #endif
 
-#ifndef _STDIO_H
+#ifndef _STDIO_H_
 /** \brief vsprintf - print formatted output
 * \param buf output string
 * \param fmt input format string

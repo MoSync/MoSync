@@ -19,6 +19,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * \brief HashMap implementation
 */
 
+#ifdef MOSYNC_NATIVE
+#include <string.h>
+#endif
+
 #ifndef _SE_MSAB_MAUTIL_HASHMAP_H_
 #error Do not include this file directly.
 #endif

@@ -70,6 +70,8 @@ std::string fullpathString(const char* name);
 
 std::string delim(std::vector<std::string>& input, const std::string& delim);
 
+void split(std::vector<std::string>& out, const std::string& input, const std::string& delims);
+
 // Writes a line that is "manifest-safe", by splitting it every 72 characters.
 void write72line(std::ostream& output, const std::string& input);
 

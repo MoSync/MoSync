@@ -1,227 +1,338 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/*
+Copyright (C) 2013 MoSync AB
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
 */
 
-/** \file Test.cpp
+/*
+* @file Test.h
+* @brief Testing framework
 */
 
 #include <conprint.h>
 #include <matime.h>
 #include <mavsprintf.h>
-#include "MAUtil/String.h"
 #include "Test.h"
 
-#define XML_LOGGING
-#ifdef XML_LOGGING
-#define XML_LOG lprintfln
-#else
-#define XML_LOG(...)
-#endif
+namespace MATest
+{
+	/* ========== Class TestListener ========== */
 
-namespace MATest {
+	TestListener::TestListener() {}
+	TestListener::~TestListener() {}
+	void TestListener::beginTestSuite(const MAUtil::String& suiteName) {}
+	void TestListener::endTestSuite() {}
+	void TestListener::beginTestCase(const MAUtil::String& testCaseName) {}
+	void TestListener::endTestCase() {}
+	void TestListener::assertion(const MAUtil::String& assertionName, bool cond) {}
+	void TestListener::expectation(const MAUtil::String& assertionName) {}
+	void TestListener::timedOut(const MAUtil::String& testCaseName) {}
 
-	using namespace MAUtil;
+	/* ========== Class TestCaseTimeOutListener ========== */
 
-	void TestListener::beginTestSuite(const String& suiteName) {
+	void TestCaseTimeOutListener::setTestCase(TestCase* testCase)
+	{
+		mTestCase = testCase;
 	}
 
-	void TestListener::endTestSuite(){
+	void TestCaseTimeOutListener::startTimer(int ms)
+	{
+		stopTimer();
+		MAUtil::Environment::getEnvironment().addTimer(this, ms, 1);
 	}
 
-	void TestListener::beginTestCase(const String& testCaseName){
+	void TestCaseTimeOutListener::stopTimer()
+	{
+		MAUtil::Environment::getEnvironment().removeTimer(this);
 	}
 
-	void TestListener::endTestCase(){
+	void TestCaseTimeOutListener::runTimerEvent()
+	{
+		// The test case has timed out.
+		stopTimer();
+		mTestCase->timeOut();
 	}
 
-	void TestListener::assertion(const String& assertionName, bool cond){
+	/* ========== Class TestCase ========== */
+
+	TestCase::TestCase(const MAUtil::String& name) :
+		name(name)
+	{
+		mTimeOutListener.setTestCase(this);
 	}
 
-	TestListener::~TestListener() {
+	TestCase::~TestCase()
+	{
 	}
 
-
-	XMLOutputTestListener::XMLOutputTestListener(MAHandle placeholder, const String& storeName) {
-		this->storeName = storeName;
-		this->placeHolder = placeholder;
-
-		beginXML();
+	void TestCase::setTimeOut(int ms)
+	{
+		mTimeOutListener.startTimer(ms);
 	}
 
-	XMLOutputTestListener::~XMLOutputTestListener() {
-		endXML();
-	}
-	void XMLOutputTestListener::beginXML() {
-		xmlOutput="";
-		xmlOutput+="<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-		xmlOutput+="<TestReport time=\"";
-		xmlOutput+=sprint_time(maLocalTime());
-		xmlOutput+="\">\n";
-	}
-	void XMLOutputTestListener::endXML() {
-		XML_LOG("endXML");
-		xmlOutput+="</TestReport>\n";
-#ifdef XML_LOGGING
-		maWriteLog(xmlOutput.c_str(), xmlOutput.length());
-#endif
-		MAHandle store = maOpenStore(storeName.c_str(), MAS_CREATE_IF_NECESSARY);
-		maCreateData(placeHolder, xmlOutput.length());
-		maWriteData(placeHolder, xmlOutput.c_str(), 0, xmlOutput.length());
-		maWriteStore(store, placeHolder);
-		maCloseStore(store, 0);
-	}
-	void XMLOutputTestListener::beginTestSuite(const String &str) {
-		XML_LOG("---------------------------------------");
-		XML_LOG("test suite: %s", str.c_str());
-		XML_LOG("---------------------------------------");
-
-		beginXML();
-
-		xmlOutput+="\t<TestSuite name=\""+str+"\">\n";
+	void TestCase::clearTimeOut()
+	{
+		mTimeOutListener.stopTimer();
 	}
 
-	void XMLOutputTestListener::endTestSuite() {
-		xmlOutput+="\t</TestSuite>\n";
-
-		endXML();
+	void TestCase::open()
+	{
 	}
 
-	void XMLOutputTestListener::beginTestCase(const String &str) {
-		XML_LOG("---------------------------------------");
-		XML_LOG("test case: %s", str.c_str());
-		XML_LOG("---------------------------------------");
-
-		xmlOutput+="\t\t<TestCase name=\""+str+"\">\n";
+	void TestCase::close()
+	{
 	}
 
-	void XMLOutputTestListener::endTestCase() {
-		xmlOutput+="\t\t</TestCase>\n";
-	}
-
-	void XMLOutputTestListener::assertion(const String &str, bool cond) {
-		String res;
-		if(cond) {
-			XML_LOG("%s, succeeded.", str.c_str());
-			res = "true";
-		}
-		else {
-			XML_LOG("%s, failed.", str.c_str());
-			res = "false";
-		}
-		xmlOutput+="\t\t\t<Assertion name=\"" + str + "\" result=\"" + res + "\"/>\n";
-	}
-
-	TestCase::TestCase(const String& name) : name(name) {
-	}
-
-	TestCase::~TestCase() {
-
-	}
-
-	void TestCase::open() {
-
-	}
-
-	void TestCase::close() {
-	}
-
-	bool TestCase::assert(const String& assertionName, bool cond) {
+	bool TestCase::assert(const MAUtil::String& assertionName, bool cond)
+	{
 		suite->fireAssertion(assertionName, cond);
 		return cond;
 	}
 
-	const String& TestCase::getName() const {
+	void TestCase::expect(const MAUtil::String& assertionName)
+	{
+		suite->fireExpectation(assertionName);
+	}
+
+	void TestCase::timeOut()
+	{
+		suite->fireTimedOut(name);
+		runNextTestCase();
+	}
+
+	MAUtil::String TestCase::getName() const
+	{
 		return name;
 	}
 
-	void TestCase::setSuite(TestSuite *suite) {
+	void TestCase::setSuite(TestSuite *suite)
+	{
 		this->suite = suite;
 	}
 
-
-	TestSuite::TestSuite(const String& name) : name(name), mNextCase(0) {
+	TestSuite* TestCase::getSuite()
+	{
+		return this->suite;
 	}
 
-	TestSuite::~TestSuite() {
+	void TestCase::runNextTestCase()
+	{
+		getSuite()->runNextCase();
 	}
 
-	void TestSuite::addTestCase(TestCase *testCase) {
-		testCases.add(testCase);
+	/* ========== Class TestSuite ========== */
+
+	TestSuite::TestSuite(const MAUtil::String& name) :
+		mName(name),
+		mCurrentTestCase(-1),
+		mRunCounter(0)
+	{
+	}
+
+	TestSuite::~TestSuite()
+	{
+	}
+
+	void TestSuite::addTestCase(TestCase* testCase)
+	{
+		mTestCases.add(testCase);
 		testCase->setSuite(this);
 	}
 
+// TODO: Why is this commented out?
+// This code seems to run all test cases sequentially.
 #if 0
 	void TestSuite::runTestCases() {
-		for(int j = 0; j < testListeners.size(); j++) {
-			testListeners[j]->beginTestSuite(name);
+		for(int i = 0; i < mTestListeners.size(); i++) {
+			mTestListeners[i]->beginTestSuite(mName);
 		}
-		for(int i = 0; i < testCases.size(); i++) {
-			for(int j = 0; j < testListeners.size(); j++) {
-				testListeners[j]->beginTestCase(testCases[i]->getName());
+		for(int i = 0; i < mTestCases.size(); i++) {
+			for(int i = 0; i < mTestListeners.size(); i++) {
+				mTestListeners[i]->beginTestCase(mTestCases[i]->getName());
 			}
-			testCases[i]->open();
-			testCases[i]->run();
-			testCases[i]->close();
-			for(int j = 0; j < testListeners.size(); j++) {
-				testListeners[j]->endTestCase();
+			mTestCases[i]->open();
+			mTestCases[i]->run();
+			mTestCases[i]->close();
+			for(int i = 0; i < mTestListeners.size(); i++) {
+				mTestListeners[i]->endTestCase();
 			}
 		}
-		for(int j = 0; j < testListeners.size(); j++) {
-			testListeners[j]->endTestSuite();
+		for(int i = 0; i < mTestListeners.size(); i++) {
+			mTestListeners[i]->endTestSuite();
 		}
 	}
 #endif
-	void TestSuite::runNextCase() {
-		if(mNextCase == 0) {
-			for(int j = 0; j < testListeners.size(); j++) {
-				testListeners[j]->beginTestSuite(name);
+
+#if(0)
+	// TODO: Should we use this rather than resetting
+	// mCurrentTestCase in runNextCaseHelper()?
+	void TestSuite::reset()
+	{
+		mCurrentTestCase = -1;
+	}
+#endif
+
+	// Note: This method is called from TestCase::runNextTestCase().
+	void TestSuite::runNextCase()
+	{
+		// If this the number of waiting test cases is zero
+		// we launch a timer to run the next test case.
+		if (0 == mRunCounter)
+		{
+			MAUtil::Environment::getEnvironment().addTimer(this, 1, 1);
+		}
+
+		// Increment counter for test cases to run.
+		mRunCounter ++;
+	}
+
+	void TestSuite::runTimerEvent()
+	{
+		// Remove the timer.
+		MAUtil::Environment::getEnvironment().removeTimer(this);
+
+		// Run next test case.
+		runNextCaseHelper();
+
+		// Decrement run counter.
+		mRunCounter --;
+
+		// If there are test cases left to run, start a timer
+		// to run it/them (should likely be only one waiting).
+		if (mRunCounter > 0)
+		{
+			MAUtil::Environment::getEnvironment().addTimer(this, 1, 1);
+		}
+	}
+
+	void TestSuite::runNextCaseHelper()
+	{
+		TestCase* testCase;
+
+		// There must be test cases to run.
+		if (mTestCases.size() > 0)
+		{
+			// Increment test case index.
+			mCurrentTestCase ++;
+
+			// Is this the first test case?
+			if (0 == mCurrentTestCase)
+			{
+				// Signal beginning of the test suite.
+				fireBeginTestSuite(mName);
 			}
-		} else {
-			testCases[mNextCase - 1]->close();
-			for(int j = 0; j < testListeners.size(); j++) {
-				testListeners[j]->endTestCase();
+			// If this is not the first test case then
+			// signal the end of the previous test case.
+			else
+			{
+				// Close/clear the previous test case.
+				testCase = mTestCases[mCurrentTestCase - 1];
+				testCase->clearTimeOut();
+				testCase->close();
+				fireEndTestCase();
 			}
-		}
-		if(mNextCase == testCases.size()) {
-			for(int j = 0; j < testListeners.size(); j++) {
-				testListeners[j]->endTestSuite();
+
+			// If last test case has been run, reset the
+			// test case index and end the suite.
+			if (mCurrentTestCase >= mTestCases.size())
+			{
+				mCurrentTestCase = -1;
+				fireEndTestSuite();
+				return;
 			}
-			return;
-		}
 
-		int curCase = mNextCase++;
-		for(int j = 0; j < testListeners.size(); j++) {
-			testListeners[j]->beginTestCase(testCases[curCase]->getName());
-		}
-		testCases[curCase]->open();
-		testCases[curCase]->start();
-	}
+			// Get the current test case.
+			testCase = mTestCases[mCurrentTestCase];
 
-	const String& TestSuite::getName() const {
-		return name;
-	}
+			// Open the current test case.
+			fireBeginTestCase(testCase->getName());
+			testCase->open();
 
-	void TestSuite::addTestListener(TestListener *testListener) {
-		testListeners.add(testListener);
-	}
+			// Run current test case.
+			testCase->start();
 
-	void TestSuite::fireAssertion(const String& str, bool cond) {
-		for(int j = 0; j < testListeners.size(); j++) {
-			testListeners[j]->assertion(str, cond);
+			// Note: We do not call fireEndTestCase() here,
+			// because it should not be called until the
+			// current test case has called runNextTestCase().
 		}
 	}
 
+	const MAUtil::String& TestSuite::getName() const
+	{
+		return mName;
+	}
+
+	void TestSuite::addTestListener(TestListener* testListener)
+	{
+		mTestListeners.add(testListener);
+	}
+
+	void TestSuite::fireBeginTestSuite(const MAUtil::String& suiteName)
+	{
+		for (int i = 0; i < mTestListeners.size(); i++)
+		{
+			mTestListeners[i]->beginTestSuite(suiteName);
+		}
+	}
+
+	void TestSuite::fireEndTestSuite()
+	{
+		for (int i = 0; i < mTestListeners.size(); i++)
+		{
+			mTestListeners[i]->endTestSuite();
+		}
+	}
+
+	void TestSuite::fireBeginTestCase(const MAUtil::String& testCaseName)
+	{
+		for (int i = 0; i < mTestListeners.size(); i++)
+		{
+			mTestListeners[i]->beginTestCase(testCaseName);
+		}
+	}
+
+	void TestSuite::fireEndTestCase()
+	{
+		for (int i = 0; i < mTestListeners.size(); i++)
+		{
+			mTestListeners[i]->endTestCase();
+		}
+	}
+
+	void TestSuite::fireAssertion(const MAUtil::String& assertionName, bool cond)
+	{
+		for (int i = 0; i < mTestListeners.size(); i++)
+		{
+			mTestListeners[i]->assertion(assertionName, cond);
+		}
+	}
+
+	void TestSuite::fireExpectation(const MAUtil::String& assertionName)
+	{
+		for (int i = 0; i < mTestListeners.size(); i++)
+		{
+			mTestListeners[i]->expectation(assertionName);
+		}
+	}
+
+	void TestSuite::fireTimedOut(const MAUtil::String& testCaseName)
+	{
+		for (int i = 0; i < mTestListeners.size(); i++)
+		{
+			mTestListeners[i]->timedOut(testCaseName);
+		}
+	}
 }
+// namespace

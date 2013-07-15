@@ -36,7 +36,12 @@ extern "C" {
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
+#ifdef __IOS__
+#include <malloc/malloc.h>
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
 #else
 
 //************************************************************************************************

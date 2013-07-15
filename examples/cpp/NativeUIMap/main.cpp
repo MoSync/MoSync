@@ -72,7 +72,7 @@ public:
 	/**
 	 * This method is called when the application is closed.
 	 */
-	void NativeUIMoblet::closeEvent()
+	void closeEvent()
 	{
 		// Deallocate the main screen.
 		delete mMainScreen;

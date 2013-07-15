@@ -21,13 +21,13 @@ using System.Windows.Resources;
 
 namespace MoSync
 {
-
-    public class Machine
+    public partial class Machine
     {
         private MoSync.Core mCore;
         private MoSync.Runtime mRuntime;
         private Thread mThread = null;
         private readonly bool mRebuild;
+        private bool mLibBuild;
 
 		public MoSync.Core GetCore()
 		{
@@ -39,8 +39,9 @@ namespace MoSync
 			return mRuntime;
 		}
 
-        private Machine(bool rebuild)
+        private Machine(bool rebuild, bool lib)
         {
+            mLibBuild = lib;
             mRebuild = rebuild;
             // This tells the util subsystem which thread is the main thread.
             // Never make an instance of Program from another thread.
@@ -94,7 +95,7 @@ namespace MoSync
             mCore.Stop();
             mThread.Join();
         }
-
+#if !LIB
         private void LoadProgram(Stream s)
         {
             Core core = new MoSync.CoreInterpreted(s);
@@ -142,11 +143,11 @@ namespace MoSync
 
         public static Machine CreateInterpretedMachine(String programFile, String resourceFile)
         {
-            MoSync.Machine mosyncMachine = new MoSync.Machine(false);
+            MoSync.Machine mosyncMachine = new MoSync.Machine(false, false);
             mosyncMachine.LoadProgram(programFile, resourceFile);
             return mosyncMachine;
         }
-
+#endif
         public static Machine CreateNativeMachine(Core core, String resourceFile)
         {
             StreamResourceInfo resourcesResInfo = Application.GetResourceStream(new Uri(resourceFile, UriKind.Relative));
@@ -154,7 +155,7 @@ namespace MoSync
             if (resourcesResInfo != null && resourcesResInfo.Stream != null)
                 resources = resourcesResInfo.Stream;
 
-            MoSync.Machine mosyncMachine = new MoSync.Machine(true);
+            MoSync.Machine mosyncMachine = new MoSync.Machine(true, false);
             mosyncMachine.Init(core, resources);
             //if (resources != null)
                 //resources.Close();
@@ -163,7 +164,7 @@ namespace MoSync
 
         private void CoreRun()
         {
-            if(mRebuild) {
+            if(mRebuild || mLibBuild) {
                 mCore.Run();
                 mRuntime.RunCleaners();
                 return;
@@ -176,6 +177,7 @@ namespace MoSync
                 }
                 catch (MoSync.Util.ExitException e)
                 {
+#if !LIB
                     mRuntime.RunCleaners();
                     if (mLoadProgramStream != null)
                     {
@@ -197,10 +199,10 @@ namespace MoSync
                     {   // no reload
                         throw e;
 					}
+#endif
                 }
             }
         }
-
 
         private static Stream mLoadProgramStream = null;
         private static bool mLoadProgramFlag = false;
@@ -212,5 +214,45 @@ namespace MoSync
             mLoadProgramStream = comboStream;
             mLoadProgramFlag |= reloadFlag;
         }
-    }
+
+        //MoSync Library specific code
+        private Machine()
+        {
+            // This tells the util subsystem which thread is the main thread.
+            // Never make an instance of Program from another thread.
+            MoSync.Util.InitStartupThread();
+        }
+#if LIB
+        public void InitLib(MoSync.Core core, Stream resources)
+        {
+            Init(core, resources);
+            InitSyscalls(this);
+        }
+
+        public static Machine CreateMachineLib(String resourceFile)
+        {
+            MoSync.Machine mosyncMachine = new MoSync.Machine(false, true);
+
+            StreamResourceInfo resourcesResInfo = Application.GetResourceStream(new Uri(resourceFile, UriKind.Relative));
+
+            Stream resources = null;
+            if (resourcesResInfo != null && resourcesResInfo.Stream != null)
+                resources = resourcesResInfo.Stream;
+
+            Core core = new MoSync.CoreNative();
+            (core as MoSync.CoreNative).InitData();
+            mosyncMachine.InitLib(core, resources);
+
+            return mosyncMachine;
+        }
+
+        public static void runMain()
+        {
+            new System.Threading.Thread(() =>
+            {
+                MosyncLibrary.WindowsPhoneRuntimeComponent.RunMain();
+            }).Start();
+        }
+#endif //LIB
+	}
 }

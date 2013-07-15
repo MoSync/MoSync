@@ -17,7 +17,7 @@ import android.database.Cursor;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds.Organization;
 
-public class PIMFieldTitle extends PIMField {
+public class PIMFieldTitle extends PIMStringField {
 
 	/**
 	 * Constructor
@@ -120,33 +120,6 @@ public class PIMFieldTitle extends PIMField {
 	boolean hasCustomLabel(int index) {
 		return ((Integer.parseInt(getColumnValue(index, Organization.TYPE)) == Organization.TYPE_CUSTOM) ? true
 				: false);
-	}
-
-	char[] getData(int index) {
-		String val = getSpecificData(index);
-		char[] buffer = new char[getDataSize(val)];
-		PIMUtil.writeString(val, buffer);
-		return buffer;
-	}
-
-	String getSpecificData(int index) {
-		String[] val = mValues.get(index);
-		return val[1];
-	}
-
-	int getDataSize(String val) {
-		return val.length() + 1;
-	}
-
-	void setData(int index, char[] buffer) {
-		String val = PIMUtil.readString(buffer);
-		setSpecificData(val, index);
-	}
-
-	void setSpecificData(String data, int index) {
-		String[] val = mValues.get(index);
-		val[1] = data;
-		mValues.set(index, val);
 	}
 
 	int setAttribute(int index, int attribute) {

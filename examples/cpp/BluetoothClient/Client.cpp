@@ -75,8 +75,7 @@ MA 02110-1301, USA.
 #include <conprint.h>
 #include <mastring.h>
 
-// Here we include the file Common.h in the BluetoothServer project.
-#include "../BluetoothServer/Common.h"
+#include "Common.h"
 
 using namespace MAUtil;
 

@@ -24,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "package.h"
 #include "util.h"
 
+#define BUFFER_SIZE 4096
+
 // Maximum line length: 80 characters.
 static const char* sUsage =
 "This program turns compiled MoSync programs into packages that can be\n"
@@ -35,6 +37,8 @@ static const char* sUsage =
 " -h, --help                   Print this information.\n"
 " -p, --program <file>         Input: compiled program file.\n"
 " -r, --resource <file>        Input: compiled resource file.\n"
+" -x, --extensions <extensions>\n"
+"                              Input: the extensions to use.\n"
 " -i, --icon <file>            Input: MoSync icon definition file (XML).\n"
 "     --cpp-output <path>      Input: Absolute path to a directory containing\n"
 "                              'rebuild.build.cpp' and 'data_section.bin',\n"
@@ -47,6 +51,8 @@ static const char* sUsage =
 "             <family>/<variant>\n"
 " -d, --dst <path>             Output: target directory.\n"
 " -n, --name <name>            Output: application name.\n"
+" -z, --project <path>         Input: the project path\n"
+"                              (not all platforms require it)."
 "     --vendor <name>          Output: application vendor's name.\n"
 "     --version <version>      Output: application version.\n"
 "                              Format: major[.minor][.micro][.qualifier]\n"
@@ -54,6 +60,8 @@ static const char* sUsage =
 "     --permissions <perms>    Output: Permissions requested from the platform.\n"
 "                              Comma-separated list containing any combination\n"
 "                              of these strings: <todo>\n"
+"     --output-type            Input: the type of output; can be\n"
+"                              'interpreted', 'rebuilt' or 'native'"
 "     --debug                  Output: use debug runtime.\n"
 "     --s60v3uid <8-digit hex> Output: Symbian UID, 3rd edition.\n"
 "     --s60v2uid <8-digit hex> Output: Symbian UID, 2nd edition.\n"
@@ -119,6 +127,7 @@ static void onExit() {
 
 int main(int argc, const char** argv) {
 	SETTINGS s;
+
 	memset(&s, 0, sizeof(s));
 
 	atexit(&onExit);
@@ -136,10 +145,14 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.program);
 		} else if(streq(argv[i], "-r") || streq(argv[i], "--resource")) {
 			setString(i, argc, argv, s.resource);
+		} else if(streq(argv[i], "-x") || streq(argv[i], "--extensions")) {
+			setString(i, argc, argv, s.extensions);
 		} else if(streq(argv[i], "-i") || streq(argv[i], "--icon")) {
 			setString(i, argc, argv, s.icon);
 		} else if(streq(argv[i], "-m") || streq(argv[i], "--model")) {
 			setString(i, argc, argv, s.model);
+		} else if(streq(argv[i], "-z") || streq(argv[i], "--project")) {
+			setString(i, argc, argv, s.mosyncProjectPath);
 		} else if(streq(argv[i], "-d") || streq(argv[i], "--dst")) {
 			setString(i, argc, argv, s.dst);
 		} else if(streq(argv[i], "-n") || streq(argv[i], "--name")) {
@@ -188,6 +201,26 @@ int main(int argc, const char** argv) {
 			s.WPgenerateOnly = true;
 		} else if(streq(argv[i], "--wp-vs-build-path")) {
 			setString(i, argc, argv, s.WPvsBuildPath);
+		} else if(streq(argv[i], "--wp-include-paths")) {
+			setString(i, argc, argv, s.WPIncludePaths);
+		} else if(streq(argv[i], "--wp-macro-define")){
+			i++;
+			if(i == argc)
+			{
+				printf("Too few arguments!\n");
+				exit(1);
+			}
+
+			if(s.WPMacroDefines == 0)
+			{
+				s.WPMacroDefines = new char[BUFFER_SIZE];
+				strcpy(s.WPMacroDefines, argv[i]);
+			}
+			else
+			{
+				strcat(s.WPMacroDefines, ";");
+				strcat(s.WPMacroDefines, argv[i]);
+			}
 		} else if(streq(argv[i], "--cs-output")) {
 			setString(i, argc, argv, s.csOutputDir);
 		} else if(streq(argv[i], "--cpp-output")) {
@@ -208,6 +241,10 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.androidInstallLocation);
 		} else if(streq(argv[i], "--android-manifest-template")) {
 			setString(i, argc, argv, s.androidManifestTemplate);
+		} else if(streq(argv[i], "--android-heap")) {
+			setString(i, argc, argv, s.androidHeap);
+		} else if(streq(argv[i], "--android-sdk-location")) {
+			setString(i, argc, argv, s.androidSdkLocation);
 		} else if(streq(argv[i], "--blackberry-jde")) {
 			setString(i, argc, argv, s.blackberryJde);
 		} else if(streq(argv[i], "--blackberry-signkey")) {
@@ -233,11 +270,14 @@ int main(int argc, const char** argv) {
 	}
 
 	package(s);
+	delete s.WPMacroDefines;
+	s.WPMacroDefines = 0;
+
 	return 0;
 }
 
 void testProgram(const SETTINGS& s) {
-	if(!s.program) {
+	if(!s.program && strcmp(s.outputType, "native")) {
 		printf("Must specify program!\n");
 		exit(1);
 	}
@@ -287,11 +327,15 @@ void testVersion(const SETTINGS& s) {
 		exit(1);
 	}
 }
+void testExtensions(const SETTINGS& s) {
+	// TODO!
+}
 void testOutputType(const SETTINGS& s) {
 	if (s.outputType) {
 		if (strcmp("interpreted", s.outputType) &&
-			strcmp("rebuilt", s.outputType)) {
-			printf("Output type must be either \"interpreted\" or \"rebuilt\"!\n");
+			strcmp("rebuilt", s.outputType) &&
+			strcmp("native", s.outputType)) {
+			printf("Output type must be either \"interpreted\", \"rebuilt\" or \"native\"!\n");
 			exit(1);
 		}
 	}
@@ -432,6 +476,15 @@ void testAndroidInstallLocation(const SETTINGS& s) {
 			strcmp("auto", s.androidInstallLocation)) {
 			printf("Android install location must be one of these:\n");
 			printf("\"internalOnly\", \"preferExternal\", \"auto\"");
+			exit(1);
+		}
+	}
+}
+
+void testAndroidHeap(const SETTINGS& s) {
+	if (s.androidHeap) {
+		if (strcmp("large", s.androidHeap)) {
+			printf("Android heap must be either \"large\" or not set.\n");
 			exit(1);
 		}
 	}

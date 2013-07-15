@@ -217,10 +217,34 @@ namespace MoSync
              */
             void mList_Tap(object sender, System.Windows.Input.GestureEventArgs e)
             {
+                int selIndex = mList.SelectedIndex;
+
+                for (int i = 0; i < mChildren.Count; i++)
+                {
+                    if (mChildren[i] is ListViewItem)
+                    {
+                        (mChildren[i] as ListViewItem).ItemSelected = false;
+                        if (i == selIndex)
+                        {
+                            (mChildren[i] as ListViewItem).ItemSelected = true;
+                        }
+                    }
+                }
+                if (selIndex > -1)
+                {
+                    sendItemClickEvent(MoSync.Constants.MAW_RES_INVALID_INDEX, selIndex);
+                }
+            }
+
+            /**
+             * Send item click event.
+             */
+            void sendItemClickEvent(int sectionIndex, int itemIndex)
+            {
                 if (mListSelectionEnabled)
                 {
                     //create a Memory object of 8 Bytes
-                    Memory eventData = new Memory(12);
+                    Memory eventData = new Memory(16);
 
                     //starting with the 0 Byte we write the eventType
                     const int MAWidgetEventData_eventType = 0;
@@ -231,29 +255,16 @@ namespace MoSync
                     //starting with the 8th Byte we write the selectedIndex
                     const int MAWidgetEventData_selectedIndex = 8;
 
-                    int selIndex = mList.SelectedIndex;
-
-                    for (int i = 0; i < mChildren.Count; i++)
-                    {
-                        if (mChildren[i] is ListViewItem)
-                        {
-                            (mChildren[i] as ListViewItem).ItemSelected = false;
-                            if (i == selIndex)
-                            {
-                                (mChildren[i] as ListViewItem).ItemSelected = true;
-                            }
-                        }
-                    }
+                    //starting with the 12th Byte we write the selectedIndex
+                    const int MAWidgetEventData_selectedSection = 12;
 
                     eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
                     eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                    eventData.WriteInt32(MAWidgetEventData_selectedIndex, itemIndex);
+                    eventData.WriteInt32(MAWidgetEventData_selectedSection, sectionIndex);
 
-                    if (selIndex > -1)
-                    {
-                        eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
-                        //posting a CustomEvent
-                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                    }
+                    //posting a CustomEvent
+                    mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                 }
                 else
                 {
@@ -299,6 +310,8 @@ namespace MoSync
                             eventData.WriteInt32(MAWidgetEventData_selectedItemIndex, itemInSectionIndex);
                             //posting a CustomEvent
                             mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+
+                            sendItemClickEvent(sectionIndex, itemInSectionIndex);
                         }
                     }
                 }
@@ -496,10 +509,14 @@ namespace MoSync
             private void ApplyTemplatesOnLongListSelector()
             {
                 mLongListSelector.ItemTemplate = Application.Current.Resources["listItemTemplate"] as DataTemplate;
-                mLongListSelector.GroupItemTemplate = Application.Current.Resources["groupItemTemplate"] as DataTemplate;
+#if !LIB
+				mLongListSelector.GroupItemTemplate = Application.Current.Resources["groupItemTemplate"] as DataTemplate;
+#endif
                 mLongListSelector.GroupHeaderTemplate = Application.Current.Resources["groupHeaderTemplate"] as DataTemplate;
                 mLongListSelector.GroupFooterTemplate = Application.Current.Resources["groupFooterTemplate"] as DataTemplate;
-                mLongListSelector.GroupItemsPanel = Application.Current.Resources["groupHeaderItemsTemplate"] as ItemsPanelTemplate;
+#if !LIB
+				mLongListSelector.GroupItemsPanel = Application.Current.Resources["groupHeaderItemsTemplate"] as ItemsPanelTemplate;
+#endif
             }
 
             /**

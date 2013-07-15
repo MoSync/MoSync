@@ -31,6 +31,7 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Linq;
 
 namespace MoSync
 {
@@ -106,9 +107,9 @@ namespace MoSync
 
                 setHorizontalSizePolicyFlags(true, false);
                 setVerticalSizePolicyFlags(true, false);
-//#if DEBUG
+                //#if DEBUG
                 //mGrid.ShowGridLines = true;
-//#endif
+                //#endif
             }
 
             /**
@@ -120,110 +121,181 @@ namespace MoSync
                 base.AddChild(child);
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    // The logic behind this layout system is to create a stack panel for each
-                    // MoSync widget. The stack panel is used for wrapping and filling size policies.
-                    // When the widget size policy states that it should fill on both horizontal and
-                    // vertical axis the stack panel is not used in the structure but added to the
-                    // grid for future usage.
-                    //
-                    // Wrap V & Fill H :
-                    //  - row.height (1 x auto)
-                    //  - column.width (1 x star)
-                    //  - stack panel  (yes)
-                    //  - orientation  (vertical)
-                    //
-                    // Wrap V & Wrap H :
-                    //  - row.height (1 x auto)
-                    //  - column.width (1 x star)
-                    //  - stack panel  (yes)
-                    //  - orientation  (horizontal)
-                    //
-                    // Fill V & Wrap H :
-                    //  - row.height (1 x star)
-                    //  - column.width (1 x star)
-                    //  - stack panel  (yes)
-                    //  - orientation  (horizontal)
-                    //
-                    // Fill V & Fill H :
-                    //  - row.height (1 x star)
-                    //  - column.width (1 x star)
-                    //  - stack panel  (No)
-                    //  - orientation  (none)
-                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-                    RowDefinition rowDef = new RowDefinition(); //The row definition for the widget
-
-                    // Adding a new container
-                    mStackPanels.Add(new StackPanel());
-
-                    int stackPanelIndex = mStackPanels.Count - 1;
-                    bool stackPanelRequired = true;
-
-                    // The row for the widget has the default GridUnitType set on 1 x Auto
-                    // meaning that it will "wrap" around the widget forcing it to wrap around
-                    // its content on the vertical axis
-                    rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-
-                    if (widget.FILL_SPACE_V) //FillSpaceVerticaly
-                    {
-                        // The row for the widget gets the Height value set on 1 x Star
-                        // meaning that it will "fill" the space available on the vertical axis
-                        // forcing the widget to do the same
-                        rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
-
-                        // FILL_SPACE_V && FILL_SPACE_H
-                        if (widget.FILL_SPACE_H)
-                        {
-                            // If this gets set on false the widget will not get added
-                            // to the stack panel container for the time being.
-                            stackPanelRequired = false;
-                        }
-                        // FILL_SPACE_V && WRAP_CONT_H
-                        else if (widget.WRAP_CONT_H)
-                        {
-                            mStackPanels[stackPanelIndex].Orientation = Orientation.Horizontal;
-                        }
-                    }
-                    // WRAP_CONT_V
-                    else if (widget.WRAP_CONT_V)
-                    {
-                        mStackPanels[mStackPanels.Count - 1].Orientation = Orientation.Vertical;
-
-                        // WRAP_CONT_V && WRAP_CONT_H
-                        if (widget.WRAP_CONT_H)
-                        {
-                            mStackPanels[mStackPanels.Count - 1].Orientation = Orientation.Horizontal;
-                        }
-                    }
-
-                    //Adding the children to the visible structure
-
-                    mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, rowDef);
-
-                    if (stackPanelRequired)
-                    {
-                        // If the stack panel container is required the widget gets added to that container
-                        // and then this goes to the grid. Read above for the logical explanation.
-                        mStackPanels[stackPanelIndex].Children.Add((widget.View as System.Windows.FrameworkElement));
-                        Grid.SetColumn(mStackPanels[stackPanelIndex], 1);
-                        Grid.SetRow(mStackPanels[stackPanelIndex], mGrid.RowDefinitions.Count - 2);
-                        mGrid.Children.Add(mStackPanels[stackPanelIndex]);
-                    }
-                    else
-                    {
-                        // If the stack panel container is not required the widget is added directly
-                        // to the grid. Also the stack panel is added to the parent grid for future
-                        // posible use. (in case the size policy changes after the child widget
-                        // was added to the parent.
-                        Grid.SetColumn((widget.View as FrameworkElement), 1);
-                        Grid.SetRow(mStackPanels[stackPanelIndex], mGrid.RowDefinitions.Count - 2);
-                        Grid.SetRow((widget.View as FrameworkElement), mGrid.RowDefinitions.Count - 2);
-                        mGrid.Children.Add(mStackPanels[stackPanelIndex]);
-                        mGrid.Children.Add(widget.View);
-                    }
-
-                    widget.RowNumber = mGrid.RowDefinitions.Count - 2;
-                    widget.ColumnNumber = 1;
+                    InsertWidget(child, mStackPanels.Count, mGrid.RowDefinitions.Count - 1);
                 });
+            }
+
+            /*
+             * InsertChild function override
+             * @param child The child that should be inserted into the grid.
+             * @param index The index at which the child widget should be inserted.
+             */
+            public override void InsertChild(IWidget child, int index)
+            {
+                base.InsertChild(child, index);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    InsertWidget(child, index, index + 1);
+                });
+            }
+
+            /**
+             * Inserts a widget into the visible structure. Handles the wrap/fill cases using StackPanels.
+             * @param child The widget to be inserted.
+             * @param sIndex The index at which the stack panel should be inserted inside the StackPanel array.
+             * @param gIndex The index at which the grid row that will contain the widget should be inserted inside
+             * the main grid.
+             */
+            private void InsertWidget(IWidget child, int sIndex, int gIndex)
+            {
+                // The logic behind this layout system is to create a stack panel for each
+                // MoSync widget. The stack panel is used for wrapping and filling size policies.
+                // When the widget size policy states that it should fill on both horizontal and
+                // vertical axis the stack panel is not used in the structure but added to the
+                // grid for future usage.
+                //
+                // Wrap V & Fill H :
+                //  - row.height (1 x auto)
+                //  - column.width (1 x star)
+                //  - stack panel  (yes)
+                //  - orientation  (vertical)
+                //
+                // Wrap V & Wrap H :
+                //  - row.height (1 x auto)
+                //  - column.width (1 x star)
+                //  - stack panel  (yes)
+                //  - orientation  (horizontal)
+                //
+                // Fill V & Wrap H :
+                //  - row.height (1 x star)
+                //  - column.width (1 x star)
+                //  - stack panel  (yes)
+                //  - orientation  (horizontal)
+                //
+                // Fill V & Fill H :
+                //  - row.height (1 x star)
+                //  - column.width (1 x star)
+                //  - stack panel  (No)
+                //  - orientation  (none)
+                WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                RowDefinition rowDef = new RowDefinition(); //The row definition for the widget
+
+                // Adding a new container
+                mStackPanels.Insert(sIndex, new StackPanel());
+                bool stackPanelRequired = true;
+
+                // The row for the widget has the default GridUnitType set on 1 x Auto
+                // meaning that it will "wrap" around the widget forcing it to wrap around
+                // its content on the vertical axis
+                rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+
+                if (widget.FILL_SPACE_V) //FillSpaceVerticaly
+                {
+                    // The row for the widget gets the Height value set on 1 x Star
+                    // meaning that it will "fill" the space available on the vertical axis
+                    // forcing the widget to do the same
+                    rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+
+                    // FILL_SPACE_V && FILL_SPACE_H
+                    if (widget.FILL_SPACE_H)
+                    {
+                        // If this gets set on false the widget will not get added
+                        // to the stack panel container for the time being.
+                        stackPanelRequired = false;
+                    }
+                    // FILL_SPACE_V && WRAP_CONT_H
+                    else if (widget.WRAP_CONT_H)
+                    {
+                        mStackPanels[sIndex].Orientation = Orientation.Horizontal;
+                    }
+                }
+                // WRAP_CONT_V
+                else if (widget.WRAP_CONT_V)
+                {
+                    mStackPanels[sIndex].Orientation = Orientation.Vertical;
+
+                    // WRAP_CONT_V && WRAP_CONT_H
+                    if (widget.WRAP_CONT_H)
+                    {
+                        mStackPanels[sIndex].Orientation = Orientation.Horizontal;
+                    }
+                }
+
+                //Adding the children to the visible structure
+                mGrid.RowDefinitions.Insert(gIndex, rowDef);
+
+                ShiftWidgetRows(gIndex);
+
+                if (stackPanelRequired)
+                {
+                    // If the stack panel container is required the widget gets added to that container
+                    // and then this goes to the grid. Read above for the logical explanation.
+                    mStackPanels[sIndex].Children.Add((widget.View as System.Windows.FrameworkElement));
+                    Grid.SetColumn(mStackPanels[sIndex], 1);
+                    Grid.SetRow(mStackPanels[sIndex], gIndex);
+
+                    mGrid.Children.Add(mStackPanels[sIndex]);
+                }
+                else
+                {
+                    // If the stack panel container is not required the widget is added directly
+                    // to the grid. Also the stack panel is added to the parent grid for future
+                    // posible use. (in case the size policy changes after the child widget
+                    // was added to the parent.
+                    Grid.SetColumn((widget.View as FrameworkElement), 1);
+                    Grid.SetRow(mStackPanels[sIndex], gIndex);
+                    Grid.SetRow((widget.View as FrameworkElement), gIndex);
+
+                    mGrid.Children.Add(mStackPanels[sIndex]);
+                    mGrid.Children.Add(widget.View);
+                }
+
+                widget.RowNumber = gIndex;
+                widget.ColumnNumber = 1;
+            }
+
+            /**
+             * Shifts all the widget/stackpanel rows inside the current grid (starting from row gridIndex).
+             * Used when inserting widgets into the main grid.
+             * @param gridIndex The index of the first grid row that needs to be shifted.
+             */
+            private void ShiftWidgetRows(int gridIndex)
+            {
+                int columnIndex = 1;
+                // the row at position mGrid.RowDefinitions.Count - 1 is a spacer row
+                // the row at position mGrid.RowDefinitions.Count - 2 is a free row that will get filled
+                // so we start at mGrid.RowDefinitions.Count - 3 - this is the first row where we need to shift
+                // its content
+                for (int i = mGrid.RowDefinitions.Count - 3; i >= gridIndex ; i--)
+                {
+                    // first get every control that is included in the current row
+                    var controls = from d in mGrid.Children
+                                   where Grid.GetColumn(d as FrameworkElement) == columnIndex
+                                      && Grid.GetRow(d as FrameworkElement) == i
+                                   select d;
+
+                    // shift all the controls with one position
+                    while (controls.Count() > 0)
+                    {
+                        int controlcount = controls.Count();
+                        FrameworkElement control = controls.First() as FrameworkElement;
+                        int controlRow = Grid.GetRow(control);
+                        int newGridRow = controlRow + 1 < mGrid.RowDefinitions.Count - 1 ? controlRow + 1 : mGrid.RowDefinitions.Count - 2;
+                        Grid.SetRow(control, newGridRow);
+                    }
+
+                    // go through all the widget and modify their row numbers
+                    // TODO SA: should this loop start from gridIndex?
+                    for (int j = 0; j < mChildren.Count; j++)
+                    {
+                        WidgetBaseWindowsPhone widget = mChildren[j] as WidgetBaseWindowsPhone;
+                        if (widget.RowNumber == i)
+                        {
+                            int newGridRow = i + 1 < mGrid.RowDefinitions.Count - 1 ? i + 1 : mGrid.RowDefinitions.Count - 2;
+                            widget.RowNumber = newGridRow;
+                        }
+                    }
+                }
             }
 
             /**
@@ -254,23 +326,57 @@ namespace MoSync
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     FrameworkElement fw = (widget.View) as System.Windows.FrameworkElement;
 
-                    if (mGrid.Children.Contains(mStackPanels[widget.RowNumber - 1]))
-                    {
-                        if (RemoveWidgetFromStackPanelContainer(child, widget.RowNumber))
-                        {
-                            mGrid.Children.Remove(fw);
-                            mGrid.Children.Remove(mStackPanels[widget.RowNumber - 1]);
-                        }
-                    }
-                    if (mGrid.Children.Contains(fw))
-                    {
-                        int x = widget.RowNumber;
+                    // in a vertical layout only column one is used for widgets (0 and 2 are padding columns)
+                    int columnIndexToRemove = 1;
+                    // the widget 'RowNumber' variable is always in sync with the widget position inside the grid
+                    // so we'll take this as a reference (we can't use Grid.GetRow() method because
+                    // the current widget might be inside a stack panel (so a row number isn't attached to its view)
+                    int rowIndexToRemove = widget.RowNumber;
+                    int rowCount = mGrid.RowDefinitions.Count;
 
-                        if (x < mGrid.RowDefinitions.Count)
+                    if (rowCount > 0)
+                    {
+                        // first get every control from that row
+                        var controls = from control in mGrid.Children
+                                       where Grid.GetColumn(control as FrameworkElement) == columnIndexToRemove
+                                          && Grid.GetRow(control as FrameworkElement) == rowIndexToRemove
+                                       select control;
+
+                        // remove all the controls present inside that grid cell
+                        while (controls.Count() > 0)
                         {
-                            mGrid.RowDefinitions.RemoveAt(x);
-                            mGrid.Children.Remove(fw);
+                            FrameworkElement control = controls.First() as FrameworkElement;
+                            mGrid.Children.Remove(control);
                         }
+
+                        // then shift evey control after that index with one row
+                        for (int i = rowIndexToRemove + 1; i < mGrid.RowDefinitions.Count; i++)
+                        {
+                            var currentControls = from d in mGrid.Children
+                                                  where Grid.GetColumn(d as FrameworkElement) == columnIndexToRemove
+                                                  && Grid.GetRow(d as FrameworkElement) == i
+                                                  select d;
+                            while (currentControls.Count() > 0)
+                            {
+                                FrameworkElement control = currentControls.First() as FrameworkElement;
+                                int controlRow = Grid.GetRow(control);
+                                Grid.SetRow(control, controlRow - 1 > 0 ? controlRow - 1 : 1);
+                            }
+                        }
+
+                        // update all the widgets row numbers
+                        // TODO SA: should this start from widget.RowNumber?
+                        for (int i = 0; i < mChildren.Count; i++)
+                        {
+                            WidgetBaseWindowsPhone currentWidget = mChildren[i] as WidgetBaseWindowsPhone;
+                            if (currentWidget.RowNumber > rowIndexToRemove)
+                            {
+                                currentWidget.RowNumber--;
+                            }
+                        }
+
+                        // lastly, remove the grid row
+                        mGrid.RowDefinitions.RemoveAt(rowIndexToRemove);
                     }
                 });
                 base.RemoveChild(child);
@@ -507,8 +613,8 @@ namespace MoSync
                 else if (propertyName.Equals("scrollable"))
                 {
                     bool val;
-	                if (!Boolean.TryParse(propertyValue, out val))
-	                {
+                    if (!Boolean.TryParse(propertyValue, out val))
+                    {
                         isPropertyValid = false;
                     }
                 }

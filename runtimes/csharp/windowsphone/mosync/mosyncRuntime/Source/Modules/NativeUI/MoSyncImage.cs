@@ -84,11 +84,25 @@ namespace MoSync
                     Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, value);
                     if (null != res && null != res.GetInternalObject())
                     {
-                        //Create a BitmapSource object from the internal object of the resource loaded
-                        System.Windows.Media.Imaging.BitmapSource bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						//Create a BitmapSource object from the internal object of the resource loaded
+						Object bmpSource = null;
+						Object internalObj = res.GetInternalObject();
+						if (internalObj is System.Windows.Media.Imaging.BitmapSource)
+						{
+							bmpSource = (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+						}
+						else if (internalObj is System.IO.Stream)
+						{
+							bmpSource = new System.Windows.Media.Imaging.WriteableBitmap(0, 0);
+							(bmpSource as System.Windows.Media.Imaging.WriteableBitmap).SetSource((System.IO.Stream)res.GetInternalObject());
+						}
+						else if (internalObj is System.Windows.Media.Imaging.WriteableBitmap)
+						{
+							bmpSource = res.GetInternalObject();
+						}
 
                         //The image standard object gets that as a source
-                        mImage.Source = bmpSource;
+                        mImage.Source = (System.Windows.Media.Imaging.BitmapSource)bmpSource;
 
                         mImageHandle = value;
                         mImagePath = "";

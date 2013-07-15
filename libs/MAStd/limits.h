@@ -19,11 +19,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * \brief Value limits of the integral data types.
 */
 
+#ifndef MOSYNC_NATIVE
 // MoSync configuration
 #define __BSD_VISIBLE 0
 #define __ISO_C_VISIBLE 1999
 #define __XPG_VISIBLE 0
-
+#endif /* COMPAT_MOSYNC_LEGACY */
 
 #define	CHAR_BIT	8		/* number of bits in a char */
 

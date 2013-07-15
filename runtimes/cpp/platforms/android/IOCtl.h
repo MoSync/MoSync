@@ -16,9 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <Syscall.h>
+#include "JNIStrConv.h"
 
 namespace Base
 {
+
 	// Framebuffer API
 
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);
@@ -850,6 +852,12 @@ namespace Base
 	int _maCameraPreviewEventDisable(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraPreviewEventConsumed(JNIEnv* jNIEnv, jobject jThis);
+
+	MAExtensionModule _maExtensionModuleLoad(JNIEnv* jNIEnv, jobject jThis, const char* name, int hash);
+
+	MAExtensionFunction _maExtensionFunctionLoad(JNIEnv* jNIEnv, jobject jThis, MAHandle module, int index);
+
+	int _maExtensionFunctionInvoke2(JNIEnv* jNIEnv, jobject jThis, MAExtensionFunction fn, int numargs, int ptrs, int memStart);
 
 	int _maNFCStart(JNIEnv* jNIEnv, jobject jThis);
 

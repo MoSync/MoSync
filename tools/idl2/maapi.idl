@@ -2126,6 +2126,8 @@ interface MAAPI {
 	*/
 	MAExtensionFunction maExtensionFunctionLoad(in MAExtensionModule module, in int index);
 
+	int maExtensionFunctionInvoke2(in MAExtensionFunction fn, in int numargs, in int ptrs);
+
 #if IX_RESOURCE_TYPES
 	constset int RT_ {  //WARNING: must match the resource compiler.
 		PLACEHOLDER = 1;
@@ -3168,6 +3170,7 @@ interface MAAPI {
 		* like a call already in progress.
 		* Causes CALL events.
 		* \param phoneNumber Max length: 100.
+		* Platform: Symbian only.
 		*/
 		int maCallDial(in MAString phoneNumber);
 
@@ -3178,6 +3181,7 @@ interface MAAPI {
 		* Causes CALL events.
 		* \note The line state may change while this function is being called. Therefore,
 		* it may fail even if you haven't received a new CALL event.
+		* Platform: Symbian only.
 		*/
 		int maCallAnswer();
 
@@ -3186,6 +3190,7 @@ interface MAAPI {
 		* Returns 0 if no call is in progress, or on successful beginning of hangup.
 		* Returns \< 0 on error.
 		* Can cause CALL events.
+		* Platform: Symbian only.
 		*/
 		int maCallHangup();
 #endif	//IX_CALL

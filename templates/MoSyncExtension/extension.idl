@@ -1,0 +1,3 @@
+interface ext {
+	void helloExtension(in char* arg1);
+}

@@ -15,11 +15,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef __IOS__
 #include "ma.h"
 #include "mawstring.h"
 #include "madmath.h"
+#else
+#include <ma.h>
+#include <mawstring.h>
+#include <madmath.h>
+#endif
 
-#ifdef MAPIP
+#if defined(MAPIP) || (defined(MOSYNC_NATIVE) && defined(__ANDROID__))
 
 #ifndef NO_BUILTINS
 
@@ -99,14 +105,22 @@ int wcsnicmp(const wchar *s1, const wchar *s2, size_t count)
 	return f - l;
 }
 
+#if defined(MOSYNC_NATIVE) && defined(__ANDROID__)
+wchar *wcschr(const wchar *s, wchar ch)
+#else
 wchar *wcschr(const wchar *s, int ch)
+#endif
 {
 	while (*s && *s != (wchar) ch) s++;
 	if (*s == (wchar) ch) return (wchar *) s;
 	return NULL;
 }
 
+#if defined(MOSYNC_NATIVE) && defined(__ANDROID__)
+wchar *wcsrchr(const wchar *s, wchar ch)
+#else
 wchar *wcsrchr(const wchar *s, int ch)
+#endif
 {
 	wchar *start = (wchar *) s;
 
@@ -228,7 +242,11 @@ wchar *wcspbrk(const wchar *string, const wchar *control)
 	return NULL;
 }
 
+#if defined(MOSYNC_NATIVE) && defined(__ANDROID__)
+void *wmemchr(const void *buf, wchar ch, size_t count)
+#else
 void *wmemchr(const void *buf, int ch, size_t count)
+#endif
 {
 	while (count && (*(wchar *) buf != (wchar) ch)) 
 	{

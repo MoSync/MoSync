@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mosync_WP8", "mosync_WP8.csproj", "{ECEC041C-1576-4084-A715-C5D57C9B266D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MoSyncLibrary", "..\MoSyncLibrary\MoSyncLibrary.vcxproj", "{0C38E13D-28C7-4A22-899D-96BC215E5E46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mosyncRuntime_WP8", "..\mosyncRuntime\mosyncRuntime_WP8.csproj", "{8318207D-3E1C-408B-8A4E-75E45B9F1E96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_lib_build|Any CPU = debug_lib_build|Any CPU
+		debug_lib_build|ARM = debug_lib_build|ARM
+		debug_lib_build|Mixed Platforms = debug_lib_build|Mixed Platforms
+		debug_lib_build|x86 = debug_lib_build|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Any CPU.ActiveCfg = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Any CPU.Build.0 = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Any CPU.Deploy.0 = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|ARM.ActiveCfg = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|ARM.Build.0 = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|ARM.Deploy.0 = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Mixed Platforms.ActiveCfg = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Mixed Platforms.Build.0 = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|Mixed Platforms.Deploy.0 = debug_lib_build|ARM
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.debug_lib_build|x86.ActiveCfg = debug_lib_build|ARM
+		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|Any CPU.ActiveCfg = debug_lib_build|ARM
+		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|Any CPU.Build.0 = debug_lib_build|ARM
+		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|ARM.ActiveCfg = debug_lib_build|ARM
+		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|ARM.Build.0 = debug_lib_build|ARM
+		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|Mixed Platforms.ActiveCfg = debug_lib_build|ARM
+		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|Mixed Platforms.Build.0 = debug_lib_build|ARM
+		{0C38E13D-28C7-4A22-899D-96BC215E5E46}.debug_lib_build|x86.ActiveCfg = debug_lib_build|ARM
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|Any CPU.ActiveCfg = debug_lib_build|ARM
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|Any CPU.Build.0 = debug_lib_build|ARM
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|ARM.ActiveCfg = debug_lib_build|ARM
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|ARM.Build.0 = debug_lib_build|ARM
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|Mixed Platforms.ActiveCfg = debug_lib_build|ARM
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|Mixed Platforms.Build.0 = debug_lib_build|ARM
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.debug_lib_build|x86.ActiveCfg = debug_lib_build|ARM
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

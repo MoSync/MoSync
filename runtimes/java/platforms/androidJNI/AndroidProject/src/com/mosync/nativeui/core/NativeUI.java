@@ -415,6 +415,7 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetScreenShow invalidate menu");
+
 		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;
@@ -476,6 +477,7 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetScreenShowWithTransition invalidate menu");
+
 		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;
@@ -524,6 +526,7 @@ public class NativeUI
 
 		// Redraw the action bar each time a screen is shown - or manually by calling maActionBarRefresh().
 		Log.e("@@MoSync","NativeUI maWidgetStackScreenPush invalidate menu");
+
 		mMoSyncThread.invalidateOptionsMenu(m_activity);
 
 		return IX_WIDGET.MAW_RES_OK;
@@ -592,7 +595,7 @@ public class NativeUI
 		else if(m_currentScreen instanceof ScreenWidget )
 			return (ScreenWidget) m_currentScreen;
 
-		return null;//(ScreenWidget) m_currentScreen;
+		return null;
 	}
 
 	/**
@@ -758,7 +761,10 @@ public class NativeUI
 		// Create a menu item with no icon if iconHandle is left null.
 		if ( TextUtils.isEmpty(iconHandle) )
 		{
-			return screen.addOptionsMenuItem(title, null);
+			int index = screen.addOptionsMenuItem(title, null);
+			mMoSyncThread.invalidateOptionsMenu(m_activity);
+			// When adding a new menu item the id is returned.
+			return index;
 		}
 
 		// Parse iconHandle to get the iconPredefinedId, or iconId.
@@ -781,12 +787,10 @@ public class NativeUI
 					.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ADD)
 					&& iconID <= Integer
 							.parseInt(IX_WIDGET.MAW_OPTIONS_MENU_ICON_CONSTANT_ZOOM))
-				//return screen.addMenuItem(title, iconID);
 			{
 				int index = screen.addOptionsMenuItem(title, iconID);
-
 				mMoSyncThread.invalidateOptionsMenu(m_activity);
-				//m_activity.onCreateOptionsMenu( screen.getMenu() );
+				// When adding a new menu item the id is returned.
 				return index;
 			}
 			else
@@ -804,8 +808,10 @@ public class NativeUI
 				Bitmap icon = NativeUI.getBitmap( iconID );
 				if( icon != null )
 				{
+					int index = screen.addOptionsMenuItem(title, new BitmapDrawable(icon));
+					mMoSyncThread.invalidateOptionsMenu(m_activity);
 					// When adding a new menu item the id is returned.
-					return screen.addOptionsMenuItem(title, new BitmapDrawable(icon));
+					return index;
 				}
 			}
 			Log.e("@@MoSync","maWidgetScreenAddOptionsMenuItem: Invalid icon handle: " + iconHandle);

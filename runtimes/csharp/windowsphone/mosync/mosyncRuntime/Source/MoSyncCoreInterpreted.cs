@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 namespace MoSync
 {
+#if !LIB
     public class CoreInterpreted : Core
     {
         protected ProgramHeader mProgramHeader = new ProgramHeader();
@@ -139,7 +140,6 @@ namespace MoSync
         {
             mProgramFile = programFile;
         }
-
 
         public override void Init()
         {
@@ -416,16 +416,9 @@ namespace MoSync
 
             //DebugDumpState();
 
-            //while(mRunning)
-            while (true)
+            while(mRunning)
             {
                 //DebugLogStateChanges();
-                /*
-                if (mIp == 16754)
-                {
-                    int a = 2;
-                }
-                */
 
                 oldIp = mIp;
 
@@ -1064,4 +1057,5 @@ namespace MoSync
             }
         }
     }
+#endif
 }

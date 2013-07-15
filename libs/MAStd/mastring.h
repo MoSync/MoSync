@@ -44,8 +44,10 @@
 #include <string.h>
 #else
 
+
 #include "ma.h"
 #include "mactype.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,26 +62,6 @@ int strncmp(const char *s1, const char *s2, size_t count);			// Built-in
 char *strncat(char *s1, const char *s2, size_t count);				// Built-in
 int memcmp(const void *dst, const void *src, size_t n);				// Built-in
 #endif
-
-/**
-* Compares strings \a s1 with \a s2 without case sensitivity.
-* \returns
-*          < 0 if s1 is less than s2\n
-*          = 0 if s1 is equal to s2\n
-*          > 0 if s1 is greater than s2\n
-*/
-
-int stricmp(const char *s1, const char *s2);
-
-/**
-* Compares strings \a s1 with \a s2 for a max length \a count without case sensitivity.
-* \returns
-*          < 0 if s1 is less than s2\n
-*          = 0 if s1 is equal to s2\n
-*          > 0 if s1 is greater than s2\n
-*/
-
-int strnicmp(const char *s1, const char *s2, size_t count);
 
 /**
 * Scans a string for the first occurance of a character.
@@ -247,6 +229,28 @@ size_t strnlen(const char *s, size_t count);
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if defined(MAPIP) || defined(MOSYNC_NATIVE) && !defined(__WINDOWS_PHONE_8__)
+/**
+* Compares strings \a s1 with \a s2 without case sensitivity.
+* \returns
+*          < 0 if s1 is less than s2\n
+*          = 0 if s1 is equal to s2\n
+*          > 0 if s1 is greater than s2\n
+*/
+
+int stricmp(const char *s1, const char *s2);
+
+/**
+* Compares strings \a s1 with \a s2 for a max length \a count without case sensitivity.
+* \returns
+*          < 0 if s1 is less than s2\n
+*          = 0 if s1 is equal to s2\n
+*          > 0 if s1 is greater than s2\n
+*/
+
+int strnicmp(const char *s1, const char *s2, size_t count);
 #endif
 
 /**

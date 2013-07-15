@@ -1,25 +1,29 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_BUFFER_INVALID;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_COUNT_MAX;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_EMPTY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_READ_ONLY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_WRITE_ONLY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_INDEX_INVALID;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_LABEL;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_BUFFER_INVALID;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_COUNT_MAX;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.mosync.internal.android.MoSyncError;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract.Data;
+
+import com.mosync.api.Pointer;
+import com.mosync.internal.android.MoSyncError;
+import com.mosync.internal.android.MoSyncThread;
+import com.mosync.internal.android.extensions.StringType;
 
 abstract class PIMField {
 
@@ -183,7 +187,7 @@ abstract class PIMField {
 		if (buffer.length > (buffSize >> 1))
 			return (buffer.length << 1);
 
-		PIMUtil.copyBufferToMemory(buffPointer, buffer);
+		StringType.marshalWString(buffPointer, new String(buffer), buffer.length);
 
 		return buffer.length;
 	}
@@ -219,10 +223,9 @@ abstract class PIMField {
 			return MA_PIM_ERR_NO_LABEL;
 		}
 
-		char[] buffer = PIMUtil
-				.readBufferFromMemory(buffPointer, buffSize >> 1);
+		String str = StringType.unmarshalWString(buffPointer, buffSize);
 
-		setLabel(index, new String(buffer));
+		setLabel(index, str);
 
 		return MA_PIM_ERR_NONE;
 	}
@@ -243,7 +246,7 @@ abstract class PIMField {
 	/**
 	 * Gets the value of the specified field.
 	 */
-	int getValue(int index, int buffPointer, int buffSize) {
+	int getValue(int index, int buffAddr, int buffSize) {
 		if (isEmpty()) {
 			return throwError(MA_PIM_ERR_FIELD_EMPTY,
 					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
@@ -258,22 +261,22 @@ abstract class PIMField {
 			return MA_PIM_ERR_FIELD_WRITE_ONLY;
 		}
 
-		char[] buffer = getData(index);
+		byte[] data = getData(index);
 
-		if (buffer.length > (buffSize >> 1))
-			return (buffer.length << 1);
+		if (data.length <= buffSize) {
+			ByteBuffer outputBuffer = MoSyncThread.getInstance().getMemorySlice(buffAddr, buffSize);
+			outputBuffer.put(data);
+		}
 
-		PIMUtil.copyBufferToMemory(buffPointer, buffer);
-
-		return buffer.length;
+		return data.length;
 	}
 
-	abstract char[] getData(int index);
+	abstract byte[] getData(int index);
 
 	/**
 	 * Sets the value of the specified field.
 	 */
-	int setValue(int index, int buffPointer, int buffSize, int attributes) {
+	int setValue(int index, int buffAddr, int buffSize, int attributes) {
 		if (isReadOnly()) {
 			return MA_PIM_ERR_FIELD_READ_ONLY;
 		}
@@ -288,13 +291,12 @@ abstract class PIMField {
 					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
-		char[] buffer = PIMUtil
-				.readBufferFromMemory(buffPointer, buffSize >> 1);
-		if (buffer.length == 0) {
+		Pointer<Void> buffPtr = Pointer.createRawPointer(buffAddr);
+		if (buffPtr.isNull()) {
 			return MA_PIM_ERR_BUFFER_INVALID;
 		}
 
-		setData(index, buffer);
+		setData(index, buffPtr);
 
 		if (mStates.get(index) != State.ADDED) {
 			DebugPrint("set state to UPDATED");
@@ -304,12 +306,12 @@ abstract class PIMField {
 		return setAttribute(index, attributes);
 	}
 
-	abstract void setData(int index, char[] buffer);
+	abstract void setData(int index, Pointer<Void> buffer);
 
 	/**
 	 * Sets the value of the specified field.
 	 */
-	int addValue(int buffPointer, int buffSize, int attributes) {
+	int addValue(int buffAddr, int buffSize, int attributes) {
 		if (isReadOnly()) {
 			return MA_PIM_ERR_FIELD_READ_ONLY;
 		}
@@ -318,9 +320,9 @@ abstract class PIMField {
 			return MA_PIM_ERR_FIELD_COUNT_MAX;
 		}
 
-		char[] buffer = PIMUtil
-				.readBufferFromMemory(buffPointer, buffSize >> 1);
-		if (buffer.length == 0) {
+		Pointer<Void> buffPtr = Pointer.createRawPointer(buffAddr);
+
+		if (buffPtr.isNull()) {
 			return MA_PIM_ERR_BUFFER_INVALID;
 		}
 
@@ -329,7 +331,7 @@ abstract class PIMField {
 		mValues.add(val);
 		mStates.add(State.ADDED);
 
-		setData(index, buffer);
+		setData(index, buffPtr);
 
 		int err = MA_PIM_ERR_NONE;
 		if ((err = setAttribute(index, attributes)) != MA_PIM_ERR_NONE) {

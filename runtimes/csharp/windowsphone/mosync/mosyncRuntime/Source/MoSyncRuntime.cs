@@ -245,9 +245,17 @@ namespace MoSync
 				mEventWaiter.WaitOne(timeout);
 			};
 
+#if !LIB
 			mSyscalls.maIOCtl = delegate(int id, int a, int b, int c)
+#else
+			mSyscalls.maIOCtl = delegate(int id, int a, int b, int c, int args)
+#endif
 			{
+#if !LIB
 				return mIoctlInvoker.InvokeIoctl(id, a, b, c);
+#else
+				return mIoctlInvoker.InvokeIoctl(id, a, b, c, args);
+#endif
 			};
 
 			mSyscalls.maDestroyObject = delegate(int res)
@@ -417,6 +425,11 @@ namespace MoSync
 					))
 				{
 					resource.SetFileStream(new BoundedStream(file, file.Position, (long)size));
+#if LIB
+					//This needs to be investigated. If I don't call this some syscalls will fail since mInternalObject is null. Used to
+					//work on the previous system.
+					resource.SetInternalObject(new BoundedStream(file, file.Position, (long)size));
+#endif
 					file.Seek(size, SeekOrigin.Current);
 				}
 				else

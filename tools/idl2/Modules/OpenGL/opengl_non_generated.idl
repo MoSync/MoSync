@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#if IX_OPENGL_ES
+#if IX_OPENGL_ES_MA
 constset int MA_GL_TEX_IMAGE_2D_ {
 	OK = 0;
 	INVALID_IMAGE = -2;

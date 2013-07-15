@@ -37,6 +37,7 @@ MessageHandler::MessageHandler()
 	mPhoneGapMessageHandler = NULL;
 	mNativeUIMessageHandler = NULL;
 	mResourceMessageHandler = NULL;
+	mExtensionMessageHandler = NULL;
 	mOrientationMessageHandler = NULL;
 }
 
@@ -56,6 +57,10 @@ MessageHandler::~MessageHandler()
 	{
 		delete mResourceMessageHandler;
 		mResourceMessageHandler = NULL;
+	}
+	if (mExtensionMessageHandler) {
+		delete mExtensionMessageHandler;
+		mExtensionMessageHandler = NULL;
 	}
 	if (mOrientationMessageHandler)
 	{
@@ -78,6 +83,7 @@ void MessageHandler::initialize(Wormhole::HybridMoblet* moblet)
 	mPhoneGapMessageHandler = new PhoneGapMessageHandler(webView);
 	mNativeUIMessageHandler = new NativeUIMessageHandler(webView);
 	mResourceMessageHandler = new ResourceMessageHandler(webView);
+	mExtensionMessageHandler = new ExtensionMessageHandler(webView);
 	mOrientationMessageHandler = new OrientationMessageHandler(webView);
 
 	// Set the FileUtil object to use...
@@ -335,6 +341,10 @@ void MessageHandler::handleMessageStream(
 		{
 			// Forward Resource messages.
 			mResourceMessageHandler->handleMessage(message);
+		}
+		else if (0 == strcmp(p, "Extension") && mExtensionMessageHandler) {
+			// Forward Extension messages.
+			mExtensionMessageHandler->handleMessage(message);
 		}
 		else if (0 == strcmp(p, "close"))
 		{

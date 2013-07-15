@@ -119,6 +119,20 @@ size_t wcharLength(const wchar* str) {
 	return length;
 }
 
+size_t wchartLength(const wchar_t* str)
+{
+	size_t length = 0;
+	while(true)
+	{
+		if (str[length] == '\0')
+		{
+			break;
+		}
+		length++;
+	}
+	return length;
+}
+
 void getScreenResolution(int& w, int &h) {
 
     w = 320;

@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
@@ -27,6 +28,7 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 
 import com.mosync.internal.android.EventQueue;
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
@@ -77,7 +79,7 @@ public class TabScreenFactory implements AbstractViewFactory
         tabRootView.setOrientation( LinearLayout.VERTICAL );
         tabRootView.setLayoutParams(
         		new ViewGroup.LayoutParams(
-        				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT ) );
+						LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT ) );
 
 		tabRootView.addView( createTabWidget( activity ) );
 		tabRootView.addView( createTabContent( activity ) );
@@ -117,7 +119,7 @@ public class TabScreenFactory implements AbstractViewFactory
         tabWidget.setId( android.R.id.tabs );
         LinearLayout.LayoutParams tabWidgetParams =
 			new LinearLayout.LayoutParams(
-        				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT );
+					LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT );
         tabWidgetParams.weight = 0;
         tabWidget.setLayoutParams( tabWidgetParams );
 
@@ -137,6 +139,15 @@ public class TabScreenFactory implements AbstractViewFactory
 		@Override
 		public void onTabChanged(String tabTag)
 		{
+			MoSyncThread mosyncThread = MoSyncThread.getInstance();
+
+			// Save the current tab screen.
+			mosyncThread.setCurrentScreen(m_tabScreenHandle);
+
+			// Recreate options menu
+			Log.e("@@MoSync", "TabChangeListener onTabChanged invalidate options menu");
+			mosyncThread.invalidateOptionsMenu(mosyncThread.getActivity());
+
 			// Assumes that the tag of the tab is the same as it's handle.
 			EventQueue.getDefault( ).postWidgetTabChangedEvent(
 					m_tabScreenHandle,

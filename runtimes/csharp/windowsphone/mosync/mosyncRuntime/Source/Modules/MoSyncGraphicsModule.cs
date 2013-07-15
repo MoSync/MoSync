@@ -163,7 +163,11 @@ namespace MoSync
 
 			syscalls.maGetClipRect = delegate(int cliprect)
 			{
+#if !LIB
 				Memory mem = core.GetDataMemory();
+#else
+				SystemMemory mem = core.GetDataMemory();
+#endif
 				mem.WriteInt32(cliprect + MoSync.Struct.MARect.left, (int)mClipRect.X);
 				mem.WriteInt32(cliprect + MoSync.Struct.MARect.top, (int)mClipRect.Y);
 				mem.WriteInt32(cliprect + MoSync.Struct.MARect.width, (int)mClipRect.Width);
@@ -179,6 +183,7 @@ namespace MoSync
 			{
 				//System.Array.Copy(mBackBuffer.Pixels, mFrontBuffer.Pixels, mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight);
 				System.Buffer.BlockCopy(mBackBuffer.Pixels, 0, mFrontBuffer.Pixels, 0, mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight * 4);
+
 				InvalidateWriteableBitmapOnMainThread(mFrontBuffer);
 			};
 
@@ -334,35 +339,96 @@ namespace MoSync
 			syscalls.maGetImageSize = delegate(int handle)
 			{
 				Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, handle);
+				int w = 0, h = 0;
+#if !LIB
 				BitmapSource src = (BitmapSource)res.GetInternalObject();
 				if (src == null)
 					MoSync.Util.CriticalError("maGetImageSize used with an invalid image resource.");
-				int w = 0, h = 0;
-
-				MoSync.Util.RunActionOnMainThreadSync(() =>
+				else
 				{
-					w = src.PixelWidth;
-					h = src.PixelHeight;
-				});
+					MoSync.Util.RunActionOnMainThreadSync(() =>
+					{
+						w = src.PixelWidth;
+						h = src.PixelHeight;
+					});
+				}
+#else
+				if (res.GetInternalObject() == null)
+					MoSync.Util.CriticalError("maGetImageSize used with an invalid image resource.");
+				else
+				{
+					MoSync.Util.RunActionOnMainThreadSync(() =>
+					{
 
+						if (res.GetInternalObject() is Stream)
+						{
+							BitmapImage bi = new BitmapImage();
+							bi.SetSource((Stream)res.GetInternalObject());
+							w = bi.PixelWidth;
+							h = bi.PixelHeight;
+						}
+						else if (res.GetInternalObject() is WriteableBitmap)
+						{
+							BitmapSource src = (BitmapSource)res.GetInternalObject();
+							w = src.PixelWidth;
+							h = src.PixelHeight;
+						}
+					});
+				}
+#endif
 				return MoSync.Util.CreateExtent(w, h);
 			};
 
 			syscalls.maDrawImage = delegate(int image, int left, int top)
 			{
 				Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, image);
+#if !LIB
 				WriteableBitmap src = (WriteableBitmap)res.GetInternalObject();
-				Rect srcRect = new Rect(0, 0, src.PixelWidth, src.PixelHeight);
-				Rect dstRect = new Rect(left, top, src.PixelWidth, src.PixelHeight);
-				mCurrentDrawTarget.Blit(dstRect, src, srcRect, WriteableBitmapExtensions.BlendMode.Alpha);
+#else
+				Object src = null;
+				MoSync.Util.RunActionOnMainThreadSync(() =>
+				{
+					Object internalObj = res.GetInternalObject();
+					if (internalObj is Stream)
+					{
+						src = new WriteableBitmap(0, 0);
+						(src as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+					}
+					else if (internalObj is WriteableBitmap)
+					{
+						src = res.GetInternalObject();
+					}
+				});
+#endif
+				Rect srcRect = new Rect(0, 0, (src as WriteableBitmap).PixelWidth, (src as WriteableBitmap).PixelHeight);
+				Rect dstRect = new Rect(left, top, (src as WriteableBitmap).PixelWidth, (src as WriteableBitmap).PixelHeight);
+				mCurrentDrawTarget.Blit(dstRect, (src as WriteableBitmap), srcRect, WriteableBitmapExtensions.BlendMode.Alpha);
 			};
 
 			syscalls.maDrawImageRegion = delegate(int image, int srcRectPtr, int dstPointPtr, int transformMode)
 			{
 				Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, image);
+#if !LIB
 				WriteableBitmap src = (WriteableBitmap)res.GetInternalObject();
-
 				Memory dataMemory = core.GetDataMemory();
+#else
+				SystemMemory dataMemory = core.GetDataMemory();
+				Object src = null;
+				MoSync.Util.RunActionOnMainThreadSync(() =>
+				{
+					Object internalObj = res.GetInternalObject();
+					if(internalObj is Stream)
+					{
+						src = new WriteableBitmap(0, 0);
+						(src as WriteableBitmap).SetSource((Stream)res.GetInternalObject());
+					}
+					else if (internalObj is WriteableBitmap)
+					{
+						src = res.GetInternalObject();
+					}
+				});
+#endif
+
 				int srcRectX = dataMemory.ReadInt32(srcRectPtr + MoSync.Struct.MARect.left);
 				int srcRectY = dataMemory.ReadInt32(srcRectPtr + MoSync.Struct.MARect.top);
 				int srcRectW = dataMemory.ReadInt32(srcRectPtr + MoSync.Struct.MARect.width);
@@ -373,7 +439,7 @@ namespace MoSync
 				Rect srcRect = new Rect(srcRectX, srcRectY, srcRectW, srcRectH);
 				Rect dstRect = new Rect(dstPointX, dstPointY, srcRectW, srcRectH);
 
-				GraphicsUtil.DrawImageRegion(mCurrentDrawTarget, dstPointX, dstPointY, srcRect, src, transformMode, mClipRect);
+				GraphicsUtil.DrawImageRegion(mCurrentDrawTarget, dstPointX, dstPointY, srcRect, (src as WriteableBitmap), transformMode, mClipRect);
 			};
 
 			syscalls.maCreateDrawableImage = delegate(int placeholder, int width, int height)
@@ -409,7 +475,15 @@ namespace MoSync
 					});
 
 				//core.GetDataMemory().ReadIntegers(bitmap.Pixels, _src, width * height);
+
+#if !LIB
 				bitmap.FromByteArray(core.GetDataMemory().GetData(), _src, width * height * 4);
+#else
+				byte[] bytes = new byte[width * height * 4];
+				core.GetDataMemory().ReadBytes(bytes, _src, width * height * 4);
+
+				bitmap.FromByteArray(bytes, 0, width * height * 4); // TO BE TESTED
+#endif
 				if (_alpha == 0)
 				{
 					int[] pixels = bitmap.Pixels;
@@ -428,7 +502,11 @@ namespace MoSync
 
 			syscalls.maDrawRGB = delegate(int _dstPoint, int _src, int _srcRect, int _scanlength)
 			{
+#if !LIB
 				Memory dataMemory = core.GetDataMemory();
+#else
+				SystemMemory dataMemory = core.GetDataMemory();
+#endif
 				int dstX = dataMemory.ReadInt32(_dstPoint + MoSync.Struct.MAPoint2d.x);
 				int dstY = dataMemory.ReadInt32(_dstPoint + MoSync.Struct.MAPoint2d.y);
 				int srcRectX = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.left);
@@ -477,7 +555,11 @@ namespace MoSync
 			{
 				Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, _image);
 				WriteableBitmap src = (WriteableBitmap)res.GetInternalObject();
+#if !LIB
 				Memory dataMemory = core.GetDataMemory();
+#else
+				SystemMemory dataMemory = core.GetDataMemory();
+#endif
 				int srcRectX = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.left);
 				int srcRectY = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.top);
 				int srcRectW = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.width);
@@ -485,7 +567,12 @@ namespace MoSync
 				int lineDst = _dst;
 				byte[] data = src.ToByteArray(srcRectY * src.PixelWidth,
 					srcRectH * src.PixelWidth); // BlockCopy?
+#if !LIB
 				byte[] coreArray = dataMemory.GetData();
+#else
+				byte[] coreArray = new byte[_scanlength];
+				dataMemory.ReadBytes(coreArray, _srcRect, _scanlength);
+#endif
 				for (int y = 0; y < srcRectH; y++)
 				{
 					System.Array.Copy(data, y * src.PixelWidth * 4, coreArray,
@@ -516,10 +603,13 @@ namespace MoSync
 			};
 		}
 
+#if !LIB
 		protected Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation = null;
+#else
+		protected MosyncLibrary.Delegate_maUpdateScreen mOldUpdateScreenImplementation = null;
+#endif
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
 		{
-
 			ioctls.maFontSetCurrent = delegate(int _font)
 			{
 				FontModule.FontInfo finfo = runtime.GetModule<FontModule>().GetFont(_font);
@@ -541,11 +631,21 @@ namespace MoSync
 
 				syscalls.maUpdateScreen = delegate()
 				{
+#if !LIB
 					Memory mem = core.GetDataMemory();
+#else
+					SystemMemory mem = core.GetDataMemory();
+#endif
 					int[] dst = mFrontBuffer.Pixels;
 
 					//mFrontBuffer.FromByteArray(mem.GetData(), frameBufferPointer, dst.Length * 4);
+#if !LIB
 					System.Buffer.BlockCopy(mem.GetData(), frameBufferPointer, dst, 0, dst.Length * 4);
+#else
+					byte[] bytes = new byte[dst.Length * 4];
+					mem.ReadBytes(bytes, frameBufferPointer, dst.Length * 4);
+					System.Buffer.BlockCopy(bytes, 0, dst, 0, dst.Length * 4); //TO BE TESTED
+#endif
 					const int opaque = (int)(0xff<<24);
 					for (int i = 0; i < dst.Length; i++)
 					{
@@ -579,7 +679,11 @@ namespace MoSync
 
 			ioctls.maFrameBufferGetInfo = delegate(int info)
 			{
+#if !LIB
 				Memory mem = core.GetDataMemory();
+#else
+				SystemMemory mem = core.GetDataMemory();
+#endif
 				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.sizeInBytes, mBackBuffer.PixelWidth * mBackBuffer.PixelHeight * 4);
 				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.bytesPerPixel, 4);
 				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.bitsPerPixel, 32);

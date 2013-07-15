@@ -19,12 +19,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TOOLS_H
 
 #include <string>
+#include <vector>
+
+using namespace std;
 
 /**
  * Injects an icon in a platform specific manner, using the icon injector.
  * Exits on failure.
  */
 void injectIcon(const char* platform, const char* size, const char* srcIcon, const char* dst, bool silent, bool force);
+
+void getExtensions(const char* extensionList, vector<string>& extensions);
 
 /**
  * Returns a MoSync binary, located in the MOSYNCDIR/bin directory.

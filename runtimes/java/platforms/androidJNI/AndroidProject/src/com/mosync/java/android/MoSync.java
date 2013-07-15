@@ -75,6 +75,8 @@ import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
+import com.mosync.internal.android.extensions.MoSyncExtensionLoader;
+import com.mosync.internal.android.billing.Consts;
 import com.mosync.internal.android.billing.PurchaseManager;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
@@ -123,6 +125,7 @@ public class MoSync extends Activity
 	 * values retrieved when configuration changes.
 	 */
 	private static int mScreenRotation = Surface.ROTATION_0;
+	private static int mConfigOrientation = Configuration.ORIENTATION_PORTRAIT;
 
 	/**
 	 * Sets screen and window properties.
@@ -219,10 +222,11 @@ public class MoSync extends Activity
 
 	@Override
 	public void onNewIntent(Intent intent) {
+		String action = intent.getAction();
 		if (MoSyncNFCService.handleNFCIntent(this, intent)) {
 			Log.d("@@@ MoSync", "Discovered tag");
 		}
-		else if(intent.getAction().equals(LocalNotificationsService.ACTION_NOTIFICATION_RECEIVED))
+		else if(LocalNotificationsService.ACTION_NOTIFICATION_RECEIVED.equals(action))
 		{
 			Log.e("@@MoSync", "onNewIntent: Local Notification received ");
 			int notificationId = intent.getIntExtra(
@@ -250,13 +254,18 @@ public class MoSync extends Activity
 
 		SYSLOG("@@MoSync rotation = " + newRotation);
 
-		// Has the rotation changed?
-		if (mScreenRotation != newRotation)
+		int newConfigOrientation = getResources().getConfiguration().orientation;
+
+		// Has the rotation or orientation changed?
+		if ((mScreenRotation != newRotation) ||
+				(mConfigOrientation != newConfigOrientation))
 		{
-			// Save current rotation.
+			// Save current rotation and config orientation.
 			mScreenRotation = newRotation;
+			mConfigOrientation = newConfigOrientation;
 
 			int screenOrientation = getScreenOrientation();
+
 			// Post rotation event.
 			ScreenWidget screen = mMoSyncThread.getUnconvertedCurrentScreen();
 			if (null != screen)
@@ -301,24 +310,47 @@ public class MoSync extends Activity
 	}
 
 	/**
-	 * Get the screen orientation based on latest rotation.
+	 * Get the screen orientation based on latest rotation and config orientation.
 	 * @return
 	 */
 	public static int getScreenOrientation()
 	{
-		switch(mScreenRotation)
+		final Activity activity = MoSyncThread.getInstance().getActivity();
+
+		int configOrientation = activity.getResources().getConfiguration().orientation;
+
+		int screenOrientation;
+
+		switch (configOrientation)
 		{
-		case Surface.ROTATION_0:
-			return MA_SCREEN_ORIENTATION_PORTRAIT_UP;
-		case Surface.ROTATION_180:
-			return MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
-		case Surface.ROTATION_270:
-			return MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
-		case Surface.ROTATION_90:
-			return MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+		case Configuration.ORIENTATION_PORTRAIT:
+			if(mScreenRotation == Surface.ROTATION_90 ||
+				mScreenRotation == Surface.ROTATION_180)
+			{
+				screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN;
+			}
+			else
+			{
+				screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+			}
+			break;
+		case Configuration.ORIENTATION_LANDSCAPE:
+			if(mScreenRotation == Surface.ROTATION_0 ||
+				mScreenRotation == Surface.ROTATION_90)
+			{
+				screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT;
+			}
+			else
+			{
+				screenOrientation = MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT;
+			}
+			break;
 		default:
-			return MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+			screenOrientation = MA_SCREEN_ORIENTATION_PORTRAIT_UP;
+			break;
 		}
+
+		return screenOrientation;
 	}
 
 	@Override
@@ -437,29 +469,20 @@ public class MoSync extends Activity
 			for (int i=0; i < items.size(); i++)
 			{
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
-				if ( items.get(i).hasIconFromResources() )
+//				if (NativeUI.mActionBarEnabled)
+//					item.setShowAsAction(items.get(i).getShowActionFlag());
+				if ( items.get(i).hasPredefinedIcon() )
 				{
-					item.setIcon( items.get(i).getIconResId() );
+					item.setIcon( items.get(i).getPredefinedIconID() );
 				}
-				else
+				else if ( items.get(i).hasCustomIcon() )
 				{
-					item.setIcon( items.get(i).getIcon() );
+					item.setIcon( items.get(i).getCustomIcon() );
 				}
 			}
-//			return true;
 		}
 		else
 			Log.e("@@MoSync"," onCreateOptionsMenu screen is NULL");
-//
-//		return super.onCreateOptionsMenu(menu);
-
-//    	MenuItem item1 = menu.add(0, 1, 0, "btn");
-//    	item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//    	item1.setIcon(17301555);
-//
-//    	MenuItem item2 = menu.add(1,0,0,"t");
-//    	item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//    	item2.setIcon(17301583);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -472,16 +495,6 @@ public class MoSync extends Activity
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
 		Log.e("@@MoSync", "MoSync onPrepareOptionsMenu");
-
-//    	MenuItem item1 = menu.add(0, 1, 0, "btn");
-//    	item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//    	item1.setIcon(17301555);
-//
-//    	MenuItem item2 = menu.add(1,0,0,"t");
-//    	item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-//    	item2.setIcon(17301583);
-
-//		return super.onPrepareOptionsMenu(menu);
 
 //		// Remove all the items from the menu.
 		menu.clear();
@@ -498,23 +511,26 @@ public class MoSync extends Activity
 			for (int i=0; i < items.size(); i++)
 			{
 				MenuItem item = menu.add ( 0, items.get(i).getId(), 0, items.get(i).getTitle() );
+				// When enabled, use ActionBar items.
+//				if (NativeUI.mActionBarEnabled)
+//				{
+//					item.setShowAsAction(items.get(i).getShowActionFlag());
+//				}
 
-				if ( items.get(i).hasIconFromResources() )
+				if ( items.get(i).hasPredefinedIcon() )
 				{
-					item.setIcon( items.get(i).getIconResId() );
+					item.setIcon( items.get(i).getPredefinedIconID() );
 				}
-				else if ( items.get(i).hasIconPredefined() )
+				else if ( items.get(i).hasCustomIcon() )
 				{
-					item.setIcon( items.get(i).getIcon() );
+					item.setIcon( items.get(i).getCustomIcon() );
 				}
 			}
-//			return true;
 		}
 		else
 			Log.e("@@MoSync"," onPrepareOptionsMenu screen is NULL");
 
 		return super.onPrepareOptionsMenu(menu);
-//		return false;
 	}
 
 	@Override
@@ -919,8 +935,10 @@ public class MoSync extends Activity
      */
     private void sendCloseEvent()
     {
-    	if (!mEventTypeCloseHasBeenSent)
-    	{
+		if (!mEventTypeCloseHasBeenSent)
+		{
+			MoSyncExtensionLoader.getDefault().unloadExtensions();
+
 			// Send EVENT_TYPE_CLOSE
 			int[] event = new int[1];
 			event[0] = EVENT_TYPE_CLOSE;

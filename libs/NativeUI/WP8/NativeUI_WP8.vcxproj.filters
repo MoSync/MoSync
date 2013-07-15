@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ActivityIndicator.cpp" />
+    <ClCompile Include="..\Button.cpp" />
+    <ClCompile Include="..\CameraPreview.cpp" />
+    <ClCompile Include="..\CheckBox.cpp" />
+    <ClCompile Include="..\DatePicker.cpp" />
+    <ClCompile Include="..\Dialog.cpp" />
+    <ClCompile Include="..\EditBox.cpp" />
+    <ClCompile Include="..\GLView.cpp" />
+    <ClCompile Include="..\HorizontalLayout.cpp" />
+    <ClCompile Include="..\Image.cpp" />
+    <ClCompile Include="..\ImageButton.cpp" />
+    <ClCompile Include="..\Label.cpp" />
+    <ClCompile Include="..\Layout.cpp" />
+    <ClCompile Include="..\ListView.cpp" />
+    <ClCompile Include="..\ListViewItem.cpp" />
+    <ClCompile Include="..\ListViewSection.cpp" />
+    <ClCompile Include="..\Location.cpp" />
+    <ClCompile Include="..\Map.cpp" />
+    <ClCompile Include="..\MapLocation.cpp" />
+    <ClCompile Include="..\MapPin.cpp" />
+    <ClCompile Include="..\MapRegion.cpp" />
+    <ClCompile Include="..\NavigationBar.cpp" />
+    <ClCompile Include="..\NumberPicker.cpp" />
+    <ClCompile Include="..\PanoramaView.cpp" />
+    <ClCompile Include="..\ProgressBar.cpp" />
+    <ClCompile Include="..\RadioButton.cpp" />
+    <ClCompile Include="..\RadioGroup.cpp" />
+    <ClCompile Include="..\RatingBar.cpp" />
+    <ClCompile Include="..\RelativeLayout.cpp" />
+    <ClCompile Include="..\Screen.cpp" />
+    <ClCompile Include="..\SearchBar.cpp" />
+    <ClCompile Include="..\Slider.cpp" />
+    <ClCompile Include="..\StackScreen.cpp" />
+    <ClCompile Include="..\TabScreen.cpp" />
+    <ClCompile Include="..\TextWidget.cpp" />
+    <ClCompile Include="..\TimePicker.cpp" />
+    <ClCompile Include="..\ToggleButton.cpp" />
+    <ClCompile Include="..\VerticalLayout.cpp" />
+    <ClCompile Include="..\VideoView.cpp" />
+    <ClCompile Include="..\WebView.cpp" />
+    <ClCompile Include="..\Widget.cpp" />
+    <ClCompile Include="..\WidgetManager.cpp" />
+    <ClCompile Include="..\Camera.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ActivityIndicator.h" />
+    <ClInclude Include="..\Button.h" />
+    <ClInclude Include="..\ButtonListener.h" />
+    <ClInclude Include="..\CameraPreview.h" />
+    <ClInclude Include="..\CheckBox.h" />
+    <ClInclude Include="..\CheckBoxListener.h" />
+    <ClInclude Include="..\DatePicker.h" />
+    <ClInclude Include="..\DatePickerListener.h" />
+    <ClInclude Include="..\Dialog.h" />
+    <ClInclude Include="..\DialogListener.h" />
+    <ClInclude Include="..\EditBox.h" />
+    <ClInclude Include="..\EditBoxListener.h" />
+    <ClInclude Include="..\GLView.h" />
+    <ClInclude Include="..\GLViewListener.h" />
+    <ClInclude Include="..\HorizontalLayout.h" />
+    <ClInclude Include="..\Image.h" />
+    <ClInclude Include="..\ImageButton.h" />
+    <ClInclude Include="..\Label.h" />
+    <ClInclude Include="..\Layout.h" />
+    <ClInclude Include="..\ListView.h" />
+    <ClInclude Include="..\ListViewItem.h" />
+    <ClInclude Include="..\ListViewListener.h" />
+    <ClInclude Include="..\ListViewSection.h" />
+    <ClInclude Include="..\Location.h" />
+    <ClInclude Include="..\Map.h" />
+    <ClInclude Include="..\MapListener.h" />
+    <ClInclude Include="..\MapLocation.h" />
+    <ClInclude Include="..\MapPin.h" />
+    <ClInclude Include="..\MapPinListener.h" />
+    <ClInclude Include="..\MapRegion.h" />
+    <ClInclude Include="..\NavigationBar.h" />
+    <ClInclude Include="..\NavigationBarListener.h" />
+    <ClInclude Include="..\NumberPicker.h" />
+    <ClInclude Include="..\NumberPickerListener.h" />
+    <ClInclude Include="..\PanoramaView.h" />
+    <ClInclude Include="..\ProgressBar.h" />
+    <ClInclude Include="..\RadioButton.h" />
+    <ClInclude Include="..\RadioButtonListener.h" />
+    <ClInclude Include="..\RadioGroup.h" />
+    <ClInclude Include="..\RadioGroupListener.h" />
+    <ClInclude Include="..\RatingBar.h" />
+    <ClInclude Include="..\RatingBarListener.h" />
+    <ClInclude Include="..\RelativeLayout.h" />
+    <ClInclude Include="..\Screen.h" />
+    <ClInclude Include="..\ScreenListener.h" />
+    <ClInclude Include="..\SearchBar.h" />
+    <ClInclude Include="..\SearchBarListener.h" />
+    <ClInclude Include="..\Slider.h" />
+    <ClInclude Include="..\SliderListener.h" />
+    <ClInclude Include="..\StackScreen.h" />
+    <ClInclude Include="..\StackScreenListener.h" />
+    <ClInclude Include="..\TabScreen.h" />
+    <ClInclude Include="..\TabScreenListener.h" />
+    <ClInclude Include="..\TextWidget.h" />
+    <ClInclude Include="..\TimePicker.h" />
+    <ClInclude Include="..\TimePickerListener.h" />
+    <ClInclude Include="..\ToggleButton.h" />
+    <ClInclude Include="..\ToggleButtonListener.h" />
+    <ClInclude Include="..\VerticalLayout.h" />
+    <ClInclude Include="..\VideoView.h" />
+    <ClInclude Include="..\VideoViewListener.h" />
+    <ClInclude Include="..\WebView.h" />
+    <ClInclude Include="..\WebViewListener.h" />
+    <ClInclude Include="..\Widget.h" />
+    <ClInclude Include="..\WidgetEventListener.h" />
+    <ClInclude Include="..\WidgetManager.h" />
+    <ClInclude Include="..\Widgets.h" />
+    <ClInclude Include="..\WidgetUtil.h" />
+    <ClInclude Include="..\Camera.h" />
+  </ItemGroup>
+</Project>
