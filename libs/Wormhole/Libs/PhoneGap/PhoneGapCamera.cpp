@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <mastring.h>
 #include <maxtoa.h>
+#include <mavsprintf.h>
 #include "PhoneGapMessageHandler.h"
 #include "PhoneGapCamera.h"
 #include "PhoneGapCameraUtil.h"
