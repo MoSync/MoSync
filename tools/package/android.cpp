@@ -45,6 +45,7 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri);
 static string packageNameToByteCodeName(const string& packageName);
 static string findNativeLibrary(const SETTINGS& s, vector<string>& modules, string& name, string& arch, bool debug, bool& staticLib);
+static void copyConfigXML(const SETTINGS& s, const RuntimeInfo& ri);
 
 class AndroidContext : public DefaultContext {
 private:
@@ -112,9 +113,11 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	string res = dstDir + "/res";
 	string layout = res + "/layout";
 	string values = res + "/values";
+	string androidXML = res + "/xml";
 	_mkdir(res.c_str());
 	_mkdir(layout.c_str());
 	_mkdir(values.c_str());
+	_mkdir(androidXML.c_str());
 
 	// Inject icon
 	injectIcons(s, ri);
@@ -125,6 +128,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		writeNFCResource(s, ri);
 	}
 
+	copyConfigXML(s, ri);
 	string extensionDex;
 	string extensionRes;
 
@@ -467,6 +471,15 @@ static string writeManifest(const SETTINGS& s, const RuntimeInfo& ri) {
 	return manifestXml;
 }
 
+static void copyConfigXML(const SETTINGS& s, const RuntimeInfo& ri) {
+	string dstDir = string(s.dst);
+	string xmlResourceDir = dstDir + "/res/xml/";
+	string xmlResource = string(xmlResourceDir) + "config.xml";
+	ProfileDB db;
+	string androidProfilesDir = db.profilesdir("Android") + "/config.xml";
+	copyFile(xmlResource.c_str(), androidProfilesDir.c_str());
+}
+
 static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri) {
 	if (!s.nfc || !existsFile(s.nfc)) {
 		printf("If NFC permissions are set, then\n"
@@ -483,7 +496,6 @@ static void writeNFCResource(const SETTINGS& s, const RuntimeInfo& ri) {
 	// by exposing it as a file.
 	string nfcTemplate = androidProfilesDir + "/nfc.template";
 	string nfcResourceDir = dstDir + "/res/xml/";
-	_mkdir(nfcResourceDir.c_str());
 	string nfcResource = string(nfcResourceDir) + "nfc.xml";
 	fromTemplate(nfcTemplate.c_str(), nfcResource.c_str(), s, ri);
 }

@@ -26,6 +26,7 @@
 #include "tools.h"
 #include "mustache/mustache.h"
 #include "helpers/mkdir.h"
+#include "profiledb/profiledb.h"
 
 #if defined (__MACH__) || defined(__APPLE__)
 #define PLATFORM_OSX
@@ -72,6 +73,10 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 		copyFile((xcodeprojOutput + "/userCode.o").c_str(), (src + "/userCode.o").c_str());
 		copyFile((xcodeprojOutput + "/MoSyncLibs.a").c_str(), (src + "/MoSyncLibs.a").c_str());
 	}
+
+	ProfileDB db;
+	string iOSProfilesDir = db.profilesdir("iOS") + "/config.xml";
+	copyFile((xcodeprojOutput + "/config.xml").c_str(), iOSProfilesDir.c_str());
 
 	string resourceFileCopy = xcodeprojOutput + "/resources";
 	if(s.resource) {

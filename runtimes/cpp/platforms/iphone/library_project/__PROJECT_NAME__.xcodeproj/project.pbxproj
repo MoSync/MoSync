@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0777DB3E178706E600F9F57B /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0777DB3D178706E600F9F57B /* config.xml */; };
+		0777DB3F178706F400F9F57B /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0777DB3D178706E600F9F57B /* config.xml */; };
+		079E27AD17857946004EAB21 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079E27AC17857946004EAB21 /* AssetsLibrary.framework */; };
+		079E27AF1785794D004EAB21 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079E27AE1785794D004EAB21 /* OpenAL.framework */; };
+		079E27B117857951004EAB21 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079E27B017857951004EAB21 /* ImageIO.framework */; };
+		079E27B317857959004EAB21 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079E27B217857959004EAB21 /* AddressBookUI.framework */; };
+		079E27B417857966004EAB21 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079E27AC17857946004EAB21 /* AssetsLibrary.framework */; };
+		079E27B51785796B004EAB21 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079E27AE1785794D004EAB21 /* OpenAL.framework */; };
+		079E27B617857971004EAB21 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079E27B017857951004EAB21 /* ImageIO.framework */; };
+		079E27B717857975004EAB21 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 079E27B217857959004EAB21 /* AddressBookUI.framework */; };
 		0B0EF4DE1717488D0041A357 /* userCode.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B0EF4DC171747890041A357 /* userCode.o */; };
 		0B10E94A14065AE600B6DA6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B10E94914065AE600B6DA6B /* MessageUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		0B80AC98171EED65002EDBD1 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
@@ -74,6 +84,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0777DB3D178706E600F9F57B /* config.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
+		079E27AC17857946004EAB21 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		079E27AE1785794D004EAB21 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		079E27B017857951004EAB21 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		079E27B217857959004EAB21 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		0B0EF4DC171747890041A357 /* userCode.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = userCode.o; sourceTree = "<group>"; };
 		0B0EF4DF171748A40041A357 /* MoSyncLibs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = MoSyncLibs.a; sourceTree = "<group>"; };
 		0B10E94914065AE600B6DA6B /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
@@ -123,6 +138,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				079E27B717857975004EAB21 /* AddressBookUI.framework in Frameworks */,
+				079E27B617857971004EAB21 /* ImageIO.framework in Frameworks */,
+				079E27B51785796B004EAB21 /* OpenAL.framework in Frameworks */,
+				079E27B417857966004EAB21 /* AssetsLibrary.framework in Frameworks */,
 				0B92CFE51716AFFF002DFDF6 /* CoreVideo.framework in Frameworks */,
 				0B92CFE61716AFFF002DFDF6 /* StoreKit.framework in Frameworks */,
 				0B92CFE71716AFFF002DFDF6 /* CoreMedia.framework in Frameworks */,
@@ -154,6 +173,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				079E27B317857959004EAB21 /* AddressBookUI.framework in Frameworks */,
+				079E27B117857951004EAB21 /* ImageIO.framework in Frameworks */,
+				079E27AF1785794D004EAB21 /* OpenAL.framework in Frameworks */,
+				079E27AD17857946004EAB21 /* AssetsLibrary.framework in Frameworks */,
 				6019007415B8587C008F2D0E /* CoreVideo.framework in Frameworks */,
 				43CCA6EE15774C3000545361 /* StoreKit.framework in Frameworks */,
 				E438DF581535E09B008B5005 /* CoreMedia.framework in Frameworks */,
@@ -207,6 +230,10 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				079E27B217857959004EAB21 /* AddressBookUI.framework */,
+				079E27B017857951004EAB21 /* ImageIO.framework */,
+				079E27AE1785794D004EAB21 /* OpenAL.framework */,
+				079E27AC17857946004EAB21 /* AssetsLibrary.framework */,
 				0B0EF4DF171748A40041A357 /* MoSyncLibs.a */,
 				0B0EF4DC171747890041A357 /* userCode.o */,
 				080E96DDFE201D6D7F000001 /* Classes */,
@@ -231,6 +258,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				0777DB3D178706E600F9F57B /* config.xml */,
 				E4A6E14D14D8030300616741 /* Icon@2x.png */,
 				85796C5312719251002B7859 /* Icon-72.png */,
 				4344B356165136A7005E26C6 /* Default-568h@2x.png */,
@@ -349,6 +377,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0777DB3F178706F400F9F57B /* config.xml in Resources */,
 				0B92CFDB1716AFFF002DFDF6 /* Icon-72.png in Resources */,
 				0B92CFDC1716AFFF002DFDF6 /* Icon.png in Resources */,
 				0B92CFDD1716AFFF002DFDF6 /* Icon@2x.png in Resources */,
@@ -367,6 +396,7 @@
 				85796C5612719251002B7859 /* Icon.png in Resources */,
 				E4A6E14E14D8030300616741 /* Icon@2x.png in Resources */,
 				4344B357165136A8005E26C6 /* Default-568h@2x.png in Resources */,
+				0777DB3E178706E600F9F57B /* config.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

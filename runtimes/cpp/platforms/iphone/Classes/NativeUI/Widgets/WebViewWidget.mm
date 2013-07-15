@@ -33,6 +33,9 @@
         UIWebView* webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         self.view = webView;
         webView.delegate = self;
+        cordovaViewController = [[CordovaViewController alloc] init:webView];
+        [cordovaViewController viewDidLoad];
+        cordovaWebViewDelegate = [[CDVWebViewDelegate alloc] initWithDelegate:cordovaViewController];
         newurl = @"";
         softHookPattern = @"";
         hardHookPattern = @"";
@@ -193,6 +196,7 @@
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
+    [cordovaWebViewDelegate webViewDidStartLoad: webView];
     MAEvent event;
     event.type = EVENT_TYPE_WIDGET;
     MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -206,6 +210,7 @@
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
+    [cordovaWebViewDelegate webViewDidFinishLoad: webView];
     MAEvent event;
     event.type = EVENT_TYPE_WIDGET;
     MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -219,6 +224,7 @@
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
+    [cordovaWebViewDelegate webView:webView didFailLoadWithError:error];
     MAEvent event;
     event.type = EVENT_TYPE_WIDGET;
     MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -233,6 +239,8 @@
 - (BOOL)webView:(UIWebView *)webView
 		shouldStartLoadWithRequest:(NSURLRequest *)request
 		navigationType:(UIWebViewNavigationType)navigationType {
+
+    [cordovaWebViewDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
 
 	if(request.URL.absoluteString == NULL)
     {
