@@ -22,6 +22,7 @@
  *
  * @brief View controller for Cordova-iOS.
  * Uses MoSync's WebView instead of Cordova's.
+ * Will be moved to MoSync's main view controller.
  */
 
 #import "CordovaViewController.h"
