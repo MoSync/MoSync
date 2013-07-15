@@ -93,12 +93,18 @@ import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.ScreenTransitions;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.apache.cordova.api.CordovaPlugin;
+import org.apache.cordova.api.CordovaInterface;
+import org.apache.cordova.CordovaWebView;
+
 /**
  * Main MoSync activity
  *
  * As long as this activity is running the application is running.
  */
-public class MoSync extends Activity
+public class MoSync extends Activity implements CordovaInterface
 {
 	/**
 	 * Activity request codes for Camera intent.
@@ -126,6 +132,76 @@ public class MoSync extends Activity
 	 */
 	private static int mScreenRotation = Surface.ROTATION_0;
 	private static int mConfigOrientation = Configuration.ORIENTATION_PORTRAIT;
+
+	private final ExecutorService threadPool = Executors.newCachedThreadPool();
+
+	// Plugin to call when activity result is received
+	protected CordovaPlugin activityResultCallback = null;
+	protected boolean activityResultKeepRunning;
+
+	// Keep app running when pause is received. (default = true)
+	// If true, then the JavaScript and native code continue to run in the background
+	// when another application (activity) is started.
+	protected boolean keepRunning = true;
+
+	private String initCallbackClass;
+
+	/**
+	 * Launch an activity for which you would like a result when it finished. When this activity exits,
+	 * your onActivityResult() method will be called.
+	 *
+	 * @param command           The command object
+	 * @param intent            The intent to start
+	 * @param requestCode       The request code that is passed to callback to identify the activity
+	 */
+	public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode) {
+		this.activityResultCallback = command;
+		this.activityResultKeepRunning = this.keepRunning;
+
+		// If multitasking turned on, then disable it for activities that return results
+		if (command != null) {
+			this.keepRunning = false;
+		}
+
+		// Start activity
+		super.startActivityForResult(intent, requestCode);
+	}
+
+	/**
+	 * Set the plugin to be called when a sub-activity exits.
+	 *
+	 * @param plugin      The plugin on which onActivityResult is to be called
+	 */
+	public void setActivityResultCallback(CordovaPlugin plugin) {
+		this.activityResultCallback = plugin;
+	}
+
+	/**
+	 * Get the Android activity.
+	 *
+	 * @return
+	 */
+	public Activity getActivity() {
+		return this;
+	}
+
+	/**
+	 * Called when a message is sent to plugin.
+	 *
+	 * @param id            The message id
+	 * @param data          The message data
+	 * @return              Object or null
+	 */
+	public Object onMessage(String id, Object data) {
+		return null;
+	}
+
+	/**
+	 * Returns a shared thread pool that can be used for background tasks.
+	 */
+	public ExecutorService getThreadPool() {
+		return threadPool;
+	}
 
 	/**
 	 * Sets screen and window properties.
@@ -629,6 +705,21 @@ public class MoSync extends Activity
 		else
 		{
 			super.onActivityResult(requestCode, resultCode, data);
+
+			CordovaPlugin callback = this.activityResultCallback;
+			if(callback == null && initCallbackClass != null) {
+				// The application was restarted, but had defined an initial callback
+				// before being shut down.
+				CordovaWebView webView = (CordovaWebView) mMoSyncThread.maWebViewGet();
+				if (webView != null) {
+					this.activityResultCallback = webView.pluginManager.getPlugin(initCallbackClass);
+					callback = this.activityResultCallback;
+				}
+			}
+			if(callback != null) {
+				callback.onActivityResult(requestCode, resultCode, data);
+				Log.i("@@MoSync","Cordova plugin callback.onActivityResult called.");
+			}
 		}
 	}
 

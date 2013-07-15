@@ -113,6 +113,7 @@ import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -4507,6 +4508,24 @@ public class MoSyncThread extends Thread implements MoSyncContext
 	public int maWidgetDestroy(final int widget)
 	{
 		return mMoSyncNativeUI.maWidgetDestroy(widget);
+	}
+
+	/**
+	 * Internal wrapper for maWidgetGetProperty that runs
+	 * the call in the UI thread.
+	 */
+	public WebView maWebViewGet()
+	{
+		return mMoSyncNativeUI.maWebViewGet();
+	}
+
+	/**
+	 * Internal wrapper for maWidgetGetProperty that runs
+	 * the call in the UI thread.
+	 */
+	public void maWebViewSet(WebView webView)
+	{
+		mMoSyncNativeUI.maWebViewSet(webView);
 	}
 
 	/**

@@ -212,7 +212,14 @@ packages = ["src/com/mosync/java/android/*.java",
 		"src/com/mosync/internal/android/notifications/*.java",
 		"src/com/mosync/internal/android/billing/*.java",
 		"src/com/mosync/internal/android/billing/util/*.java",
-		"gen/com/android/vending/billing/IInAppBillingService.java"
+		"gen/com/android/vending/billing/IInAppBillingService.java",
+		"src/com/squareup/okhttp/*.java",
+		"src/com/squareup/okhttp/internal/*.java",
+		"src/com/squareup/okhttp/internal/http/*.java",
+		"src/com/squareup/okhttp/internal/spdy/*.java",
+		"src/org/apache/cordova/*.java",
+		"src/org/apache/cordova/api/*.java",
+		"src/org/apache/cordova/file/*.java"
 ]
 
 # Concatenate each list element with package_root, and flatten the list to a string
@@ -238,6 +245,8 @@ FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.
 puts "Copy external Library Files\n\n"
 FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/GoogleAdMobAdsSdk.jar")}", "temp/GoogleAdMobAdsSdk.jar")
 FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/gcm.jar")}", "temp/gcm.jar")
+
+FileUtils.cp_r( "#{File.join(package_root, "res")}", "temp/")
 
 puts "Build Zip Package\n\n"
 

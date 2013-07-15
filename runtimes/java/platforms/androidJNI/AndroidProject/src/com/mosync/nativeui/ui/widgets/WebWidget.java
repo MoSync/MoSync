@@ -41,6 +41,9 @@ import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.api.CordovaInterface;
+
 /**
  * A WebWidget is graphical element that displays a webpage
  * on the screen.
@@ -111,6 +114,8 @@ public class WebWidget extends Widget
 	{
 		// Create the Android WebView component.
 		WebView webView = new WebWidget.MoSyncWebView(activity);
+
+		MoSyncThread.getInstance().maWebViewSet(webView);
 
 		// Create the widget proxy object that MoSync uses to manage
 		// the WebView.
@@ -402,7 +407,7 @@ public class WebWidget extends Widget
 	 *
 	 * @author Mikael Kindborg
 	 */
-	static class MoSyncWebView extends WebView
+	static class MoSyncWebView extends CordovaWebView
 	{
 		public MoSyncWebView(Context context)
 		{
