@@ -97,6 +97,22 @@ namespace Wormhole
 		 */
 		virtual int getArgsFieldInt(int index);
 
+		/**
+		 * Used to retrieve an args field when args is an object.
+		 * @param fieldName The key of the field to retrieve.
+		 * @return The boolean value of a field in the JSON data.
+		 * Return false if the field does not exist.
+		 */
+		virtual bool getArgsFieldBool(const MAUtil::String& fieldName);
+
+		/**
+		 * Used to retrieve an args element when args is an array.
+		 * @param index Zero based index of the array element.
+		 * @return The boolean value of a field in the JSON data.
+		 * Return false if the field does not exist.
+		 */
+		virtual bool getArgsFieldBool(int index);
+
 	};
 } // namespace
 

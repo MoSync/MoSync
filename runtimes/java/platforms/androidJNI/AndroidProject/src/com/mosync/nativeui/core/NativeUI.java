@@ -26,6 +26,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
@@ -88,6 +89,8 @@ public class NativeUI
 	 * Mapping between image handles and bitmaps.
 	 */
 	private static Hashtable<Integer, ImageCache> m_imageTable = null;
+
+	WebView mWebView;
 
 	/**
 	 * Constructor.
@@ -876,5 +879,15 @@ public class NativeUI
 	public Widget getWidget(final int handle)
 	{
 		return (Widget) m_widgetTable.get( handle );
+	}
+
+	public WebView getWebView()
+	{
+		return mWebView;
+	}
+
+	public void setWebView(WebView webView)
+	{
+		mWebView = webView;
 	}
 }

@@ -22,6 +22,7 @@ import java.util.Hashtable;
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.generated.IX_WIDGET;
@@ -408,6 +409,39 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	public ScreenWidget getUnconvertedCurrentScreen()
 	{
 		return mNativeUI.getUnconvertedCurrentScreen();
+	}
+
+	/**
+	 * Internal wrapper for maWebViewGet that runs
+	 * the call in the UI thread.
+	 */
+	public WebView maWebViewGet()
+	{
+		{
+			final AsyncWait<WebView> waiter = new AsyncWait<WebView>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					WebView result = mNativeUI.getWebView();
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+	}
+
+	/**
+	 * Internal wrapper for maWebViewSet that runs
+	 * the call in the UI thread.
+	 */
+	public void maWebViewSet(final WebView webView)
+	{
+		getActivity().runOnUiThread(new Runnable() {
+			public void run()
+			{
+				mNativeUI.setWebView(webView);
+			}
+		});
 	}
 
 	/**

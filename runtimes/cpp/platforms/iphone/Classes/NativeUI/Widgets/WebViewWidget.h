@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
+#import "CordovaViewController.h"
+#import "CDVWebViewDelegate.h"
 
 @interface WebViewWidget : IWidget <UIWebViewDelegate> {
 	NSString* newurl;
@@ -29,6 +31,8 @@
 	NSString* canNavigateEither;
     NSString* javaScriptIdentifier; //"javascript:"
     NSMutableDictionary* urlsToNotHook; //Used to let the set url property to bypass the hooks
+    CordovaViewController* cordovaViewController;
+    CDVWebViewDelegate* cordovaWebViewDelegate;
 }
 
 - (id)init;
