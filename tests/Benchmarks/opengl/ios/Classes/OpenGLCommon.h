@@ -2,7 +2,6 @@
 //	QuatTest
 //
 //	Created by jeff on 4/27/10.
-//	Copyright __MyCompanyName__ 2010. All rights reserved.
 
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR || TARGET_OS_EMBEDDED
 #import <OpenGLES/EAGL.h>

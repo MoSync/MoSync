@@ -3,10 +3,14 @@
 # filenames
 rakefile.*
 workfile.rb
+workfile.*.rb
+workfile_*.rb
 build-all.rb
 build-one.rb
 
 # directories
+
+/docs
 
 /githooks
 
@@ -50,7 +54,7 @@ build-one.rb
 /testPrograms/jsontest/yajl
 /testPrograms/native_ui/iphone/Classes/LayoutManagers
 
-/tests/hubbub
+/tests/OtherTests/libc-suite
 
 /tools/android/dx
 /tools/android/aapt
@@ -73,12 +77,14 @@ build-one.rb
 /examples/cpp/MoGraph/MoGraphFinance/resources/font.fnt
 
 /libs/MAStd/api_areas.h
+/libs/MAStd/api_connections.h
 /libs/MAStd/e_acos.c
 /libs/MAStd/e_asin.c
 /libs/MAStd/e_atan2.c
 /libs/MAStd/e_log.c
 /libs/MAStd/e_pow.c
 /libs/MAStd/fdlibm.h
+/libs/MAStd/inet_ntop.c
 /libs/MAStd/mastring.h
 /libs/MAStd/matime.c
 /libs/MAStd/math_private.h
@@ -107,6 +113,10 @@ build-one.rb
 
 /libs/MTXml/entities.c
 /libs/MTXml/entities.h
+
+/libs/MoSyncLibIOS/buildMoSyncLibs.rb
+/libs/prepareMAStdNative.rb
+/libs/WP8Libs/buildLibraries.rb
 
 /runtimes/cpp/core/Recompiler/ArmAssembler.cpp
 /runtimes/cpp/core/Recompiler/ArmAssembler.h
@@ -152,19 +162,31 @@ build-one.rb
 
 /runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/android/billing/util
 
+/runtimes/csharp/windowsphone/buildLibraries*.rb
+
 /testPrograms/tlsf/tlsf.h
 /testPrograms/tlsf/tlsf.c
 
 /testPrograms/megademo/PCXLoader.h
 /testPrograms/megademo/PCXLoader.cpp
 
+/testPrograms/SqliteTest/sqlite3.*
+/testPrograms/stat/main.c
+
 /testPrograms/zbarScanner/zbar
 
-/tests/sdl_ffmpeg/example.c
+/tests/Benchmarks/linpack/ios/NativeLinpack3/linpack.c
+/tests/Benchmarks/linpack/mosync/buildinfo.h
+/tests/Benchmarks/linpack/mosync/linpack.c
+/tests/Benchmarks/linpack/mosync/linpack.cpp
+/tests/Benchmarks/opengl/ios/Classes/ConstantsAndMacros.h
+/tests/Benchmarks/opengl/ios/Classes/OpenGLCommon.h
+/tests/Benchmarks/opengl/ios/Classes/OpenGLTexture3D.h
+/tests/Benchmarks/opengl/ios/Classes/OpenGLTexture3D.m
+
+/tests/OtherTests/sdl_ffmpeg/example.c
 
 /tests/unitTestServer/httpPost.rb
-
-/tests/libc-suite
 
 /tools/GLWrapperGenerator/gl_common_lite.h
 /tools/WrapperGenerator/tests/gl.h
