@@ -50,6 +50,13 @@ LocalFiles.bin*
 
 /*.bat
 
+/ij.txt
+/rp.txt
+/tm.txt
+/tms.txt
+/license_header.*.txt
+/old_license_header.*.txt
+
 /ipch/*
 
 /tools/profileGenerator/input/*
@@ -109,7 +116,6 @@ LocalFiles.bin*
 /libs/Wormhole/jslib/html5
 /libs/Wormhole/jslib/mosync-constants.js
 
-/testPrograms/_masterdump.s
 /testPrograms/temp.s
 /testPrograms/copyfiles.bat
 /testPrograms/filesystem/
@@ -202,9 +208,10 @@ LocalFiles.bin*
 /runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/java/android/R.java
 
 /tests/libc-suite/settings.rb
-/tests/libc-suite/_masterdump.s
 /tests/libc-suite/filesystem
 /tests/libc-suite/loader/config.h
+
+/tests/Benchmarks/database_libs/android/BenchDB/gen/
 
 /tests/Benchmarks/linpack/android-dalvik/bin/
 /tests/Benchmarks/linpack/android-dalvik/gen/

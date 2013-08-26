@@ -117,6 +117,8 @@ build-one.rb
 /runtimes/cpp/platforms/iphone/Classes/MoSyncGLView.*
 /runtimes/cpp/platforms/iphone/Classes/NSObjectExpanded.*
 /runtimes/cpp/platforms/iphone/Classes/UI/LayoutManagers/
+/runtimes/cpp/platforms/iphone/Classes/SBJson/
+/runtimes/cpp/platforms/iphone/Classes/Reachability/
 
 /runtimes/cpp/platforms/sdl/resource.h
 
@@ -148,11 +150,15 @@ build-one.rb
 /runtimes/cpp/platforms/winmobile/SoundServer.h
 /runtimes/cpp/platforms/winmobile/WifiPeek.h
 
+/runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/android/billing/util
+
 /testPrograms/tlsf/tlsf.h
 /testPrograms/tlsf/tlsf.c
 
 /testPrograms/megademo/PCXLoader.h
 /testPrograms/megademo/PCXLoader.cpp
+
+/testPrograms/zbarScanner/zbar
 
 /tests/sdl_ffmpeg/example.c
 
@@ -162,6 +168,8 @@ build-one.rb
 
 /tools/GLWrapperGenerator/gl_common_lite.h
 /tools/WrapperGenerator/tests/gl.h
+
+/tools/idl2/Modules/
 
 /tools/e32hack/crc.cpp
 /tools/e32hack/crc.h
