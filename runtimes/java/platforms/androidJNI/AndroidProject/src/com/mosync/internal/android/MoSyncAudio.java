@@ -731,7 +731,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 
 		if(instance.isDynamic())
 		{
-
+			instance.setPaused(false);
 		}
 		else
 		{
@@ -747,6 +747,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 				}
 				else
 				{
+					Log.e("maAudioPlay","mSoundPool.resume " + instance.getStreamID());
 					mSoundPool.resume(instance.getStreamID());
 				}
 				return MA_AUDIO_ERR_OK;
@@ -785,6 +786,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 			}
 			else
 			{
+				mSoundPool.stop(instance.getStreamID());
 				int streamID = mSoundPool.play(data.getAudioID(), instance.getVolume(),
 						instance.getVolume(), 1, instance.getLooping(), 1.0f);
 
@@ -871,30 +873,31 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 
 		if(instance.isDynamic())
 		{
-
+			instance.setPaused(true);
 		}
 		else
 		{
 			AudioData data = instance.getAudioData();
 
-			//if((false == instance.isPlaying()) || (true == instance.isPaused()))
-			if(true == instance.isPaused())
+			if(true == instance.isPaused() || false == instance.isPlaying())
 				return MA_AUDIO_ERR_OK;
 
 			if(MA_AUDIO_DATA_STREAM == data.getFlags())
 			{
-				if(null != mMediaPlayer)
+				if(null != mMediaPlayer) {
 					mMediaPlayer.pause();
+					instance.setPaused(true);
+				}
 			}
 			else
 			{
 				int streamID = instance.getStreamID();
-				if(streamID != -1)
+				if(streamID != -1) {
 					mSoundPool.pause(streamID);
+					instance.setPaused(true);
+				}
 			}
 		}
-
-		instance.setPaused(true);
 
 		return MA_AUDIO_ERR_OK;
 	}
@@ -967,6 +970,7 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 				// oops.. we got an error during playback
 				mActiveStreamingAudio = 0;
 			}
+			audio.setPlaying(false, false);
 		}
 
 		postAudioEvent(EVENT_TYPE_AUDIO_COMPLETED, mActiveStreamingAudio);
