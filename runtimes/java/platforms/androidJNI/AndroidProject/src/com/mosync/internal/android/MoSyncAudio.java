@@ -913,9 +913,6 @@ public class MoSyncAudio implements OnCompletionListener, OnPreparedListener, On
 		{
 			AudioData data = instance.getAudioData();
 
-			if((true == instance.isPlaying()) || (true == instance.isPaused()))
-				return MA_AUDIO_ERR_OK;
-
 			if((MA_AUDIO_DATA_STREAM == data.getFlags())
 					&& (null != mMediaPlayer))
 			{
