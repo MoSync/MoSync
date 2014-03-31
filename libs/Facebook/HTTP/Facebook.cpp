@@ -72,7 +72,7 @@ Facebook::Facebook(const String& appId, const MAUtil::Set<MAUtil::String>& permi
 //	mOAuthUrl += "display=touch&";
 //	mOAuthUrl += "client_id=" + mAppId;
 
-	mOAuthUrl = "https://www.facebook.com/dialog/oauth?";
+	mOAuthUrl = "https://m.facebook.com/dialog/oauth?";
 	mOAuthUrl += "redirect_uri=fbconnect%3A%2F%2Fsuccess&";
 	mOAuthUrl += "response_type=token&";
 	mOAuthUrl += "display=touch&";
