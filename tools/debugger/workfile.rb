@@ -20,6 +20,7 @@ work.instance_eval do
 		@LIBRARIES = ["SDL", "SDLmain"]
 	end
 	if(HOST == :linux)
+    @EXTRA_LINKFLAGS = " -lpthread"
 		@LIBRARIES << "bluetooth"
 	end
 	@SPECIFIC_CFLAGS = {
