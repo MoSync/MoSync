@@ -80,6 +80,10 @@ if(HOST == :linux)
 		HOST_PLATFORM = :mandrake
 	elsif ( File.exist?( "/etc/gentoo-release" ) )
 		HOST_PLATFORM = :gentoo
+	elsif ( File.exist?( "/etc/arch-release" ) )
+		HOST_PLATFORM = :arch
+  else
+    HOST_PLATFORM = :unknown
 	end
 
 	SDL_SOUND = File.exist?( "/usr/include/SDL/SDL_sound.h" )
