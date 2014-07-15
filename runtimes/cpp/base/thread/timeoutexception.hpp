@@ -47,7 +47,7 @@ namespace Base
              *
              * @param m     Message (default is empty string)
              */
-            TimeoutException ( char * m = "" )
+            TimeoutException ( const char * m = "" )
             : std::exception(), m_msg ( m )
             {
             }

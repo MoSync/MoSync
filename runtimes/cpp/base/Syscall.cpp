@@ -1378,7 +1378,7 @@ namespace Base {
 #endif	//SYMBIAN && _WIN32_WCE
 
 	int Syscall::maFileWrite(MAHandle file, const void* src, int len) {
-		LOGF("maFileWrite(%i, 0x%"PFP", %i)\n", file, src, len);
+		LOGF("maFileWrite(%i, 0x%" PFP ", %i)\n", file, src, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
@@ -1403,7 +1403,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileRead(MAHandle file, void* dst, int len) {
-		LOGF("maFileRead(%i, 0x%"PFP", %i)\n", file, dst, len);
+		LOGF("maFileRead(%i, 0x%" PFP ", %i)\n", file, dst, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
