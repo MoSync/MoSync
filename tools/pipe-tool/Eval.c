@@ -58,7 +58,7 @@ char * GetSym()
 
 		*NamePtr++ = c;
 
-		if (v++ >= NAME_MAX)
+		if (v++ >= MOSYNC_NAME_MAX)
 			Error(Error_Fatal, "Symbol too int");
 	}
 	

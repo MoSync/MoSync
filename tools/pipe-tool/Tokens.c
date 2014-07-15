@@ -350,7 +350,7 @@ void GetToken()
 
 		*NamePtr++ = c;
 
-		if (v++ >= NAME_MAX)
+		if (v++ >= MOSYNC_NAME_MAX)
 			Error(Error_Fatal, "Token too long");
 	}
 	
@@ -381,7 +381,7 @@ void GetName()
 	{
 		*NamePtr++ = *FilePtr++;
 
-		if (v++ >= NAME_MAX)
+		if (v++ >= MOSYNC_NAME_MAX)
 			Error(Error_Fatal, "Symbol too int");
 	}
 	
@@ -403,7 +403,7 @@ void GetStringName(int maxlen)
 	if (*FilePtr++ != '"')
 		Error(Error_Skip, "String has missing '\"'");
 	
-	if (maxlen >= NAME_MAX)
+	if (maxlen >= MOSYNC_NAME_MAX)
 		Error(Error_Fatal, "Demands of string size too high");
 		
 	while (1)
@@ -421,7 +421,7 @@ void GetStringName(int maxlen)
 
 		*NamePtr++ = (char)v;
 
-		if (c++ >= NAME_MAX)
+		if (c++ >= MOSYNC_NAME_MAX)
 			Error(Error_Skip, "string exceeded maximum length");
 	}
 	
@@ -454,7 +454,7 @@ void GetLFileName()
 
 		*NamePtr++ = (char) v;
 
-		if (c++ >= NAME_MAX)
+		if (c++ >= MOSYNC_NAME_MAX)
 			Error(Error_Fatal, "file name exceeded maximum length");
 	}
 	
@@ -482,7 +482,7 @@ void GetCmdString()
 			
 		*NamePtr++ = (char) v;
 
-		if (c++ >= NAME_MAX)
+		if (c++ >= MOSYNC_NAME_MAX)
 			break;
 	}
 	

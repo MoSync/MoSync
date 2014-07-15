@@ -1137,7 +1137,7 @@ void GetStrings()
 	{
 		if (NextToken("\""))
 		{
-			GetQuoteStr(NAME_MAX);						// get a bounded string
+			GetQuoteStr(MOSYNC_NAME_MAX);						// get a bounded string
 		}
 		else
 		{
