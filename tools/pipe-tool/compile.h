@@ -385,7 +385,7 @@ typedef struct
 //								Header file for Symbols
 //****************************************************************************************
 // TODO: maxlen for string sizes seems to be short
-#define NAME_MAX 32767
+#define MOSYNC_NAME_MAX 32767
 
 #define SYMMAX_MIN 1024				// Maximum symbols in table
 #define SYMMAX (16*64*1024)			// Maximum symbols in table
@@ -759,7 +759,7 @@ decset(short AsmMsg, 1)
 decset(short DebugActive, 0)
 decset(short AssemActive, 0)
 
-dec(char Name[NAME_MAX])
+dec(char Name[MOSYNC_NAME_MAX])
 
 dec(int Rebuild_Mode)
 
@@ -867,7 +867,7 @@ dec(int IndexWidth)
 
 // Eval
 
-dec(char xName[NAME_MAX])
+dec(char xName[MOSYNC_NAME_MAX])
 dec(int	ExpType)
 dec(int	ExpSection)
 dec(int	ExpResolved)
@@ -905,8 +905,8 @@ decset(const char *last_mangled_name, 0)
 
 // Stabs
 
-dec(char StabFilePath[NAME_MAX])
-dec(char StabFileName[NAME_MAX])
+dec(char StabFilePath[MOSYNC_NAME_MAX])
+dec(char StabFileName[MOSYNC_NAME_MAX])
 dec(int C_Source_Line)
 
 

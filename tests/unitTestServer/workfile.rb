@@ -21,6 +21,7 @@ work.instance_eval do
 		@LIBRARIES = ['wsock32', 'ws2_32']
 	elsif(HOST == :linux) then
 		@LIBRARIES = common_libraries + ['bluetooth']
+    @EXTRA_LINKFLAGS = " -lpthread"
 		@EXTRA_SOURCEFILES << '../../runtimes/cpp/platforms/sdl/mutexImpl.cpp'
 	elsif(HOST == :darwin)
 		@LIBRARIES = common_libraries

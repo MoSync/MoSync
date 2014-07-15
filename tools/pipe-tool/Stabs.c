@@ -259,7 +259,7 @@ void Stabs_Write()
 
 void StabsEmit(char *Template, ...)
 {
-	char 	Str[NAME_MAX];
+	char 	Str[MOSYNC_NAME_MAX];
 	va_list args;
 	int n,len;
 
@@ -303,7 +303,7 @@ void GetNameDubug()
 	
 		*NamePtr++ = (char) v;
 
-		if (c++ >= NAME_MAX)
+		if (c++ >= MOSYNC_NAME_MAX)
 			break;
 	}
 	

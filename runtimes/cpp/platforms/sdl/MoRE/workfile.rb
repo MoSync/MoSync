@@ -27,6 +27,8 @@ work.instance_eval do
 	end
 	if(HOST == :win32)
 		@EXTRA_LINKFLAGS = ' -mwindows'
+	elsif(HOST == :linux)
+    @EXTRA_LINKFLAGS = ' -ldl -lpthread -lgobject-2.0'
 	end
 	
 	@LOCAL_LIBS = ["mosync_sdl", "demangle"] + @LOCAL_LIBS
