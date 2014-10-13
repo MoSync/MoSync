@@ -29,6 +29,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -151,6 +152,7 @@ public class IabHelper {
 
     // Item type: in-app item
     public static final String ITEM_TYPE_INAPP = "inapp";
+    public static final String ITEM_TYPE_SUBS = "subs";
 
     // some fields on the getSkuDetails response bundle
     public static final String GET_SKU_DETAILS_ITEM_LIST = "ITEM_ID_LIST";
@@ -562,7 +564,8 @@ public class IabHelper {
     public void queryInventoryAsync(final boolean querySkuDetails,
                                final List<String> moreSkus,
                                final QueryInventoryFinishedListener listener) {
-        final Handler handler = new Handler();
+    	// Correction: Use Main looper since current thread does not have one
+        final Handler handler = new Handler(Looper.getMainLooper());
         checkSetupDone("queryInventory");
         flagStartAsync("refresh inventory");
         (new Thread(new Runnable() {
@@ -625,8 +628,10 @@ public class IabHelper {
             int response = mService.consumePurchase(BILLING_API_VERSION, mContext.getPackageName(), token);
             if (response == BILLING_RESPONSE_RESULT_OK) {
                logDebug("Successfully consumed sku: " + sku);
-            }
-            else {
+            } else if (response == BILLING_RESPONSE_RESULT_DEVELOPER_ERROR) {
+            	// Not all Items are consumable e.g. auto-renewables should be ignored here
+                logDebug("not consumable sku " + sku + ". " + getResponseDesc(response));
+            } else {
                logDebug("Error consuming consuming sku " + sku + ". " + getResponseDesc(response));
                throw new IabException(response, "Error consuming sku " + sku);
             }
@@ -787,11 +792,18 @@ public class IabHelper {
             logDebug("Calling getPurchases with continuation token: " + continueToken);
             Bundle ownedItems = mService.getPurchases(BILLING_API_VERSION, mContext.getPackageName(),
                     ITEM_TYPE_INAPP, continueToken);
-
             int response = getResponseCodeFromBundle(ownedItems);
             logDebug("Owned items response: " + String.valueOf(response));
-            if (response != BILLING_RESPONSE_RESULT_OK) {
-                logDebug("getPurchases() failed: " + getResponseDesc(response));
+
+            // Correction: Subscriptions should also be loaded.
+            Bundle items2=mService.getPurchases(BILLING_API_VERSION, mContext.getPackageName(),
+                    ITEM_TYPE_SUBS, continueToken);
+            ownedItems.putAll(items2);
+            int response2 = getResponseCodeFromBundle(items2);
+            logDebug("Owned items response: " + String.valueOf(response2));
+            //
+            if (response != BILLING_RESPONSE_RESULT_OK || response2 != BILLING_RESPONSE_RESULT_OK) {
+                logDebug("getPurchases() failed: " + getResponseDesc(response) + "/" + getResponseDesc(response2));
                 return response;
             }
             if (!ownedItems.containsKey(RESPONSE_INAPP_ITEM_LIST)
@@ -905,6 +917,11 @@ public class IabHelper {
         Bundle skuDetails = mService.getSkuDetails(BILLING_API_VERSION, mContext.getPackageName(),
                 ITEM_TYPE_INAPP, querySkus);
 
+        // Subscriptions should also be processed
+        skuDetails.putAll(mService.getSkuDetails(BILLING_API_VERSION, mContext.getPackageName(),
+                ITEM_TYPE_SUBS, querySkus));
+        //
+
         if (!skuDetails.containsKey(RESPONSE_GET_SKU_DETAILS_LIST)) {
 			int response = getResponseCodeFromBundle(skuDetails);
             if (response != BILLING_RESPONSE_RESULT_OK) {
@@ -932,7 +949,8 @@ public class IabHelper {
     void consumeAsyncInternal(final List<Purchase> purchases,
                               final OnConsumeFinishedListener singleListener,
                               final OnConsumeMultiFinishedListener multiListener) {
-        final Handler handler = new Handler();
+    	// Correction: Use MainLooper since current thread does not have one
+        final Handler handler = new Handler(Looper.getMainLooper());
         flagStartAsync("consume");
         (new Thread(new Runnable() {
             public void run() {
