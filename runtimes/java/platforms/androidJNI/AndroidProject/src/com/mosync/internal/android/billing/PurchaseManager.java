@@ -174,7 +174,8 @@ public class PurchaseManager extends BillingListener
             {
 				mHelper.consumeAsync(ownedItems.get(i), mConsumeFinishedListener);
             }
-            mRestoringTransactions = false;
+            // Correction: Flag cannot be reset here since resore is not yet completed
+            //mRestoringTransactions = false;
         }
     };
 
@@ -539,10 +540,13 @@ public class PurchaseManager extends BillingListener
 	public static void setCurrentPurchaseInformation(Purchase purchase)
 	{
 		Purchase currentPurchase = m_PurchaseTable.get(mCurrentPurchaseHandle);
-		currentPurchase.setState(purchase.getState());
-		currentPurchase.setOrderID(purchase.getOrderId());
-		currentPurchase.setOrderTime(purchase.getPurchaseTime());
-		currentPurchase.setPackageName(purchase.getPackageName());
+		// Correction: Pointer can be NULL
+		if (currentPurchase!=null) {
+			currentPurchase.setState(purchase.getState());
+			currentPurchase.setOrderID(purchase.getOrderId());
+			currentPurchase.setOrderTime(purchase.getPurchaseTime());
+			currentPurchase.setPackageName(purchase.getPackageName());
+		}
 	}
 
 	/**
